@@ -1,0 +1,91 @@
+<!-- public/test-socket.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Socket.IO Test Client</title>
+</head>
+<body>
+  <h1>Socket.IO Test Client</h1>
+  <label for="username">Enter your name:</label>
+  <input type="text" id="username" placeholder="e.g. bammmm" />
+  <button onclick="connectSocket()">Connect</button>
+
+  <p id="status">Not connected</p>
+  <pre id="log"></pre>
+
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <script>
+    let socket;
+
+    function connectSocket() {
+      const name = document.getElementById('username').value;
+      if (!name) {
+        alert("Please enter a username.");
+        return;
+      }
+
+      socket = io('http://localhost:5000');
+
+      socket.on('connect', () => {
+        document.getElementById('status').innerText = 'Connected: ' + socket.id;
+        log(`🟢 Connected as ${name} (${socket.id})`);
+        socket.emit('registerName', { name });
+      });
+
+      socket.on('newPlayer', (playerId) => {
+        log(`👤 New player connected: ${playerId}`);
+      });
+
+      socket.on('playerJoined', (playerId) => {
+        log(`👥 Player joined: ${playerId}`);
+      });
+
+      socket.on('playerDisconnected', (playerId) => {
+        log(`❌ Player disconnected: ${playerId}`);
+      });
+
+      socket.on('roleUpdated', ({ playerId, role }) => {
+        log(`🎭 ${playerId} is now a ${role}`);
+      });
+
+      socket.on('roomCreated', (roomCode) => {
+        log(`🏠 Room created: ${roomCode}`);
+      });
+
+      socket.on('roomJoined', (roomCode) => {
+        log(`✅ Joined room: ${roomCode}`);
+      });
+
+      socket.on('roomJoinError', (msg) => {
+        log(`❗ Room error: ${msg}`);
+      });
+
+      // Simulate joining room, setting role, etc.
+      setTimeout(() => {
+        socket.emit('createRoom', 'abc123');
+        socket.emit('setRole', 'guesser');
+      }, 1000);
+
+      setTimeout(() => {
+        socket.emit('newKeyword', { word: 'Elephant', hint: 'Big gray animal' });
+      }, 2000);
+
+      setTimeout(() => {
+        socket.emit('sendHint', 'Lives in jungle');
+        socket.emit('submitAnswer', 'TT:Elephant');
+        socket.emit('updateScore', 1);
+      }, 3000);
+
+      setTimeout(() => {
+        socket.emit('gameOver');
+      }, 4000);
+    }
+
+    function log(message) {
+      const logArea = document.getElementById('log');
+      logArea.textContent += message + '\n';
+    }
+  </script>
+</body>
+</html>
