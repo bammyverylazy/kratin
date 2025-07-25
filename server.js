@@ -1,66 +1,61 @@
+// server.js
 import express from 'express';
-import cors from "cors";
-import mongoose from "mongoose";
-import bodyParser from "body-parser";
-import model from "./src/model/model.js";
+import cors from 'cors';
+import mongoose from 'mongoose';
+import bodyParser from 'body-parser';
 import http from 'http';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { Server as SocketIO } from 'socket.io';
-import { setupSocket } from './socket.js'; 
-console.log('Environment variables:', JSON.stringify(process.env, null, 2));
-console.log('Mounting routes...');
+import dotenv from 'dotenv';
 
+import { User, Keyword, Gameplay } from './models.js';
+import { setupSocket } from './socket.js';
+
+dotenv.config();
 const app = express();
 const { urlencoded, json } = bodyParser;
-const mongo_uri = process.env.MONGO_URI || "fallback-mongo-uri";
-console.log('[BOOT] server.js is starting...');
 
-// --- MongoDB Schemas ---
-const userSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  email: { type: String, required: true },
-  progress: { type: Number, default: 0 },
-  gameprogress: { type: String, default: "Chapter1" },
-  weakness: { type: Array, default: [] },
-});
-const User = mongoose.models.Users || mongoose.model('Users', userSchema);
-
-const keywordSchema = new mongoose.Schema({
-  word: { type: String, required: true },
-  hint: { type: String },
-  level: { type: String },
-  category: { type: String }
-});
-const Keyword = mongoose.models.Keywords || mongoose.model('Keywords', keywordSchema);
-
-const gameplaySchema = new mongoose.Schema({
-  roomCode: { type: String, required: true },
-  hinter: [{ _id: String, name: String }],
-  guesser: [{ _id: String, name: String }],
-  mistakes: { type: [String], required: true },
-  score: { type: Number, required: true },
-});
-const Gameplay = mongoose.models.Gameplay || mongoose.model('Gameplay', gameplaySchema);
-
-mongoose.connect(mongo_uri, { useNewUrlParser: true }).then(
-  () => console.log("[success] Connected to MongoDB"),
-  error => {
-    console.log("[failed] MongoDB connection error: " + error);
+const mongo_uri = process.env.MONGO_URI || "mongodb://localhost:27017/fallback";
+mongoose.connect(mongo_uri, { useNewUrlParser: true })
+  .then(() => console.log('[MongoDB] Connected'))
+  .catch(err => {
+    console.error('[MongoDB] Connection error:', err);
     process.exit(1);
-  }
-);
+  });
 
-// --- Middleware ---
 app.use(cors());
 app.use(urlencoded({ extended: true }));
 app.use(json());
 
-// --- Static Files ---
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 app.use(express.static(path.join(__dirname, 'dist')));
 
-// --- Routes ---
+app.get('/', (req, res) => {
+  res.send('Hello from backend!');
+});
+
+// Your existing REST API endpoints (e.g. /users, /keywords, /api routes)
+app.get('/users', async (req, res) => {
+  try {
+    const users = await User.find();
+    res.json(users);
+  } catch (err) {
+    res.status(500).send('Server error');
+  }
+});
+
+app.post('/users', async (req, res) => {
+  try {
+    const newUser = new User(req.body);
+    const saved = await newUser.save();
+    res.status(201).json(saved);
+  } catch (err) {
+    res.status(400).send(err.message);
+  }
+});
+
+// ... Add the rest of your API routes here (copy from your original code)
 app.get('/test/:id', (req, res) => {
   res.send(`Received ID: ${req.params.id}`);
 });
@@ -292,10 +287,7 @@ app.post('/progress/save', async (req, res) => {
   }
 });
 
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
-});
-// --- HTTP + WebSocket Server ---
+// --- WebSocket Setup ---
 const server = http.createServer(app);
 const io = new SocketIO(server, {
   cors: {
@@ -304,21 +296,13 @@ const io = new SocketIO(server, {
   },
   pingTimeout: 60000,
 });
-setupSocket(io); 
-
-const port = process.env.PORT || 5000;
-server.listen(port, () => {
-  console.log(`[success] Server running on port ${port}`);
+setupSocket(io);
+// --- Fallback route ---
+app.get('*', (req, res) => {
+ /// res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
-// --- Error Handlers ---
-app.use((req, res) => {
-  res.status(404).send("Path not found");
+const PORT = process.env.PORT || 5000;
+server.listen(PORT, () => {
+  console.log(`[Server] Running on port ${PORT}`);
 });
-
-app.use((err, req, res, next) => {
-  res.status(err.status || 500).send(err.message || "Server error");
-});
-
-export default app;
-export { Gameplay };

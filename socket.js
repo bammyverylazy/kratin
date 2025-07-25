@@ -1,7 +1,7 @@
 // Socket.js - Multiplayer server logic
 import { Server } from 'socket.io';
 import mongoose from 'mongoose';
-import { Gameplay } from './server.js';
+import { Gameplay } from './models.js';
 
 const rooms = {};
 const players = {};
