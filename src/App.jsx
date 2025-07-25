@@ -7,6 +7,8 @@ import { EventBus } from './game/EventBus';
 import Login from './Login';
 import Signin from './Signin';
 import { io } from 'socket.io-client';
+const backendURL = import.meta.env.VITE_BACKEND_URL;
+
 
 function App() {
   const [canMoveSprite, setCanMoveSprite] = useState(true);

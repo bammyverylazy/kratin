@@ -1,5 +1,6 @@
 import React from 'react';
 import { EventBus } from './game/EventBus'; // adjust path if needed
+const backendURL = import.meta.env.VITE_BACKEND_URL;
 
 
 let signinPrompted = false;
