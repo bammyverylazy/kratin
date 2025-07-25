@@ -1,3 +1,3 @@
 import { io } from 'socket.io-client';
 
-export const socket = io('http://localhost:5000'); // Or your deployed server
+export const socket = io('(import.meta.env.VITE_BACKEND_URL'); // Or your deployed server

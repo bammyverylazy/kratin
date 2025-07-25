@@ -5,7 +5,7 @@ export async function saveGameProgress(userId, currentChapter) {
     return;
   }
   try {
-    const res = await fetch('http://localhost:5000/progress/save', {  // Adjust URL if needed
+    const res = await fetch('${backendURL}progress/save', {  // Adjust URL if needed
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ userId, scene: currentChapter }),

@@ -22,14 +22,14 @@ function App() {
   const socket = useRef(null);
 
   useEffect(() => {
-    axios.get('http://localhost:5000/users')
+    axios.get('${backendURL}users')
       .then((res) => setUsers(res.data))
       .catch((err) => console.error('Failed to load users:', err));
   }, []);
 
   useEffect(() => {
     if (user) {
-      socket.current = io('http://localhost:5000');
+      socket.current = io('(import.meta.env.VITE_BACKEND_URL');
 
       socket.current.emit('registerUser', user.name);
 
