@@ -310,6 +310,20 @@ const port = process.env.PORT || 5000;
 server.listen(port, () => {
   console.log(`[success] Server running on port ${port}`);
 });
+console.log('Registered routes:');
+app._router.stack.forEach((middleware) => {
+  if (middleware.route) {
+    // routes registered directly on the app
+    console.log(middleware.route.path);
+  } else if (middleware.name === 'router') {
+    // router middleware 
+    middleware.handle.stack.forEach((handler) => {
+      if (handler.route) {
+        console.log(handler.route.path);
+      }
+    });
+  }
+});
 
 // --- Error Handlers ---
 app.use((req, res) => {
