@@ -287,9 +287,6 @@ app.post('/progress/save', async (req, res) => {
   }
 });
 
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
-});
 // --- WebSocket Setup ---
 const server = http.createServer(app);
 const io = new SocketIO(server, {
@@ -300,7 +297,9 @@ const io = new SocketIO(server, {
   pingTimeout: 60000,
 });
 setupSocket(io);
-
+app.get('*', (req, res) => {
+ //// res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+});
 // --- Fallback route ---
 app.get('*', (req, res) => {
  /// res.sendFile(path.join(__dirname, 'dist', 'index.html'));
