@@ -8,6 +8,8 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { Server as SocketIO } from 'socket.io';
 import { setupSocket } from './socket.js'; 
+console.log('Environment variables:', JSON.stringify(process.env, null, 2));
+console.log('Mounting routes...');
 
 const app = express();
 const { urlencoded, json } = bodyParser;
