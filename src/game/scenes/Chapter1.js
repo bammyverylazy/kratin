@@ -38,33 +38,33 @@ export class Chapter1 extends Scene {
   }
 
   preload() {
-    this.load.image('Chapter1scene1', 'assets/Chapter1scene1.png'); // Cover page
-    this.load.image('Chapter1scene2', 'assets/Chapter1scene2.png'); // First background
-    this.load.image('bone', 'assets/Bone.png');
-    this.load.image('bone1', 'assets/Bone1.png');
-    this.load.image('bone2', 'assets/Bone2.png');
-    this.load.image('Bonemarrow', 'assets/Bonemarrow.png');
-    this.load.image('noobysleep', 'assets/noobysleep.png');
-    this.load.image('noobywake', 'assets/noobywake.png');
-    this.load.video('CellBorn', 'assets/CellBorn.mp4');
-    this.load.video('Blood', 'assets/Blood.mp4');
-    this.load.video('body','assets/body.mp4')
-    this.load.video('bloodvess', 'assets/bloodvess.mp4');
-    this.load.video('noobywalkyellow', 'assets/noobywalkyellow.mp4');
-    this.load.video('RBCIntro', 'assets/RBCIntro.mp4');
-    this.load.video('RBCwalkpink', 'assets/RBCwalkpink.mp4');
-    this.load.image('BloodVessel', 'assets/BloodVessel.png');
-    this.load.image('BloodVesselA', 'assets/BloodVesselA.png');
-    this.load.image('BloodVesselB', 'assets/BloodVesselB.png');
+    this.load.image('Chapter1scene1', '/assets/Chapter1scene1.png'); // Cover page
+    this.load.image('Chapter1scene2', '/assets/Chapter1scene2.png'); // First background
+    this.load.image('bone', '/assets/Bone.png');
+    this.load.image('bone1', '/assets/Bone1.png');
+    this.load.image('bone2', '/assets/Bone2.png');
+    this.load.image('Bonemarrow', '/assets/Bonemarrow.png');
+    this.load.image('noobysleep', '/assets/noobysleep.png');
+    this.load.image('noobywake', '/assets/noobywake.png');
+    this.load.video('CellBorn', '/assets/CellBorn.mp4');
+    this.load.video('Blood', '/assets/Blood.mp4');
+    this.load.video('body','/assets/body.mp4')
+    this.load.video('bloodvess', '/assets/bloodvess.mp4');
+    this.load.video('noobywalkyellow', '/assets/noobywalkyellow.mp4');
+    this.load.video('RBCIntro', '/assets/RBCIntro.mp4');
+    this.load.video('RBCwalkpink', '/assets/RBCwalkpink.mp4');
+    this.load.image('BloodVessel', '/assets/BloodVessel.png');
+    this.load.image('BloodVesselA', '/assets/BloodVesselA.png');
+    this.load.image('BloodVesselB', '/assets/BloodVesselB.png');
 
-    this.load.image('magnifying', 'assets/magnifying.png');
-    this.load.image('setting', 'assets/setting.png');
-    this.load.image('book', 'assets/book.png');
-    this.load.image('5.png', 'assets/5.png');
-    this.load.image('6.png', 'assets/6.png');
-    this.load.image('7.png', 'assets/7.png');
-    this.load.image('8.png', 'assets/8.png');
-    this.load.image('9.png', 'assets/9.png');
+    this.load.image('magnifying', '/assets/magnifying.png');
+    this.load.image('setting', '/assets/setting.png');
+    this.load.image('book', '/assets/book.png');
+    this.load.image('5.png', '/assets/5.png');
+    this.load.image('6.png', '/assets/6.png');
+    this.load.image('7.png', '/assets/7.png');
+    this.load.image('8.png', '/assets/8.png');
+    this.load.image('9.png', '/assets/9.png');
     // Preload other assets if needed
   }
 

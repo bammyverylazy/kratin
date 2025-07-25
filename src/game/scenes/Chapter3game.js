@@ -15,15 +15,15 @@ export class Chapter3game extends Phaser.Scene {
   }
 
   preload() {
-    this.load.video('bloodflow', 'assets/bloodflow.mp4');
-    this.load.image('star', 'assets/star.png');
-    this.load.image('magnifying', 'assets/magnifying.png');
-    this.load.image('setting', 'assets/setting.png');
-    this.load.image('book', 'assets/book.png');
-    this.load.image('rbc', 'assets/rbc.png');
-    this.load.image('wbc', 'assets/wbc.png');
-    this.load.image('platelet', 'assets/platelet.png');
-    this.load.image('plasma', 'assets/plasma.png');
+    this.load.video('bloodflow', '/assets/bloodflow.mp4');
+    this.load.image('star', '/assets/star.png');
+    this.load.image('magnifying', '/assets/magnifying.png');
+    this.load.image('setting', '/assets/setting.png');
+    this.load.image('book', '/assets/book.png');
+    this.load.image('rbc', '/assets/rbc.png');
+    this.load.image('wbc', '/assets/wbc.png');
+    this.load.image('platelet', '/assets/platelet.png');
+    this.load.image('plasma', '/assets/plasma.png');
   }
 
   create() {

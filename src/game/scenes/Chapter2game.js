@@ -19,17 +19,17 @@ export class Chapter2game extends Phaser.Scene {
   }
 
   preload() {
-    this.load.image('magnifying', 'assets/magnifying.png');
-    this.load.image('setting', 'assets/setting.png');
-    this.load.image('book', 'assets/book.png');
-    this.load.image('map', 'assets/map.jpg');
-    this.load.image('player', 'assets/noobynooby.png');
-    this.load.image('enemy', 'assets/enemy.png');
-    this.load.image('star', 'assets/star.png');
+    this.load.image('magnifying', '/assets/magnifying.png');
+    this.load.image('setting', '/assets/setting.png');
+    this.load.image('book', '/assets/book.png');
+    this.load.image('map', '/assets/map.jpg');
+    this.load.image('player', '/assets/noobynooby.png');
+    this.load.image('enemy', '/assets/enemy.png');
+    this.load.image('star', '/assets/star.png');
 
-    this.load.image('correct', 'assets/correct.png');
-    this.load.image('tryAgain', 'assets/tryAgain.png');
-    this.load.image('quest2', 'assets/quest2.png');
+    this.load.image('correct', '/assets/correct.png');
+    this.load.image('tryAgain', '/assets/tryAgain.png');
+    this.load.image('quest2', '/assets/quest2.png');
   }
 
   create() {

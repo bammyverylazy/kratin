@@ -13,17 +13,17 @@ export class Mode extends Scene {
     }
 
     preload() {
-        this.load.image('magnifying', 'assets/magnifying.png');
-        this.load.image('storymode', 'assets/storymode.png');
-        this.load.image('multimode', 'assets/multimode.png');
-        this.load.image('NewgameButton', 'assets/NewgameButton.png');
-        this.load.image('ContinueButton', 'assets/ContinueButton.png');
-        this.load.image('5.png', 'assets/5.png');
-        this.load.image('6.png', 'assets/6.png');
-        this.load.image('7.png', 'assets/7.png');
-        this.load.image('8.png', 'assets/8.png');
-        this.load.image('9.png', 'assets/9.png');
-        this.load.image('star', 'assets/star.png');
+        this.load.image('magnifying', '/assets/magnifying.png');
+        this.load.image('storymode', '/assets/storymode.png');
+        this.load.image('multimode', '/assets/multimode.png');
+        this.load.image('NewgameButton', '/assets/NewgameButton.png');
+        this.load.image('ContinueButton', '/assets/ContinueButton.png');
+        this.load.image('5.png', '/assets/5.png');
+        this.load.image('6.png', '/assets/6.png');
+        this.load.image('7.png', '/assets/7.png');
+        this.load.image('8.png', '/assets/8.png');
+        this.load.image('9.png', '/assets/9.png');
+        this.load.image('star', '/assets/star.png');
     }
 
     create() {

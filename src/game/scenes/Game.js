@@ -18,7 +18,7 @@ export class Game extends Scene {
   }
 
   preload() {
-    this.load.image('hint', 'assets/hint.png');
+    this.load.image('hint', '/assets/hint.png');
   }
 
   create() {

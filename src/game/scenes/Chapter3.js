@@ -15,23 +15,23 @@ export class Chapter3 extends Scene {
   }
 
   preload() {
-    this.load.image('Chapter3scene1', 'assets/Chapter3scene1.png');
-    this.load.video('bloodflow', 'assets/bloodflow.mp4');
+    this.load.image('Chapter3scene1', '/assets/Chapter3scene1.png');
+    this.load.video('bloodflow', '/assets/bloodflow.mp4');
 
-    this.load.image('rbc', 'assets/rbc.png');
-    this.load.image('wbc', 'assets/wbc.png');
-    this.load.image('platelet', 'assets/platelet.png');
-    this.load.image('plasma', 'assets/plasma.png');
+    this.load.image('rbc', '/assets/rbc.png');
+    this.load.image('wbc', '/assets/wbc.png');
+    this.load.image('platelet', '/assets/platelet.png');
+    this.load.image('plasma', '/assets/plasma.png');
 
-    this.load.image('magnifying', 'assets/magnifying.png');
-    this.load.image('setting', 'assets/setting.png');
-    this.load.image('book', 'assets/book.png');
-    this.load.image('5.png', 'assets/5.png');
-    this.load.image('6.png', 'assets/6.png');
-    this.load.image('7.png', 'assets/7.png');
-    this.load.image('8.png', 'assets/8.png');
-    this.load.image('9.png', 'assets/9.png');
-    this.load.image('quest3', 'assets/quest3.png');
+    this.load.image('magnifying', '/assets/magnifying.png');
+    this.load.image('setting', '/assets/setting.png');
+    this.load.image('book', '/assets/book.png');
+    this.load.image('5.png', '/assets/5.png');
+    this.load.image('6.png', '/assets/6.png');
+    this.load.image('7.png', '/assets/7.png');
+    this.load.image('8.png', '/assets/8.png');
+    this.load.image('9.png', '/assets/9.png');
+    this.load.image('quest3', '/assets/quest3.png');
   }
 
   create() {

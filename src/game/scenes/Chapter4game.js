@@ -23,18 +23,18 @@ export class Chapter4game extends Phaser.Scene {
   }
 
   preload() {
-    this.load.image('star', 'assets/star.png');
-    this.load.image('relaxing', 'assets/relaxing.png');
-    this.load.image('resting', 'assets/resting.png');
-    this.load.image('walking', 'assets/walking.png');
-    this.load.image('jogging', 'assets/jogging.png');
-    this.load.image('running', 'assets/running.png');
-    this.load.video('heartbeat', 'assets/heartbeat.mp4');
-    this.load.image('magnifying', 'assets/magnifying.png');
-    this.load.image('setting', 'assets/setting.png');
-    this.load.image('book', 'assets/book.png');
-    this.load.image('correct', 'assets/correct.png');
-    this.load.image('End', 'assets/End.png'); 
+    this.load.image('star', '/assets/star.png');
+    this.load.image('relaxing', '/assets/relaxing.png');
+    this.load.image('resting', '/assets/resting.png');
+    this.load.image('walking', '/assets/walking.png');
+    this.load.image('jogging', '/assets/jogging.png');
+    this.load.image('running', '/assets/running.png');
+    this.load.video('heartbeat', '/assets/heartbeat.mp4');
+    this.load.image('magnifying', '/assets/magnifying.png');
+    this.load.image('setting', '/assets/setting.png');
+    this.load.image('book', '/assets/book.png');
+    this.load.image('correct', '/assets/correct.png');
+    this.load.image('End', '/assets/End.png'); 
   }
 
   create() {

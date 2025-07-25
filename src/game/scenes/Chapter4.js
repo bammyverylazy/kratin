@@ -13,21 +13,21 @@ export class Chapter4 extends Scene {
   }
 
   preload() {
-    this.load.video('Chapter4scene1', 'assets/Chapter4scene1.mp4');
-    this.load.video('heartbeat', 'assets/heartbeat.mp4');
-    this.load.image('relaxing', 'assets/relaxing.png');
-    this.load.image('resting', 'assets/resting.png');
-    this.load.image('walking', 'assets/walking.png');
-    this.load.image('Jogging', 'assets/jogging.png');
-    this.load.image('running', 'assets/running.png');
-    this.load.video('Blood', 'assets/Blood.mp4');
-    this.load.video('Bloodflow', 'assets/Bloodflow.mp4');
-    this.load.image('magnifying', 'assets/magnifying.png');
-    this.load.image('setting', 'assets/setting.png');
-    this.load.image('book', 'assets/book.png');
+    this.load.video('Chapter4scene1', '/assets/Chapter4scene1.mp4');
+    this.load.video('heartbeat', '/assets/heartbeat.mp4');
+    this.load.image('relaxing', '/assets/relaxing.png');
+    this.load.image('resting', '/assets/resting.png');
+    this.load.image('walking', '/assets/walking.png');
+    this.load.image('Jogging', '/assets/jogging.png');
+    this.load.image('running', '/assets/running.png');
+    this.load.video('Blood', '/assets/Blood.mp4');
+    this.load.video('Bloodflow', '/assets/Bloodflow.mp4');
+    this.load.image('magnifying', '/assets/magnifying.png');
+    this.load.image('setting', '/assets/setting.png');
+    this.load.image('book', '/assets/book.png');
 
     // Add quest4 asset for How To Play popup
-    this.load.image('quest4', 'assets/quest4.png');
+    this.load.image('quest4', '/assets/quest4.png');
   }
 
   create() {

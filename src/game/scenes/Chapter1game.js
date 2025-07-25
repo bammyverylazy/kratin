@@ -14,14 +14,14 @@ export class Chapter1game extends Phaser.Scene {
   }
 
   preload() {
-    this.load.image('BloodVessel', 'assets/BloodVessel_Capi.png');
-    this.load.image('Vein', 'assets/Vein.png');
-    this.load.image('Artery', 'assets/Artery.png');
-    this.load.image('setting', 'assets/setting.png');
-    this.load.image('book', 'assets/book.png');
-    this.load.image('correct', 'assets/correct.png');     
-    this.load.image('tryAgain', 'assets/tryAgain.png');
-    this.load.image('quest1', 'assets/quest1.png');     
+    this.load.image('BloodVessel', '/assets/BloodVessel_Capi.png');
+    this.load.image('Vein', '/assets/Vein.png');
+    this.load.image('Artery', '/assets/Artery.png');
+    this.load.image('setting', '/assets/setting.png');
+    this.load.image('book', '/assets/book.png');
+    this.load.image('correct', '/assets/correct.png');     
+    this.load.image('tryAgain', '/assets/tryAgain.png');
+    this.load.image('quest1', '/assets/quest1.png');     
   }
 
   create() {

@@ -31,26 +31,26 @@ export class Chapter2 extends Scene {
   }
 
   preload() {
-    this.load.video('Chapter2scene1', 'assets/Chapter2fr.mp4');
-    this.load.image('map', 'assets/map.jpg');
-    this.load.image('P1', 'assets/C2P1.jpg');
-    this.load.image('P2', 'assets/48.jpg');
-    this.load.image('P3', 'assets/49.jpg');
-    this.load.image('P4', 'assets/50.jpg');
-    this.load.image('P5', 'assets/52.jpg');
-    this.load.image('P6', 'assets/53.jpg');
-    this.load.image('P7', 'assets/54.jpg');
-    this.load.video('body','assets/body.mp4');
+    this.load.video('Chapter2scene1', '/assets/Chapter2fr.mp4');
+    this.load.image('map', '/assets/map.jpg');
+    this.load.image('P1', '/assets/C2P1.jpg');
+    this.load.image('P2', '/assets/48.jpg');
+    this.load.image('P3', '/assets/49.jpg');
+    this.load.image('P4', '/assets/50.jpg');
+    this.load.image('P5', '/assets/52.jpg');
+    this.load.image('P6', '/assets/53.jpg');
+    this.load.image('P7', '/assets/54.jpg');
+    this.load.video('body','/assets/body.mp4');
 
     // UI assets
-    this.load.image('magnifying', 'assets/magnifying.png');
-    this.load.image('setting', 'assets/setting.png');
-    this.load.image('book', 'assets/book.png');
-    this.load.image('5.png', 'assets/5.png');
-    this.load.image('6.png', 'assets/6.png');
-    this.load.image('7.png', 'assets/7.png');
-    this.load.image('8.png', 'assets/8.png');
-    this.load.image('9.png', 'assets/9.png');
+    this.load.image('magnifying', '/assets/magnifying.png');
+    this.load.image('setting', '/assets/setting.png');
+    this.load.image('book', '/assets/book.png');
+    this.load.image('5.png', '/assets/5.png');
+    this.load.image('6.png', '/assets/6.png');
+    this.load.image('7.png', '/assets/7.png');
+    this.load.image('8.png', '/assets/8.png');
+    this.load.image('9.png', '/assets/9.png');
   }
 
   create() {
