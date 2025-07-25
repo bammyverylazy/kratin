@@ -11,8 +11,7 @@ import { setupSocket } from './socket.js';
 
 const app = express();
 const { urlencoded, json } = bodyParser;
-
-const mongo_uri = "mongodb+srv://bammynithirathaya:cellvivor@cluster0.ovn4dde.mongodb.net/guessitdb?retryWrites=true&w=majority&appName=Cluster0";
+const mongo_uri = process.env.MONGO_URI || "fallback-mongo-uri";
 console.log('[BOOT] server.js is starting...');
 
 // --- MongoDB Schemas ---
@@ -46,7 +45,7 @@ mongoose.connect(mongo_uri, { useNewUrlParser: true }).then(
   () => console.log("[success] Connected to MongoDB"),
   error => {
     console.log("[failed] MongoDB connection error: " + error);
-    process.exit();
+    process.exit(1);
   }
 );
 
@@ -57,23 +56,7 @@ app.use(json());
 
 // --- Static Files ---
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-app.use(express.static(path.join(__dirname, 'public')));
-
-// --- HTTP + WebSocket Server ---
-const server = http.createServer(app);
-const io = new SocketIO(server, {
-  cors: {
-    origin: '*',
-    methods: ['GET', 'POST'],
-  },
-  pingTimeout: 60000,
-});
-setupSocket(io); 
-
-const port = process.env.PORT || 5000;
-server.listen(port, () => {
-  console.log(`[success] Server running on port ${port}`);
-});
+app.use(express.static(path.join(__dirname, 'dist')));
 
 // --- Routes ---
 app.get('/test/:id', (req, res) => {
@@ -168,7 +151,6 @@ app.post('/api/gameplay-mistake', async (req, res) => {
   }
 });
 
-
 // Multiplayer-aware score lookup
 app.get('/api/gameplay-score', async (req, res) => {
   try {
@@ -197,9 +179,6 @@ app.get('/progress/load/:userId', async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 });
-
-
-
 
 // Auth check
 app.post('/api/check-user', async (req, res) => {
@@ -311,7 +290,26 @@ app.post('/progress/save', async (req, res) => {
   }
 });
 
-// --- Fallbacks ---
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+});
+// --- HTTP + WebSocket Server ---
+const server = http.createServer(app);
+const io = new SocketIO(server, {
+  cors: {
+    origin: '*',
+    methods: ['GET', 'POST'],
+  },
+  pingTimeout: 60000,
+});
+setupSocket(io); 
+
+const port = process.env.PORT || 5000;
+server.listen(port, () => {
+  console.log(`[success] Server running on port ${port}`);
+});
+
+// --- Error Handlers ---
 app.use((req, res) => {
   res.status(404).send("Path not found");
 });
