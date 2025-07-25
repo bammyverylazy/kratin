@@ -295,6 +295,22 @@ app.post('/progress/save', async (req, res) => {
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
+
+console.log('Registered routes:');
+app._router.stack.forEach((middleware) => {
+  if (middleware.route) {
+    // routes registered directly on the app
+    console.log(middleware.route.path);
+  } else if (middleware.name === 'router') {
+    // router middleware 
+    middleware.handle.stack.forEach((handler) => {
+      if (handler.route) {
+        console.log(handler.route.path);
+      }
+    });
+  }
+});
+
 // --- HTTP + WebSocket Server ---
 const server = http.createServer(app);
 const io = new SocketIO(server, {
