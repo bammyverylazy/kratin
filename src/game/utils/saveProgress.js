@@ -1,3 +1,5 @@
+const backendURL = import.meta.env.VITE_BACKEND_URL;
+
 // src/utils/saveProgress.js
 export async function saveGameProgress(userId, currentChapter) {
   if (!userId || !currentChapter || currentChapter.trim() === '') {
