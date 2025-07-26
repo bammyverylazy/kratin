@@ -8,12 +8,12 @@ export default defineConfig({
         react(),
     ],
     server: {
-        port: 8080
-    },
-
-    server: {
-        proxy: {
-          '/api': 'http://localhost:5000',
-        }
-      }
+  port: 8080,
+  proxy: {
+    '/api':{  
+        target: 'https://cellvivor-backend.onrender.com',
+        changeOrigin: true,
+        secure: true,},
+  }
+}
 })

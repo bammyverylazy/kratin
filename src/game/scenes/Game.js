@@ -2,7 +2,8 @@
 import { EventBus } from '../EventBus';
 import { Scene } from 'phaser';
 import io from 'socket.io-client';
-const socket = io('import.meta.env.VITE_BACKEND_URL');
+const socket = io(import.meta.env.VITE_BACKEND_URL);
+const backendURL = import.meta.env.VITE_BACKEND_URL;
 
 export class Game extends Scene {
   constructor() {
@@ -36,7 +37,7 @@ export class Game extends Scene {
     };
 
     if (this.roomCode !== 'simple-local') {
-      fetch(`/api/gameplay-score?roomCode=${this.roomCode}`)
+      fetch(`${backendURL}api/gameplay-score?roomCode=${this.roomCode}`)
         .then(res => res.json())
         .then(data => {
           this.score = data.score || 0;
@@ -81,7 +82,7 @@ export class Game extends Scene {
     }).setOrigin(0.5).setDepth(1);
 
     const fetchNewKeyword = () => {
-      fetch('/api/random-keyword')
+      fetch(`${backendURL}/api/random-keyword`)
         .then(res => res.json())
         .then(data => {
           if (!data || !data.keyword) {

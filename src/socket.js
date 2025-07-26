@@ -1,3 +1,9 @@
-import { io } from 'socket.io-client';
+// frontend/src/socket.js or equivalent file
+import { io } from "socket.io-client";
 
-export const socket = io('import.meta.env.VITE_BACKEND_URL'); // Or your deployed server
+const socket = io(import.meta.env.VITE_BACKEND_URL, {
+  transports: ["websocket"],
+  withCredentials: true,
+});
+
+export default socket;

@@ -5,7 +5,7 @@ import mongoose from 'mongoose';
 import bodyParser from 'body-parser';
 import http from 'http';
 import path from 'path';
-import { fileURLToPath } from 'url';
+import { fileURLToPath } from 'URL';
 import { Server as SocketIO } from 'socket.io';
 import dotenv from 'dotenv';
 
@@ -16,7 +16,7 @@ dotenv.config();
 const app = express();
 const { urlencoded, json } = bodyParser;
 
-const mongo_uri = process.env.MONGO_URI || "mongodb://localhost:27017/fallback";
+const mongo_uri = process.env.MONGO_URI;// || "mongodb://localhost:27017/fallback";
 mongoose.connect(mongo_uri, { useNewUrlParser: true })
   .then(() => console.log('[MongoDB] Connected'))
   .catch(err => {

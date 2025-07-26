@@ -19,7 +19,7 @@ function Login({ onLogin }) {
       loginPrompted = false;
       return;
     }
-    const response = await fetch('${backendURL}api/login', {
+    const response = await fetch(`${backendURL}api/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name, email }),

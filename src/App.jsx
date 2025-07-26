@@ -7,7 +7,7 @@ import { EventBus } from './game/EventBus';
 import Login from './Login';
 import Signin from './Signin';
 import { io } from 'socket.io-client';
-const backendURL = import.meta.env.VITE_BACKEND_URL;
+//const backendURL = import.meta.env.VITE_BACKEND_URL;
 
 
 function App() {
@@ -24,14 +24,14 @@ function App() {
   const socket = useRef(null);
 
   useEffect(() => {
-    axios.get('${backendURL}users')
+    axios.get(`users`)
       .then((res) => setUsers(res.data))
       .catch((err) => console.error('Failed to load users:', err));
   }, []);
 
   useEffect(() => {
     if (user) {
-      socket.current = io('import.meta.env.VITE_BACKEND_URL');
+      socket.current = io(import.meta.env.VITE_BACKEND_URL);
 
       socket.current.emit('registerUser', user.name);
 
