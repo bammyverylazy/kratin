@@ -5,7 +5,7 @@ import mongoose from 'mongoose';
 import bodyParser from 'body-parser';
 import http from 'http';
 import path from 'path';
-import { fileURLToPath } from 'url';
+import { fileURLToPath } from 'URL';
 import { Server as SocketIO } from 'socket.io';
 import dotenv from 'dotenv';
 
@@ -16,7 +16,7 @@ dotenv.config();
 const app = express();
 const { urlencoded, json } = bodyParser;
 
-const mongo_uri = process.env.MONGO_URI || "mongodb://localhost:27017/fallback";
+const mongo_uri = process.env.MONGO_URI;// || "mongodb://localhost:27017/fallback";
 mongoose.connect(mongo_uri, { useNewUrlParser: true })
   .then(() => console.log('[MongoDB] Connected'))
   .catch(err => {
@@ -28,8 +28,8 @@ app.use(cors());
 app.use(urlencoded({ extended: true }));
 app.use(json());
 
-///const __dirname = path.dirname(fileURLToPath(import.meta.url));
-///app.use(express.static(path.join(__dirname, 'dist')));
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+app.use(express.static(path.join(__dirname, 'dist')));
 
 app.get('/', (req, res) => {
   res.send('Hello from backend!');
@@ -297,9 +297,6 @@ const io = new SocketIO(server, {
   pingTimeout: 60000,
 });
 setupSocket(io);
-app.get('*', (req, res) => {
- //// res.sendFile(path.join(__dirname, 'dist', 'index.html'));
-});
 // --- Fallback route ---
 app.get('*', (req, res) => {
  /// res.sendFile(path.join(__dirname, 'dist', 'index.html'));
