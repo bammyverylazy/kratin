@@ -31,7 +31,7 @@ function App() {
 
   useEffect(() => {
     if (user) {
-      socket.current = io('(import.meta.env.VITE_BACKEND_URL');
+      socket.current = io('import.meta.env.VITE_BACKEND_URL');
 
       socket.current.emit('registerUser', user.name);
 
