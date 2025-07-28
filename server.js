@@ -1,10 +1,11 @@
+// server.js
 import express from 'express';
 import cors from 'cors';
 import mongoose from 'mongoose';
 import bodyParser from 'body-parser';
 import http from 'http';
 import path from 'path';
-import { fileURLToPath } from 'url'; 
+import { fileURLToPath } from 'URL';
 import { Server as SocketIO } from 'socket.io';
 import dotenv from 'dotenv';
 
@@ -12,12 +13,7 @@ import { User, Keyword, Gameplay } from './models.js';
 import { setupSocket } from './socket.js';
 
 dotenv.config();
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
 const app = express();
-
 const { urlencoded, json } = bodyParser;
 
 const mongo_uri = process.env.MONGO_URI;// || "mongodb://localhost:27017/fallback";
@@ -32,6 +28,7 @@ app.use(cors());
 app.use(urlencoded({ extended: true }));
 app.use(json());
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 app.use(express.static(path.join(__dirname, 'dist')));
 
 app.get('/', (req, res) => {
@@ -150,6 +147,71 @@ app.post('/api/gameplay-mistake', async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
+app.post('/api/save-player-result', async (req, res) => {
+  try {
+    const { roomCode, userId, role, keyword, result, usedHint } = req.body;
+
+    if (!roomCode || !userId || !role || !keyword || !result) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    const gameplay = await Gameplay.findOne({ roomCode });
+    if (!gameplay) {
+      return res.status(404).json({ error: 'Gameplay not found' });
+    }
+
+    const keywordDoc = await Keyword.findOne({ word: keyword });
+    const chapter = keywordDoc?.chapter || 'Unknown';
+    const difficulty = keywordDoc?.level || 'medium';
+
+    gameplay.resultsPerPlayer.push({
+      userId,
+      role,
+      keyword,
+      result,
+      usedHint: !!usedHint,
+      chapter,
+      difficulty,
+      timestamp: new Date()
+    });
+
+    await gameplay.save();
+
+    res.json({ success: true });
+
+  } catch (error) {
+    console.error('[API] save-player-result error:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+//Add new weaknesses to user's record
+app.patch('/api/users/:userId/add-weakness', async (req, res) => {
+  const { userId } = req.params;
+  const { newWeakness } = req.body;
+
+  if (!Array.isArray(newWeakness)) {
+    return res.status(400).json({ success: false, message: 'Invalid weakness data' });
+  }
+
+  try {
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+
+    const combined = [...user.weakness, ...newWeakness];
+    const uniqueWeakness = [...new Set(combined)];
+
+    user.weakness = uniqueWeakness;
+    await user.save();
+
+    res.json({ success: true, updated: uniqueWeakness });
+  } catch (error) {
+    console.error('[API] add-weakness error:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
 
 // Multiplayer-aware score lookup
 app.get('/api/gameplay-score', async (req, res) => {
