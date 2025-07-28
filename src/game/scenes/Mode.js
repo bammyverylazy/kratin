@@ -29,7 +29,7 @@ export class Mode extends Scene {
     create() {
             const user = JSON.parse(localStorage.getItem('currentUser')) || JSON.parse(localStorage.getItem('user'));
             const playerName = user?.name || "Anonymous";
-            
+
         this.cameras.main.setBackgroundColor('#fa821a');
         const headerY = this.cameras.main.height * 0.22;
         const headerText = this.add.text(this.cameras.main.width / 2, headerY, 'MODE', {
@@ -45,31 +45,6 @@ export class Mode extends Scene {
 
         const buttonY = this.cameras.main.height * 0.55;
 
-            // Add star icon
-            const star = this.add.image(30, cameraHeight - 50, 'star')
-                .setOrigin(0, 1)
-                .setDisplaySize(starSize, starSize)
-                .setDepth(110)
-                .setInteractive({ useHandCursor: true });
-
-            // Add welcome text next to star
-            const welcomeText = this.add.text(star.x + starSize + padding, cameraHeight - 50, `${playerName}'s Dashboard!`, {
-                fontSize: '25px',
-                color: '#000000ff',
-                fontStyle: 'bold',
-                fontWeight: '600',
-                align: 'left',
-                strokeThickness: 0
-            }).setOrigin(0, 1)
-            .setDepth(110)
-            .setInteractive({ useHandCursor: true });
-
-            // Make both star and text clickable
-            [star, welcomeText].forEach(el => {
-                el.on('pointerdown', () => {
-                    this.scene.start('Dashboard'); // or whatever your dashboard scene key is
-                });
-            });
         // --- Story Mode Popup ---
         const storyboardBtn = this.add.image(this.cameras.main.width * 0.265, buttonY, 'storymode')
         .setOrigin(0.5).setScale(0.145).setInteractive({ useHandCursor: true }).setDepth(50);
@@ -283,6 +258,8 @@ export class Mode extends Scene {
         }).setOrigin(0.5).setDepth(200).setInteractive();
 
         arrow.on('pointerdown', () => {
+            this.scene.stop();    
+            this.children.removeAll(); 
             this.scene.start('MainMenu');
         });
     }

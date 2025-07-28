@@ -1,7 +1,7 @@
 // GameOver.js
 import { Scene } from 'phaser';
 
-const backendURL = 'https://cellvivor-backend.onrender.com'; // ปรับ URL ตามจริง
+const backendURL = 'https://cellvivor-backend.onrender.com'; 
 
 export class GameOver extends Scene {
   constructor() {
@@ -16,6 +16,15 @@ export class GameOver extends Scene {
 
   create() {
     this.cameras.main.setBackgroundColor('#333');
+     const arrow = this.add.text(60, 90, '<', {
+            fontSize: '48px', color: '#ffffffff', align: 'Left'
+        }).setOrigin(0.5).setDepth(200).setInteractive();
+
+        arrow.on('pointerdown', () => {
+            this.scene.stop();    
+            this.children.removeAll(); 
+            this.scene.start('Mode');
+        });
 
     this.add.text(512, 100, 'Game Over', {
       fontSize: '64px',
@@ -68,7 +77,7 @@ export class GameOver extends Scene {
         }).setOrigin(0.5);
     }
 
-    this.add.text(512, 600, 'Click to return to main menu', {
+    this.add.text(512, 600, 'Click to Navigate to Dashboard', {
       fontSize: '24px',
       color: '#ffffff'
     }).setOrigin(0.5);
@@ -77,7 +86,7 @@ export class GameOver extends Scene {
     this.updateWeakness(this.userId, wrongKeywords);
 
     this.input.once('pointerdown', () => {
-      this.scene.start('MainMenu');
+      this.scene.start('Dashboard');
     });
   }
 

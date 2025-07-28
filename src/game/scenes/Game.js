@@ -73,6 +73,8 @@ export class Game extends Scene {
       const confirmQuit = window.confirm('Do you want to quit the game?');
       if (confirmQuit) {
         socket.emit('player-quit', { roomCode: this.roomCode });
+        this.scene.stop();    
+        this.children.removeAll();
         this.scene.start('Mode');
       }
     });

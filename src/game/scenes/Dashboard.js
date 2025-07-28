@@ -7,37 +7,78 @@ export class Dashboard extends Scene {
   }
 
   preload() {
-    this.load.image('chapter1', '/assets/chapter1.png');
-    this.load.image('chapter2', '/assets/chapter2.png');
-    this.load.image('chapter3', '/assets/chapter3.png');
-    this.load.image('chapter4', '/assets/chapter4.png');
+    this.load.image('Chapter1scene1', '/assets/Chapter1scene1.png');
+    this.load.video('Chapter2scene1', '/assets/Chapter2fr.mp4');
+    this.load.image('Chapter3scene1', '/assets/Chapter3scene1.png');
+    this.load.video('Chapter4scene1', '/assets/Chapter4scene1.mp4');
+    this.load.image('star', '/assets/star.png');
+  }
+
+  showTooltip(text, x, y) {
+    if (this.tooltipText) this.tooltipText.destroy();
+    this.tooltipText = this.add.text(x, y, text, {
+      fontSize: '16px',
+      color: '#fff',
+      backgroundColor: '#000a',
+      padding: { left: 8, right: 8, top: 4, bottom: 4 },
+      align: 'center',
+      wordWrap: { width: 200 }
+    }).setDepth(300).setOrigin(0.5);
+  }
+
+  hideTooltip() {
+    if (this.tooltipText) {
+      this.tooltipText.destroy();
+      this.tooltipText = null;
+    }
   }
 
   async create() {
-    this.cameras.main.setBackgroundColor('#E8F7FF');
+    const w = this.scale.width;
+    const h = this.scale.height;
+
+    this.cameras.main.setBackgroundColor('#fa821a');
 
     const currentUser = JSON.parse(localStorage.getItem('currentUser'));
     const userId = currentUser?._id;
     if (!userId) {
-      this.add.text(512, 360, 'User not logged in', { fontSize: '32px', color: '#000' }).setOrigin(0.5);
+      this.add.text(w / 2, h / 2, 'User not logged in', { fontSize: '32px', color: '#000' }).setOrigin(0.5);
       return;
     }
 
-    // Title
-    this.add.text(512, 40, '📊 Performance Dashboard', {
-      fontSize: '38px',
-      color: '#000',
-      fontStyle: 'bold'
-    }).setOrigin(0.5);
+    // === Header ===
+    const headerY = h * 0.1;
+    const headerText = this.add.text(w / 2, headerY, 'Performance Dashboard', {
+      fontSize: '68px',
+      color: '#fff',
+      fontStyle: 'bold',
+      align: 'center'
+    }).setOrigin(0.5).setDepth(100);
 
-    // ========== [TOP LEFT] Graph Display ==========
-    const graphBox = this.add.rectangle(256, 220, 460, 300, 0xffffff).setStrokeStyle(2, 0xcccccc);
-    this.add.text(70, 90, '📈 Score & Hint Usage', { fontSize: '24px', color: '#000' });
+    const starOffsetX = 126;
+    this.add.image(headerText.x - starOffsetX, headerY, 'star').setOrigin(0.5).setScale(0.13).setDepth(101);
+    this.add.image(headerText.x + starOffsetX, headerY, 'star').setOrigin(0.5).setScale(0.13).setDepth(101);
 
-    const graphData = await fetch(`${backendURL}/api/user/${userId}/gameplay-history`).then(res => res.json());
+    // === Graph Box ===
+    this.add.rectangle(w * 0.25, h * 0.35, 460, 300, 0xffffff).setStrokeStyle(2, 0xcccccc);
+    this.add.text(w * 0.07, h * 0.18, '📈 Score & Hint Usage', { fontSize: '24px', color: '#000' });
 
-    const baseX = 80;
-    const baseY = 320;
+    // === Graph Legend ===
+    this.add.rectangle(w * 0.07, h * 0.57, 20, 20, 0x4BC6F0); // Score
+    this.add.text(w * 0.07 + 30, h * 0.57, 'Score', { fontSize: '18px', color: '#000' });
+    this.add.rectangle(w * 0.07 + 100, h * 0.57, 20, 20, 0xFF7171); // Hints
+    this.add.text(w * 0.07 + 130, h * 0.57, 'Hints Used', { fontSize: '18px', color: '#000' });
+
+    let graphData = [];
+    try {
+      const res = await fetch(`${backendURL}/api/user/${userId}/gameplay-history`);
+      graphData = await res.json();
+    } catch (err) {
+      console.error('Gameplay history error:', err);
+    }
+
+    const baseX = w * 0.07;
+    const baseY = h * 0.43;
     const barWidth = 30;
     const gap = 40;
 
@@ -47,38 +88,72 @@ export class Dashboard extends Scene {
       const hint = entry.hintUsed || 0;
       const avgTime = Math.floor(entry.avgTime || 0);
 
-      this.add.rectangle(x, baseY, barWidth, -score * 3, 0x4BC6F0).setOrigin(0, 1); // Score bar
-      this.add.rectangle(x + 15, baseY, barWidth / 2, -hint * 10, 0xFF7171).setOrigin(0, 1); // Hint bar
-
+      this.add.rectangle(x, baseY, barWidth, -score * 3, 0x4BC6F0).setOrigin(0, 1);
+      this.add.rectangle(x + 15, baseY, barWidth / 2, -hint * 10, 0xFF7171).setOrigin(0, 1);
       this.add.text(x, baseY + 10, `${avgTime}s`, { fontSize: '12px', color: '#000' }).setOrigin(0, 0);
     });
 
-    // ========== [TOP RIGHT] Weakness List ==========
-    const listBox = this.add.rectangle(760, 220, 460, 300, 0xffffff).setStrokeStyle(2, 0xcccccc);
-    this.add.text(580, 90, '❌ Missed Words', { fontSize: '24px', color: '#000' });
+    // === Weakness List ===
+    this.add.rectangle(w * 0.75, h * 0.35, 460, 300, 0xffffff).setStrokeStyle(2, 0xcccccc);
+    this.add.text(w * 0.58, h * 0.18, '❌ Missed Words', { fontSize: '24px', color: '#000' });
 
-    const userData = await fetch(`${backendURL}/users/${userId}`).then(res => res.json());
+    let userData = {};
+    try {
+      const res = await fetch(`${backendURL}/users/${userId}`);
+      userData = await res.json();
+    } catch (err) {
+      console.error('User data error:', err);
+    }
+
     const missed = userData.weakness || [];
-
     missed.slice(0, 12).forEach((item, i) => {
-      this.add.text(580, 130 + i * 22, `- ${item}`, { fontSize: '18px', color: '#000' });
+      const color = item.startsWith('TT') ? '#FF5555' : '#555555';
+      this.add.text(w * 0.58, h * 0.22 + i * 22, `- ${item}`, { fontSize: '18px', color });
     });
 
-    // ========== [BOTTOM] Chapter Roadmap ==========
-    this.add.text(512, 500, '📘 Chapter Roadmap', { fontSize: '28px', color: '#000' }).setOrigin(0.5);
+    // === Chapter Roadmap ===
+    this.add.text(w / 2, h * 0.7, '📘 Chapter Roadmap', { fontSize: '28px', color: '#000' }).setOrigin(0.5);
 
-    const chapterImages = ['chapter1', 'chapter2', 'chapter3', 'chapter4'];
-    const chapterNames = ['Chapter1Intro', 'Chapter2Intro', 'Chapter3Intro', 'Chapter4Intro'];
+    const chapterEntries = [
+      { type: 'image', key: 'Chapter1scene1', scene: 'Chapter1Intro', desc: 'Learn about the circulatory system basics.' },
+      { type: 'video', key: 'Chapter2scene1', scene: 'Chapter2Intro', desc: 'Explore the heart and blood vessels.' },
+      { type: 'image', key: 'Chapter3scene1', scene: 'Chapter3Intro', desc: 'Understand oxygen transport.' },
+      { type: 'video', key: 'Chapter4scene1', scene: 'Chapter4Intro', desc: 'Master the rhythm of the heartbeat.' },
+    ];
 
-    chapterImages.forEach((key, i) => {
-      const x = 220 + i * 200;
-      const img = this.add.image(x, 580, key).setDisplaySize(160, 90).setInteractive({ useHandCursor: true });
-      img.on('pointerdown', () => this.scene.start(chapterNames[i]));
+    chapterEntries.forEach((entry, i) => {
+      const x = w * 0.2 + i * (w * 0.2);
+      const y = h * 0.78;
+
+      if (entry.type === 'image') {
+        const img = this.add.image(x, y, entry.key).setDisplaySize(160, 90).setInteractive({ useHandCursor: true });
+        img.on('pointerover', () => {
+          img.setScale(1.05);
+          this.showTooltip(entry.desc, x, y - 70);
+        });
+        img.on('pointerout', () => {
+          img.setScale(1);
+          this.hideTooltip();
+        });
+        img.on('pointerdown', () => this.scene.start(entry.scene));
+      } else {
+        const vid = this.add.video(x, y, entry.key).setDisplaySize(160, 90).setInteractive({ useHandCursor: true });
+        vid.setLoop(true).setMute(true).play(true);
+        vid.on('pointerover', () => {
+          vid.setScale(1.05);
+          this.showTooltip(entry.desc, x, y - 70);
+        });
+        vid.on('pointerout', () => {
+          vid.setScale(1);
+          this.hideTooltip();
+        });
+        vid.on('pointerdown', () => this.scene.start(entry.scene));
+      }
     });
 
-    // ========== [GAME MODE BUTTON] ==========
-    const playBtn = this.add.rectangle(890, 50, 200, 50, 0x6067FE).setInteractive({ useHandCursor: true });
-    this.add.text(890, 50, '🎮 Game Mode', {
+    // === Game Mode Button ===
+    const playBtn = this.add.rectangle(w - 120, 50, 200, 50, 0x6067FE).setInteractive({ useHandCursor: true });
+    this.add.text(w - 120, 50, '🎮 Game Mode', {
       fontSize: '22px',
       color: '#fff'
     }).setOrigin(0.5);
