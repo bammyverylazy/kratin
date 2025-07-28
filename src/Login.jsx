@@ -27,6 +27,7 @@ function Login({ onLogin }) {
     const data = await response.json();
     if (data.success) {
       localStorage.setItem('currentUser', JSON.stringify(data.user));
+      localStorage.setItem('userId', data.user._id); 
       if (onLogin) onLogin(data.user);
       EventBus.emit('login-success');
     } else {

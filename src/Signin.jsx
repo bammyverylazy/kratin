@@ -28,6 +28,7 @@ function Signin({ onSignin }) {
     const data = await response.json();
     if (data.success) {
       localStorage.setItem('currentUser', JSON.stringify(data.user));
+      localStorage.setItem('userId', data.user._id);
       window.alert('Signin successful!');
       if (onSignin) onSignin(data.user);
       EventBus.emit('signin-success');
