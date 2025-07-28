@@ -28,7 +28,12 @@ mongoose.connect(mongo_uri, { useNewUrlParser: true })
     process.exit(1);
   });
 
-app.use(cors());
+  app.use(cors({
+    origin: 'https://cellvivortest.vercel.app', // your frontend URL
+    methods: ['GET', 'POST'],
+    credentials: true
+  }));
+
 app.use(urlencoded({ extended: true }));
 app.use(json());
 
@@ -389,8 +394,9 @@ app.post('/progress/save', async (req, res) => {
 const server = http.createServer(app);
 const io = new SocketIO(server, {
   cors: {
-    origin: '*',
+    origin: 'https://cellvivortest.vercel.app',
     methods: ['GET', 'POST'],
+    credentials: true
   },
   pingTimeout: 60000,
 });
