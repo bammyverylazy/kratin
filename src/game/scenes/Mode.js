@@ -139,8 +139,7 @@ export class Mode extends Scene {
 
             const createRoomBtn = this.add.text(512, btnY, "   Create Room   ", btnStyle).setOrigin(0.5).setDepth(302).setInteractive();
             const joinRoomBtn = this.add.text(512, btnY + btnSpacing, "    Join Room    ", btnStyle).setOrigin(0.5).setDepth(302).setInteractive();
-            //const simpleGameBtn = this.add.text(512, btnY + btnSpacing * 2, "Start Simple Game", btnStyle).setOrigin(0.5).setDepth(302).setInteractive();
-
+           
             let roleMsg, guesserBtn, hinterBtn, startBtn;
 
             const showRoleSelection = () => {
@@ -221,11 +220,7 @@ export class Mode extends Scene {
                 socket.emit('joinRoom', roomCode);
                 infoMsg.setText(`${playerName} — Role: None — Room: ${roomCode}`);
                 showRoleSelection();
-            });
-
-            simpleGameBtn.on('pointerdown', () => {
-                this.scene.start('Game', { role: 'guesser', roomCode: 'simple', startTime: Date.now() });
-            });
+            });;
 
             socket.on('roleUpdate', ({ guesser, hinter }) => {
                 this.roles = { guesser, hinter };

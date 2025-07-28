@@ -48,14 +48,14 @@ export class Dashboard extends Scene {
 
     // === Header ===
     const headerY = h * 0.1;
-    const headerText = this.add.text(w / 2, headerY, 'Performance Dashboard', {
+    const headerText = this.add.text(w / 2, headerY, 'Dashboard', {
       fontSize: '68px',
       color: '#fff',
       fontStyle: 'bold',
       align: 'center'
     }).setOrigin(0.5).setDepth(100);
 
-    const starOffsetX = 126;
+    const starOffsetX = 226;
     this.add.image(headerText.x - starOffsetX, headerY, 'star').setOrigin(0.5).setScale(0.13).setDepth(101);
     this.add.image(headerText.x + starOffsetX, headerY, 'star').setOrigin(0.5).setScale(0.13).setDepth(101);
 
