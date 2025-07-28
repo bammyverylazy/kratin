@@ -15,6 +15,7 @@ export class MainMenu extends Scene {
         this.load.image('7.png', '/assets/7.png');
         this.load.image('8.png', '/assets/8.png');
         this.load.image('9.png', '/assets/9.png');
+        this.load.image('star', '/assets/star.png');
     }
 
     create() {
@@ -22,23 +23,44 @@ export class MainMenu extends Scene {
         this.logo = this.add.image(this.cameras.main.centerX, 300, 'logo').setDepth(100).setScale(0.4);
 
         // Load current user
-        let currentUser = null;
-        try {
-            currentUser = JSON.parse(localStorage.getItem('currentUser'));
-        } catch (e) {
-            currentUser = null;
-        }
+let currentUser = null;
+try {
+    currentUser = JSON.parse(localStorage.getItem('currentUser'));
+} catch (e) {
+    currentUser = null;
+}
 
-        if (currentUser && currentUser.name) {
-            this.add.text(30, this.cameras.main.height - 50, `Welcome, ${currentUser.name}!`, {
-                fontSize: '25px',
-                color: '#000000ff',
-                align: 'left',
-                fontStyle: 'bold',
-                fontWeight: '600',
-                strokeThickness: 0
-            }).setOrigin(0, 1).setDepth(110);
-        }
+if (currentUser && currentUser.name) {
+    const padding = 10;
+    const starSize = 32;
+    const cameraHeight = this.cameras.main.height;
+
+    // Add star icon
+    const star = this.add.image(30, cameraHeight - 50, 'star')
+        .setOrigin(0, 1)
+        .setDisplaySize(starSize, starSize)
+        .setDepth(110)
+        .setInteractive({ useHandCursor: true });
+
+    // Add welcome text next to star
+    const welcomeText = this.add.text(star.x + starSize + padding, cameraHeight - 50, `Welcome, ${currentUser.name}!`, {
+        fontSize: '25px',
+        color: '#000000ff',
+        fontStyle: 'bold',
+        fontWeight: '600',
+        align: 'left',
+        strokeThickness: 0
+    }).setOrigin(0, 1)
+      .setDepth(110)
+      .setInteractive({ useHandCursor: true });
+
+    // Make both star and text clickable
+    [star, welcomeText].forEach(el => {
+        el.on('pointerdown', () => {
+            this.scene.start('Dashboard');
+        });
+    });
+}
 
         // === Play Game button (centered top) ===
         if (currentUser && currentUser.name) {

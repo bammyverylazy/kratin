@@ -30,6 +30,41 @@ export class Mode extends Scene {
             const user = JSON.parse(localStorage.getItem('currentUser')) || JSON.parse(localStorage.getItem('user'));
             const playerName = user?.name || "Anonymous";
 
+
+        let currentUser = null;
+
+        if (currentUser && currentUser.name) {
+            const padding = 10;
+            const starSize = 32;
+            const cameraHeight = this.cameras.main.height;
+
+            // Add star icon
+            const star = this.add.image(30, cameraHeight - 50, 'star')
+                .setOrigin(0, 1)
+                .setDisplaySize(starSize, starSize)
+                .setDepth(110)
+                .setInteractive({ useHandCursor: true });
+
+            // Add welcome text next to star
+            const welcomeText = this.add.text(star.x + starSize + padding, cameraHeight - 50, `Welcome, ${currentUser.name}!`, {
+                fontSize: '25px',
+                color: '#000000ff',
+                fontStyle: 'bold',
+                fontWeight: '600',
+                align: 'left',
+                strokeThickness: 0
+            }).setOrigin(0, 1)
+            .setDepth(110)
+            .setInteractive({ useHandCursor: true });
+
+            // Make both star and text clickable
+            [star, welcomeText].forEach(el => {
+                el.on('pointerdown', () => {
+                    this.scene.start('Dashboard'); // or whatever your dashboard scene key is
+                });
+            });
+        }
+            
         this.cameras.main.setBackgroundColor('#fa821a');
         const headerY = this.cameras.main.height * 0.22;
         const headerText = this.add.text(this.cameras.main.width / 2, headerY, 'MODE', {
@@ -139,7 +174,7 @@ export class Mode extends Scene {
 
             const createRoomBtn = this.add.text(512, btnY, "   Create Room   ", btnStyle).setOrigin(0.5).setDepth(302).setInteractive();
             const joinRoomBtn = this.add.text(512, btnY + btnSpacing, "    Join Room    ", btnStyle).setOrigin(0.5).setDepth(302).setInteractive();
-            const simpleGameBtn = this.add.text(512, btnY + btnSpacing * 2, "Start Simple Game", btnStyle).setOrigin(0.5).setDepth(302).setInteractive();
+            //const simpleGameBtn = this.add.text(512, btnY + btnSpacing * 2, "Start Simple Game", btnStyle).setOrigin(0.5).setDepth(302).setInteractive();
 
             let roleMsg, guesserBtn, hinterBtn, startBtn;
 
