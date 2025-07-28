@@ -1,3 +1,4 @@
+// src/game/EventBus.js
 import Phaser from 'phaser';
 
 // Used to emit events between components, HTML and Phaser scenes

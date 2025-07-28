@@ -1,3 +1,4 @@
+// src/game/main.js
 import Phaser from 'phaser';
 import { Boot } from './scenes/Boot';
 import { Preloader } from './scenes/Preloader';
@@ -15,6 +16,7 @@ import { Chapter3game } from './scenes/Chapter3game.js';
 import { Chapter4 } from './scenes/Chapter4.js';
 import { Chapter4game } from './scenes/Chapter4game.js';
 //import { EndingScene } from './scenes/EndingScene.js';
+import { Dashboard } from './scenes/Dashboard.js';
 
 
 const config = {
@@ -40,6 +42,7 @@ const config = {
         Chapter4, 
         Chapter4game,
         //EndingScene
+        Dashboard
     ],
       physics: {
     default: 'arcade',
