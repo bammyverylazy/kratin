@@ -37,7 +37,7 @@ export class Game extends Scene {
     };
 
     if (this.roomCode !== 'simple-local') {
-      fetch(`${backendURL}api/gameplay-score?roomCode=${this.roomCode}`)
+      fetch(`${backendURL}/api/gameplay-score?roomCode=${this.roomCode}`)
         .then(res => res.json())
         .then(data => {
           this.score = data.score || 0;
