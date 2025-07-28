@@ -73,6 +73,8 @@ export function addStoryModeUI(scene, options = {}) {
         if (confirmQuit) {
             console.log('User chose to quit the game.');
             scene.scene.start('Mode');
+            this.scene.stop();    
+            this.children.removeAll(); 
         } else {
             console.log('User chose to stay in the game.');
         }
