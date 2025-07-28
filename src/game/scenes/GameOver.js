@@ -1,6 +1,8 @@
 // GameOver.js
 import { Scene } from 'phaser';
 
+const backendURL = 'https://cellvivor-backend.onrender.com'; // ปรับ URL ตามจริง
+
 export class GameOver extends Scene {
   constructor() {
     super('GameOver');
@@ -9,21 +11,26 @@ export class GameOver extends Scene {
   init(data) {
     this.score = data.score || 0;
     this.results = data.results || []; // Array of { word, result }
+    this.userId = data.userId || null; // ต้องส่ง userId มาด้วยตอนเปลี่ยนฉาก
   }
 
   create() {
     this.cameras.main.setBackgroundColor('#333');
 
     this.add.text(512, 100, 'Game Over', {
-      fontSize: '64px', color: '#ffffff', fontStyle: 'bold'
+      fontSize: '64px',
+      color: '#ffffff',
+      fontStyle: 'bold'
     }).setOrigin(0.5);
 
     this.add.text(512, 180, `Final Score: ${this.score}`, {
-      fontSize: '40px', color: '#00ff00'
+      fontSize: '40px',
+      color: '#00ff00'
     }).setOrigin(0.5);
 
     this.add.text(512, 250, 'Keywords Played:', {
-      fontSize: '32px', color: '#ffffff'
+      fontSize: '32px',
+      color: '#ffffff'
     }).setOrigin(0.5);
 
     let startY = 300;
@@ -31,7 +38,8 @@ export class GameOver extends Scene {
 
     if (this.results.length === 0) {
       this.add.text(512, startY, 'No rounds played.', {
-        fontSize: '24px', color: '#ffcc00'
+        fontSize: '24px',
+        color: '#ffcc00'
       }).setOrigin(0.5);
     } else {
       this.results.forEach((entry, index) => {
@@ -46,12 +54,50 @@ export class GameOver extends Scene {
       });
     }
 
+    // แสดงคำผิดที่ควรทบทวน
+    const wrongKeywords = this.results
+      .filter(r => r.result === 'FF' || r.result === 'FT')
+      .map(r => r.word);
+
+    if (wrongKeywords.length > 0) {
+      this.add.text(512, startY + this.results.length * rowHeight + 30,
+        `Words to review: ${wrongKeywords.join(', ')}`, {
+          fontSize: '22px',
+          color: '#ff4d4d',
+          wordWrap: { width: 800 }
+        }).setOrigin(0.5);
+    }
+
     this.add.text(512, 600, 'Click to return to main menu', {
-      fontSize: '24px', color: '#ffffff'
+      fontSize: '24px',
+      color: '#ffffff'
     }).setOrigin(0.5);
+
+    // เรียกอัปเดต weakness ใน DB
+    this.updateWeakness(this.userId, wrongKeywords);
 
     this.input.once('pointerdown', () => {
       this.scene.start('MainMenu');
     });
+  }
+
+  async updateWeakness(userId, wrongWords) {
+    if (!userId || wrongWords.length === 0) return;
+
+    try {
+      const res = await fetch(`${backendURL}/api/users/${userId}/add-weakness`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ newWeakness: wrongWords }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        console.log('Weakness updated successfully:', data.weakness);
+      } else {
+        console.warn('Failed to update weakness:', data);
+      }
+    } catch (err) {
+      console.error('Error updating weakness:', err);
+    }
   }
 }

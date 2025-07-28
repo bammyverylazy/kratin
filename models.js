@@ -14,7 +14,8 @@ const keywordSchema = new mongoose.Schema({
   word: { type: String, required: true },
   hint: { type: String },
   level: { type: String },
-  category: { type: String }
+  category: { type: String },
+  chapter: { type: String },
 });
 const Keyword = mongoose.models.Keywords || mongoose.model('Keywords', keywordSchema);
 
@@ -24,6 +25,16 @@ const gameplaySchema = new mongoose.Schema({
   guesser: [{ _id: String, name: String }],
   mistakes: { type: [String], required: true },
   score: { type: Number, required: true },
+  resultsPerPlayer: [{
+    userId: String,
+    role: { type: String, enum: ['hinter', 'guesser'] },
+    keyword: String,
+    result: { type: String, enum: ['TT', 'FT', 'FF'] },
+    usedHint: Boolean,
+    chapter: String,
+    difficulty: String,
+    timestamp: { type: Date, default: Date.now }
+  }]
 });
 const Gameplay = mongoose.models.Gameplay || mongoose.model('Gameplay', gameplaySchema);
 

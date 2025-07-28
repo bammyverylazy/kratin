@@ -1,106 +1,34 @@
-- README.md
+- .env
+- .env.production
+- dist
+  - assets
+  - favicon.png
+  - index.html
+  - style.css
+  - test-socket.html
 - game
   - EventBus.js
   - main.js
   - scenes
-    - Boot.js
-    - Game.js
-    - GameOver.js
-    - MainMenu.js
-    - Preloader.js
 - index.html
 - log.js
 - model
   - model.js
+- models.js
+- nodemon.json
+- package-lock.json
 - package.json
 - project_structure.text
 - public
   - assets
-    - 48.jpg
-    - 49.jpg
-    - 5.png
-    - 50.jpg
-    - 52.jpg
-    - 53.jpg
-    - 54.jpg
-    - 6.png
-    - 7.png
-    - 8.png
-    - 9.png
-    - Artery.png
-    - Blood.mp4
-    - BloodVessel.png
-    - BloodVesselA.png
-    - BloodVesselB.png
-    - BloodVessel_Capi.png
-    - Bone.png
-    - Bone1.png
-    - Bone2.png
-    - Bonemarrow.png
-    - C2P1.jpg
-    - CellBorn.mp4
-    - Chapter1scene1.png
-    - Chapter1scene2.png
-    - Chapter2fr.mp4
-    - Chapter3scene1.png
-    - Chapter4scene1.mp4
-    - ContinueButton.png
-    - D1F243E9-3E55-450A-93AC-5B75BE6C27F7.png
-    - End.png
-    - NewgameButton.png
-    - RBCIntro.mp4
-    - RBCwalkpink.mp4
-    - Vein.png
-    - bg.png
-    - bloodflow.mp4
-    - bloodvess.mp4
-    - body.mp4
-    - book.png
-    - correct.png
-    - dialogue
-      - sampleDialogue.json
-    - enemy.png
-    - heartbeat.mp4
-    - hint.png
-    - jogging.png
-    - logo.png
-    - magnifying.png
-    - map.jpg
-    - multimode.png
-    - noobynooby.png
-    - noobysleep.png
-    - noobywake.png
-    - noobywalkyellow.mp4
-    - noobyzom.png
-    - plasma.png
-    - platelet.png
-    - quest1.png
-    - quest2.png
-    - quest3.png
-    - quest4.png
-    - rbc.png
-    - relaxing.png
-    - resting.png
-    - running.png
-    - setting.png
-    - skipafter.png
-    - skipbefore.png
-    - spark.png
-    - star.png
-    - storymode.png
-    - tryAgain.png
-    - walking.png
-    - wbc.png
   - favicon.png
   - style.css
   - test-socket.html
+- README.md
 - server.js
 - socket.js
 - src
   - App.jsx
-  - Login.jsx
-  - PhaserGame.jsx
-  - Signin.jsx
   - game
     - EventBus.js
     - main.js
@@ -121,15 +49,18 @@
       - MainMenu.js
       - Mode.js
       - Preloader.js
+      - storyboard.js
       - UIdialogue.js
       - UIscene.js
-      - storyboard.js
     - utils
       - api.js
       - saveProgress.js
+  - Login.jsx
   - main.jsx
   - model
     - model.js
+  - PhaserGame.jsx
+  - Signin.jsx
   - socket.js
 - vite
   - config.dev.mjs

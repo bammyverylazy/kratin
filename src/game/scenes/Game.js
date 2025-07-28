@@ -1,4 +1,4 @@
-// Multiplayer-enabled Game.js
+// Game.js
 import { EventBus } from '../EventBus';
 import { Scene } from 'phaser';
 import io from 'socket.io-client';
@@ -44,6 +44,14 @@ export class Game extends Scene {
           this.updateScoreText();
         });
     }
+    socket.on('roleUpdate', ({ hinter, guesser }) => {
+      if (this.myRole === 'guesser' && hinter.length > 0) {
+        this.hinterId = hinter[0]; // เก็บ ID ของฝั่ง hinter
+      }
+      if (this.myRole === 'hinter' && guesser.length > 0) {
+        this.guesserId = guesser[0]; // เผื่อไว้ใช้ในอนาคต
+      }
+    });
 
     const graphics = this.add.graphics();
     graphics.fillStyle(0xFF8317);
@@ -158,7 +166,8 @@ export class Game extends Scene {
         if (remaining <= 0) {
           this.scene.start('GameOver', {
             score: this.score,
-            results: this.playedKeywords
+            results: this.playedKeywords,
+            userId: localStorage.getItem('userId')
           });
         }
       },
@@ -166,38 +175,63 @@ export class Game extends Scene {
       loop: true
     });
 
-    const handleResult = async (value) => {
-      result = value;
-      this.playedKeywords.push({ word: currentKeyword, result });
+  const handleResult = async (value) => {
+  result = value;
+  this.playedKeywords.push({ word: currentKeyword, result });
 
-      if (this.roomCode === 'simple-local') {
-        if (result === 'TT') this.score += 2;
-        else if (result === 'FT') this.score += 1;
-        this.updateScoreText();
-      } else {
-        if (result === 'TT') this.score += 2;
-        else if (result === 'FT') this.score += 1;
-        this.updateScoreText();
+  // อัพเดตคะแนน
+  if (this.roomCode === 'simple-local') {
+    if (result === 'TT') this.score += 2;
+    else if (result === 'FT') this.score += 1;
+    this.updateScoreText();
+  } else {
+    if (result === 'TT') this.score += 2;
+    else if (result === 'FT') this.score += 1;
+    this.updateScoreText();
 
-        socket.emit('score-update', {
+    // ส่งผล guesser
+    try {
+      await fetch(`${backendURL}/api/save-player-result`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
           roomCode: this.roomCode,
+          userId: localStorage.getItem('userId'),  // หรือวิธีที่คุณเก็บ userId
+          role: 'guesser',
+          keyword: currentKeyword,
           result,
-          keyword: currentKeyword
+          usedHint: hintUsed
+        }),
+      });
+    } catch (err) {
+      console.error('Error saving guesser result:', err);
+    }
+
+    // ส่งผล hinter (กรณี guesser เท่านั้น)
+    if (this.myRole === 'guesser' && this.hinterId) {
+      const hinterResult = (result === 'TT') ? 'T' : 'F';  // ตาม logic ตาราง
+      try {
+        await fetch(`${backendURL}/api/save-player-result`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            roomCode: this.roomCode,
+            userId: this.hinterId,
+            role: 'hinter',
+            keyword: currentKeyword,
+            result: hinterResult,
+            usedHint: false
+          }),
         });
-
-        try {
-          await fetch('/api/gameplay-mistake', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ roomCode: this.roomCode, keyword: currentKeyword, result })
-          });
-        } catch (err) {
-          console.error('Error saving to DB:', err);
-        }
+      } catch (err) {
+        console.error('Error saving hinter result:', err);
       }
+    }
+  }
 
-      fetchNewKeyword();
-    };
+  fetchNewKeyword();
+};
+
 
     socket.on('score-update', ({ score }) => {
       this.score = score;
