@@ -215,6 +215,36 @@ app.patch('/api/users/:userId/add-weakness', async (req, res) => {
   }
 });
 
+// Get gameplay history for graph
+app.get('/api/user/:id/gameplay-history', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const sessions = await Gameplay.find({ userId: id }).sort({ createdAt: -1 }).limit(20);
+
+    const data = sessions.map(session => {
+      const totalMistakes = session.mistakes.length;
+      const hintCount = session.mistakes.filter(m => m.includes('FT')).length;
+      const timestamps = session.timestamps || []; // optional: if you stored time logs
+      const avgTime = timestamps.length > 1
+        ? (timestamps[timestamps.length - 1] - timestamps[0]) / (timestamps.length - 1)
+        : 0;
+
+      return {
+        roomCode: session.roomCode,
+        score: session.score,
+        avgTime: parseFloat(avgTime.toFixed(2)),
+        hintsUsed: hintCount,
+        timestamp: session.createdAt
+      };
+    });
+
+    res.json(data);
+  } catch (err) {
+    console.error('History fetch error:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 
 // Multiplayer-aware score lookup
 app.get('/api/gameplay-score', async (req, res) => {
