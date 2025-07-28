@@ -1,11 +1,10 @@
-// server.js
 import express from 'express';
 import cors from 'cors';
 import mongoose from 'mongoose';
 import bodyParser from 'body-parser';
 import http from 'http';
 import path from 'path';
-import { fileURLToPath } from 'URL';
+import { fileURLToPath } from 'url'; 
 import { Server as SocketIO } from 'socket.io';
 import dotenv from 'dotenv';
 
@@ -13,7 +12,12 @@ import { User, Keyword, Gameplay } from './models.js';
 import { setupSocket } from './socket.js';
 
 dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const app = express();
+
 const { urlencoded, json } = bodyParser;
 
 const mongo_uri = process.env.MONGO_URI;// || "mongodb://localhost:27017/fallback";
@@ -28,7 +32,6 @@ app.use(cors());
 app.use(urlencoded({ extended: true }));
 app.use(json());
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 app.use(express.static(path.join(__dirname, 'dist')));
 
 app.get('/', (req, res) => {
@@ -148,6 +151,7 @@ app.post('/api/gameplay-mistake', async (req, res) => {
   }
 });
 
+// SAVE PLAYER RESULT (บันทึกผลแต่ละรอบ)
 app.post('/api/save-player-result', async (req, res) => {
   try {
     const { roomCode, userId, role, keyword, result, usedHint } = req.body;
@@ -177,7 +181,6 @@ app.post('/api/save-player-result', async (req, res) => {
     });
 
     await gameplay.save();
-
     res.json({ success: true });
 
   } catch (error) {
@@ -186,7 +189,7 @@ app.post('/api/save-player-result', async (req, res) => {
   }
 });
 
-//Add new weaknesses to user's record
+// ADD WEAKNESS TO USER
 app.patch('/api/users/:userId/add-weakness', async (req, res) => {
   const { userId } = req.params;
   const { newWeakness } = req.body;
