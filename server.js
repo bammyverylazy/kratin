@@ -118,6 +118,30 @@ app.get('/api/random-keyword', async (req, res) => {
   }
 });
 
+// GET /api/keywords/random?difficulty=easy
+app.get('/api/keywords/random', async (req, res) => {
+  try {
+    const { difficulty } = req.query;
+    if (!difficulty) {
+      return res.status(400).json({ error: 'Missing difficulty parameter' });
+    }
+
+    const keyword = await Keyword.aggregate([
+      { $match: { level: difficulty } },
+      { $sample: { size: 1 } }
+    ]);
+
+    if (!keyword || keyword.length === 0) {
+      return res.status(404).json({ error: 'No keyword found for this difficulty' });
+    }
+
+    res.json(keyword[0]);
+  } catch (error) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+
 // Patch user progress
 app.patch('/users/:id', async (req, res) => {
   try {
