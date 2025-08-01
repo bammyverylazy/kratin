@@ -1,8 +1,9 @@
 // src/utils/api.js
+const backendURL = 'https://cellvivor-backend.onrender.com';
 
 export async function saveProgress(userId, scene) {
   if (!userId || !scene) throw new Error("Missing userId or scene");
-  const res = await fetch(`${BASE_URL}/progress/save`, {
+  const res = await fetch(`${backendURL}progress/save`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ userId, scene }),
@@ -13,7 +14,7 @@ export async function saveProgress(userId, scene) {
 
 export async function loadProgress(userId) {
   if (!userId) throw new Error("Missing userId");
-  const res = await fetch(`${BASE_URL}/progress/load/${userId}`);
+  const res = await fetch(`${backendURL}/progress/load/${userId}`);
   if (!res.ok) throw new Error('Failed to load progress');
   const data = await res.json();
   return data.lastScene || 'Chapter1';
