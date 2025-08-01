@@ -1,4 +1,4 @@
-const backendURL = import.meta.env.VITE_BACKEND_URL;
+const backendURL = 'https://cellvivor-backend.onrender.com';
 
 // src/utils/saveProgress.js
 export async function saveGameProgress(userId, currentChapter) {
