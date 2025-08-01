@@ -382,7 +382,7 @@ export class Chapter2game extends Phaser.Scene {
     nextBtn.on('pointerdown', () => {
       playAgainBtn.destroy();
       nextBtn.destroy();
-      this.scene.launch('LoadingOverlay');
+      
       this.scene.start('Chapter3');
     });
   }

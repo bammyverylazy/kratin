@@ -78,7 +78,7 @@ export class Mode extends Scene {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId: user._id, scene: "Chapter1" })
       });
-      this.scene.launch('LoadingOverlay');
+      
       this.scene.start('Chapter1');
     });
 
@@ -103,7 +103,7 @@ export class Mode extends Scene {
 
   } catch (err) {
     console.error('Error loading progress:', err);
-    this.scene.launch('LoadingOverlay');
+    
     this.scene.start('Chapter1'); // Fallback
   }
 });

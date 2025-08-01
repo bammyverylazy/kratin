@@ -123,7 +123,8 @@ export class Chapter1game extends Phaser.Scene {
       }).setOrigin(0.5).setDepth(1001);
 
       this.time.delayedCall(1000, () => {
-        this.scene.launch('LoadingOverlay');
+        this.cameras.main.setBackgroundColor(null);
+        
         this.scene.start('Chapter2');
       });
       return;

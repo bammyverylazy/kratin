@@ -276,7 +276,7 @@ showCurrentLine() {
       overlay.destroy();
       popup.destroy();
       startBtn.destroy();
-       this.scene.launch('LoadingOverlay');
+       
       this.scene.start('Chapter3game');
     });
   });
