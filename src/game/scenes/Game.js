@@ -77,7 +77,7 @@ export class Game extends Scene {
         socket.emit('player-quit', { roomCode: this.roomCode });
         this.scene.stop();    
         this.children.removeAll();
-        this.scene.start('Mode');
+        this.scene.restart('Mode');
       }
     });
 

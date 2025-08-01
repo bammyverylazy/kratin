@@ -72,7 +72,7 @@ export function addStoryModeUI(scene, options = {}) {
         const confirmQuit = window.confirm('Do you want to quit the storyboard mode?');
         if (confirmQuit) {
             console.log('User chose to quit the game.');
-            scene.scene.start('Mode');
+            scene.scene.restart('Mode');
             this.scene.stop();    
             this.children.removeAll(); 
         } else {
