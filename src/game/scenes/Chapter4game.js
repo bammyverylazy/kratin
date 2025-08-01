@@ -58,6 +58,7 @@ export class Chapter4game extends Phaser.Scene {
     this.startRound();
 
     this.input.keyboard.on('keydown-SPACE', () => this.handleTap());
+    this.input.on('click', () => this.handleTap());
     this.input.on('pointerdown', () => this.handleTap());
 
     // Black overlay behind popup

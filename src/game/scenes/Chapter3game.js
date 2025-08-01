@@ -312,6 +312,7 @@ export class Chapter3game extends Phaser.Scene {
       .setInteractive({ useHandCursor: true });
 
     nextBtn.on('pointerdown', () => {
+       this.scene.launch('LoadingOverlay');
       this.scene.start('Chapter4');
     });
   }

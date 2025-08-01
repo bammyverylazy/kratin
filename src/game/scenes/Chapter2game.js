@@ -63,7 +63,7 @@ export class Chapter2game extends Phaser.Scene {
     this.player = this.physics.add.sprite(100, 700, 'player');
     this.player.setDisplaySize(64, 64);
     this.player.setCollideWorldBounds(true);
-    this.cursors = this.input.keyboard.createCursorKeys();
+    this.cursors = this.input.keyboard.createCursorKeys() || this.input.touch.createCursorKeys();
 
     this.createZones();
     this.createEnemies();
@@ -382,6 +382,7 @@ export class Chapter2game extends Phaser.Scene {
     nextBtn.on('pointerdown', () => {
       playAgainBtn.destroy();
       nextBtn.destroy();
+      this.scene.launch('LoadingOverlay');
       this.scene.start('Chapter3');
     });
   }

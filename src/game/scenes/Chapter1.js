@@ -220,6 +220,7 @@ showCurrentLine() {
     // Always use this function to step through the script
     if (this.currentLine >= this.script.length) {
         // End of all dialogue
+        this.scene.launch('LoadingOverlay');
         this.scene.start('Chapter1game'); // Transition to Chapter1game scene
         return;
     }

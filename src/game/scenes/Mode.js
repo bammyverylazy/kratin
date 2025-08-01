@@ -44,7 +44,7 @@ export class Mode extends Scene {
         this.add.image(headerText.x + starOffsetX, headerY, 'star').setOrigin(0.5).setScale(0.13).setDepth(101);
 
         const buttonY = this.cameras.main.height * 0.55;
-
+        
         // --- Story Mode Popup ---
         const storyboardBtn = this.add.image(this.cameras.main.width * 0.265, buttonY, 'storymode')
         .setOrigin(0.5).setScale(0.145).setInteractive({ useHandCursor: true }).setDepth(50);
@@ -52,7 +52,7 @@ export class Mode extends Scene {
 
     storyboardBtn.on('pointerdown', () => {
     if (this.popupContainer) return;
-
+    
     this.popupContainer = this.add.rectangle(512, 360, 1024, 800, 0x000000, 0.5).setOrigin(0.5).setDepth(299);
     const popupBox = this.add.rectangle(512, 320, 500, 250, 0xffffff, 1).setOrigin(0.5).setDepth(300);
     const popupText = this.add.text(512, 270, 'Continue the story or start again?', {
@@ -78,6 +78,7 @@ export class Mode extends Scene {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId: user._id, scene: "Chapter1" })
       });
+      this.scene.launch('LoadingOverlay');
       this.scene.start('Chapter1');
     });
 
@@ -102,6 +103,7 @@ export class Mode extends Scene {
 
   } catch (err) {
     console.error('Error loading progress:', err);
+    this.scene.launch('LoadingOverlay');
     this.scene.start('Chapter1'); // Fallback
   }
 });

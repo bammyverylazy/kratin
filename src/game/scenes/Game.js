@@ -4,6 +4,8 @@ import { Scene } from 'phaser';
 import io from 'socket.io-client';
 const socket = io(import.meta.env.VITE_BACKEND_URL);
 const backendURL ='https://cellvivor-backend.onrender.com' ;
+import { getNextKeywordAI } from '../ai/getNextKeywordAI';
+
 
 export class Game extends Scene {
   constructor() {
@@ -91,26 +93,50 @@ export class Game extends Scene {
       align: 'center'
     }).setOrigin(0.5).setDepth(1);
 
-    const fetchNewKeyword = () => {
-      fetch(`${backendURL}/api/random-keyword`)
-        .then(res => res.json())
-        .then(data => {
-          if (!data || !data.keyword) {
-            console.warn('No keyword returned');
-            return;
-          }
-          currentKeyword = data.keyword;
-          currentHint = data.hint || '';
-          if (this.roomCode !== 'simple-local') {
-            socket.emit('keyword', { roomCode: this.roomCode, keyword: currentKeyword, hint: currentHint });
-          }
-          showKeyword(currentKeyword);
-        });
-    };
+  const fetchNewKeyword = async () => {
+  try {
+    const userId = localStorage.getItem('userId');
+    const lastResult = this.playedKeywords[this.playedKeywords.length - 1];
 
-    if (this.myRole === 'guesser') {
-      fetchNewKeyword();
+    const next = await getNextKeywordAI(lastResult, userId);
+
+    if (!next || !next.word) {
+      console.warn('[AI] No keyword returned, fallback to random');
+      throw new Error('No AI keyword');
     }
+
+    currentKeyword = next.word;
+    currentHint = next.hint || '';
+    this.currentDifficulty = next.level || 'medium';
+    this.currentChapter = next.chapter || '1';
+    showKeyword(currentKeyword);
+
+    if (this.roomCode !== 'simple-local') {
+      socket.emit('keyword', {
+        roomCode: this.roomCode,
+        keyword: currentKeyword,
+        hint: currentHint
+      });
+    }
+
+  } catch (err) {
+    console.error('[AI] Failed to get keyword from AI — fallback to default API:', err.message);
+
+    // fallback
+    const res = await fetch(`${backendURL}/api/random-keyword`);
+    const data = await res.json();
+
+    currentKeyword = data.keyword;
+    currentHint = data.hint || '';
+    this.currentDifficulty = data.difficulty || 'medium';
+    this.currentChapter = data.chapter || '1';
+
+    showKeyword(currentKeyword);
+  }
+};
+
+
+
 
     socket.on('keyword', ({ keyword, hint }) => {
       currentKeyword = keyword;
@@ -179,7 +205,12 @@ export class Game extends Scene {
 
   const handleResult = async (value) => {
   result = value;
-  this.playedKeywords.push({ word: currentKeyword, result });
+  this.playedKeywords.push({
+  word: currentKeyword,
+  difficulty: this.currentDifficulty,
+  chapter: this.currentChapter
+});
+
 
   // อัพเดตคะแนน
   if (this.roomCode === 'simple-local') {

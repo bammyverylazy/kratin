@@ -221,6 +221,7 @@ export class Chapter4 extends Scene {
       overlay.destroy();
       popup.destroy();
       startBtn.destroy();
+      this.scene.launch('LoadingOverlay');
       this.scene.start('Chapter4game');
     });
   }
