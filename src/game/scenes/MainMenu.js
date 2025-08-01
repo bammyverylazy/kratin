@@ -18,8 +18,7 @@ export class MainMenu extends Scene {
         this.load.image('star', '/assets/star.png');
     }
 
-    create() {
-        this.scene.restart('MainMenu'); 
+    create() { 
         this.cameras.main.setBackgroundColor('#91e3ff');
         this.logo = this.add.image(this.cameras.main.centerX, 300, 'logo').setDepth(100).setScale(0.4);
 
