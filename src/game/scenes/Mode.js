@@ -27,6 +27,7 @@ export class Mode extends Scene {
     }
 
     create() {
+        this.scene.restart('Mode'); 
             const user = JSON.parse(localStorage.getItem('currentUser')) || JSON.parse(localStorage.getItem('user'));
             const playerName = user?.name || "Anonymous";
 

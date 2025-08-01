@@ -57,7 +57,7 @@ export class Chapter3game extends Phaser.Scene {
           .setDepth(201),
     });
 
-    this.cursors = this.input.keyboard.createCursorKeys();
+    this.cursors = this.input.keyboard.createCursorKeys() || this.input.touch.createCursorKeys();
 
     this.targetBoxes = this.physics.add.staticGroup();
     const boxInfo = [
@@ -243,6 +243,7 @@ export class Chapter3game extends Phaser.Scene {
           targets: this.heartIcons[this.hearts],
           alpha: 0,
           duration: 300,
+          scale: 0.5,
         });
       }
 
