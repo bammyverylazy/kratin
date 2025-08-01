@@ -3,8 +3,8 @@ import { EventBus } from '../EventBus';
 import { Scene } from 'phaser';
 import io from 'socket.io-client';
 const socket = io(import.meta.env.VITE_BACKEND_URL);
-const backendURL ='https://cellvivor-backend.onrender.com' ;
-import { getNextKeywordAI } from '../ai/getNextKeywordAI';
+const backendURL ='https://cellvivor-backend.onrender.com';
+import { getNextKeywordAI } from '../../ai/getNextKeywordAI.js';
 
 
 export class Game extends Scene {
