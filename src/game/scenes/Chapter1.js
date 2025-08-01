@@ -93,6 +93,13 @@ export class Chapter1 extends Scene {
     this.load.image('9.png', '/assets/9.png');
     // Preload other assets if needed
 
+    // audio 
+  for (let i = 0; i < this.script.length; i++) {
+  const audioKey = `Chapter1_line${i}`;
+  this.load.audio(audioKey, `/assets/audio/chapter1/${audioKey}.mp3`);
+}
+
+
   }
 
   create() {
