@@ -10,20 +10,23 @@ export class Chapter1 extends Phaser.Scene {
   constructor() {
     super("Chapter1");
     this.currentChapter = 'Chapter1';
+
     this.coverImage = null;
     this.background = null;
     this.bgVideo = null;
     this.startButton = null;
     this.dialogueUI = null;
     this.voiceNarrator = null;
+
     this.popupContainer = null;
     this.popupBook = null;
     this.popupText = null;
+
     this.userId = null;
     this.musicStarted = false;
 
     this.script = [
-      { speaker: "Narrator:", text: 'Welcome to your journey inside the body, This is "CELLVIVOR".', sceneStep: 0 },
+      { speaker: "Narrator:", text: 'Welcome to your journey inside the body, This is "CELLVIVOR".' },
       { speaker: "Narrator:", text: " a vast network of cells works relentlessly to keep us alive.", sceneStep: 2 },
       { speaker: "Narrator", text: "And here, deep inside, is the marrow.", sceneStep: 3 },
       { speaker: "Narrator:", text: "The marrow is bustling with activity.", sceneStep: 4 },
@@ -51,44 +54,33 @@ export class Chapter1 extends Phaser.Scene {
       'CellBorn', 'Blood', 'body', 'bloodvess', 'noobywalkyellow', 'RBCIntro',
       'RBCwalkpink', 'BloodVessel', 'BloodVesselA', 'BloodVesselB'
     ];
-    this.bgStepIndex = -1; // Start with -1 so first sceneStep 0 triggers load
+    this.bgStepIndex = 0;
   }
+
   preload() {
     this.load.audio('openingsong', '/assets/audio/openingsong.mp3');
     this.load.audio('backgroundmusic', '/assets/audio/backgroundmusic.mp3');
+
     for (let i = 0; i < this.script.length; i++) {
       const audioKey = `Chapter1_line${i}`;
       this.load.audio(audioKey, `/assets/audio/chapter1/${audioKey}.mp3`);
     }
 
     this.load.image('Chapter1scene1', '/assets/Chapter1scene1.png');
-    this.load.image('Chapter1scene2', '/assets/Chapter1scene2.png');
-    this.load.image('bone', '/assets/Bone.png');
-    this.load.image('bone1', '/assets/Bone1.png');
-    this.load.image('bone2', '/assets/Bone2.png');
-    this.load.image('Bonemarrow', '/assets/Bonemarrow.png');
-    this.load.image('noobysleep', '/assets/noobysleep.png');
-    this.load.image('noobywake', '/assets/noobywake.png');
-    this.load.image('BloodVessel', '/assets/BloodVessel.png');
-    this.load.image('BloodVesselA', '/assets/BloodVesselA.png');
-    this.load.image('BloodVesselB', '/assets/BloodVesselB.png');
+    this.bgSteps.forEach(key => {
+      if (!this.textures.exists(key)) {
+        this.load.image(key, `/assets/${key}.png`);
+      }
+    });
 
-    this.load.video('CellBorn', '/assets/CellBorn.mp4');
-    this.load.video('Blood', '/assets/Blood.mp4');
-    this.load.video('body', '/assets/body.mp4');
-    this.load.video('bloodvess', '/assets/bloodvess.mp4');
-    this.load.video('noobywalkyellow', '/assets/noobywalkyellow.mp4');
-    this.load.video('RBCIntro', '/assets/RBCIntro.mp4');
-    this.load.video('RBCwalkpink', '/assets/RBCwalkpink.mp4');
+    // Load videos if not loaded by default
+    const videoKeys = ['CellBorn', 'Blood', 'body', 'bloodvess', 'noobywalkyellow', 'RBCIntro', 'RBCwalkpink'];
+    videoKeys.forEach(key => this.load.video(key, `/assets/${key}.mp4`));
 
+    // UI assets
     this.load.image('magnifying', '/assets/magnifying.png');
     this.load.image('setting', '/assets/setting.png');
     this.load.image('book', '/assets/book.png');
-    this.load.image('5.png', '/assets/5.png');
-    this.load.image('6.png', '/assets/6.png');
-    this.load.image('7.png', '/assets/7.png');
-    this.load.image('8.png', '/assets/8.png');
-    this.load.image('9.png', '/assets/9.png');
   }
 
   create() {
@@ -111,6 +103,7 @@ export class Chapter1 extends Phaser.Scene {
     });
 
     this.cameras.main.setBackgroundColor('#000000');
+
     this.coverImage = this.add.image(0, 0, 'Chapter1scene1')
       .setOrigin(0, 0)
       .setDepth(0)
@@ -121,7 +114,8 @@ export class Chapter1 extends Phaser.Scene {
       this.cameras.main.centerY + 300,
       'Start',
       {
-        fontSize: '48px', color: '#ffffff',
+        fontSize: '48px',
+        color: '#ffffff',
         padding: { left: 32, right: 32, top: 16, bottom: 16 },
         borderRadius: 12
       }
@@ -135,9 +129,7 @@ export class Chapter1 extends Phaser.Scene {
     });
 
     this.input.keyboard.on('keydown', (event) => {
-      const allowedKeys = [
-        'Space', 'Enter', 'ArrowRight', 'ArrowLeft', 'KeyZ', 'KeyX'
-      ];
+      const allowedKeys = ['Space', 'Enter', 'ArrowRight', 'ArrowLeft', 'KeyZ', 'KeyX'];
       if (allowedKeys.includes(event.code) && this.startButton?.active) {
         this.startButton.emit('pointerdown');
       }
@@ -159,52 +151,67 @@ export class Chapter1 extends Phaser.Scene {
   }
 
   startStorySequence() {
-    this.dialogueUI = new DialogueUI(this, this.script);
-    this.voiceNarrator = new VoiceNarratorManager(this, { volume: 1 }); // volume increased
+    if (this.background) this.background.destroy();
+    if (this.bgVideo) this.bgVideo.destroy();
 
+    this.bgStepIndex = 0;
+    this.background = this.add.image(0, 0, this.bgSteps[this.bgStepIndex])
+      .setOrigin(0, 0)
+      .setDepth(0)
+      .setDisplaySize(this.sys.game.config.width, this.sys.game.config.height);
+
+    if (!this.dialogueUI) this.dialogueUI = new DialogueUI(this, this.script);
+    if (!this.voiceNarrator) this.voiceNarrator = new VoiceNarratorManager(this);
+
+    // Create buttons only once
+    if (!this.nextButton) {
+      this.nextButton = this.add.text(900, 680, '▶ Next', {
+        fontSize: '20px',
+        fill: '#ffffff',
+        backgroundColor: '#333',
+        padding: { left: 10, right: 10, top: 5, bottom: 5 }
+      }).setInteractive().setDepth(1000);
+      this.nextButton.on('pointerdown', () => this.advanceDialogue());
+    }
+
+    if (!this.backButton) {
+      this.backButton = this.add.text(820, 680, '◀ Back', {
+        fontSize: '20px',
+        fill: '#ffffff',
+        backgroundColor: '#333',
+        padding: { left: 10, right: 10, top: 5, bottom: 5 }
+      }).setInteractive().setDepth(1000);
+      this.backButton.on('pointerdown', () => this.rewindDialogue());
+    }
+
+    // Keyboard controls
+    this.input.keyboard.on('keydown-ENTER', () => this.advanceDialogue());
+    this.input.keyboard.on('keydown-SPACE', () => this.advanceDialogue());
+    this.input.keyboard.on('keydown-RIGHT', () => this.advanceDialogue());
+    this.input.keyboard.on('keydown-LEFT', () => this.rewindDialogue());
+
+    this.currentLine = 0;
     this.showCurrentLine();
+  }
 
-    // Create Next button
-    this.nextButton = this.add.text(this.sys.game.config.width - 150, this.sys.game.config.height - 80, 'Next', {
-      fontSize: '32px',
-      color: '#fff',
-      backgroundColor: '#000',
-      padding: { left: 20, right: 20, top: 10, bottom: 10 },
-      borderRadius: 6
-    })
-      .setOrigin(0.5)
-      .setDepth(300)
-      .setInteractive({ useHandCursor: true });
+  advanceDialogue() {
+    if (this.currentLine < this.script.length - 1) {
+      this.currentLine++;
+      this.showCurrentLine();
+    } else {
+      this.scene.start('Chapter1game');
+    }
+  }
 
-    this.nextButton.on('pointerdown', () => {
-      this.dialogueUI.onLineComplete();
-    });
-
-    // Create Back button
-    this.backButton = this.add.text(150, this.sys.game.config.height - 80, 'Back', {
-      fontSize: '32px',
-      color: '#fff',
-      backgroundColor: '#000',
-      padding: { left: 20, right: 20, top: 10, bottom: 10 },
-      borderRadius: 6
-    })
-      .setOrigin(0.5)
-      .setDepth(300)
-      .setInteractive({ useHandCursor: true });
-
-    this.backButton.on('pointerdown', () => {
-      if (this.currentLine > 0) {
-        this.currentLine--;
-        this.showCurrentLine();
-      }
-    });
-
-    this.backButton.setVisible(false);
+  rewindDialogue() {
+    if (this.currentLine > 0) {
+      this.currentLine--;
+      this.showCurrentLine();
+    }
   }
 
   showCurrentLine() {
     if (this.currentLine >= this.script.length) {
-      this.cameras.main.setBackgroundColor(null);
       this.scene.start('Chapter1game');
       return;
     }
@@ -212,7 +219,7 @@ export class Chapter1 extends Phaser.Scene {
     const nextLine = this.script[this.currentLine];
     nextLine.audioKey = `Chapter1_line${this.currentLine}`;
 
-    // Background/video scene step changes
+    // Handle background or video changes
     if (
       typeof nextLine.sceneStep === 'number' &&
       nextLine.sceneStep !== this.bgStepIndex &&
@@ -255,142 +262,84 @@ export class Chapter1 extends Phaser.Scene {
       }
     }
 
-    // Show/hide Back button
-    if (this.backButton) {
-      this.backButton.setVisible(this.currentLine > 0);
-    }
+    // Show/hide back button
+    this.backButton.setVisible(this.currentLine > 0);
 
-    // Popup logic for special dialogues
+    // Popup handling for special dialogues
     if (
       nextLine.speaker === "Senior Red Blood Cell" &&
       nextLine.text.includes("heart map")
     ) {
-      this.dialogueUI.startDialogue([nextLine]);
-
-      this.time.delayedCall(600, () => {
-        if (this.popupContainer) return;
-        this.popupContainer = this.add.rectangle(512, 360, 1024, 800, 0x000000, 0.5)
-          .setOrigin(0.5).setDepth(299).setInteractive();
-
-        const popupBox = this.add.rectangle(512, 320, 500, 200, 0xc7c7c7, 1)
-          .setOrigin(0.5).setDepth(300).setInteractive();
-
-        this.popupBook = this.add.image(332, 320, 'book')
-          .setOrigin(0.5)
-          .setDisplaySize(80, 80)
-          .setDepth(301);
-
-        this.popupText = this.add.text(547, 320, "You received a heart map!\nUse it to navigate the body.", {
-          fontSize: '28px',
-          color: '#222',
-          wordWrap: { width: 340 }
-        }).setOrigin(0.5).setDepth(301);
-
-        this.popupContainer.on('pointerdown', (pointer) => {
-          const px = pointer.x, py = pointer.y;
-          if (
-            px < popupBox.x - popupBox.width / 2 ||
-            px > popupBox.x + popupBox.width / 2 ||
-            py < popupBox.y - popupBox.height / 2 ||
-            py > popupBox.y + popupBox.height / 2
-          ) {
-            this.popupContainer.destroy();
-            popupBox.destroy();
-            this.popupBook.destroy();
-            this.popupText.destroy();
-            this.popupContainer = null;
-            this.popupBook = null;
-            this.popupText = null;
-          }
-        });
-
-        const closePopup = () => {
-          if (this.popupContainer) this.popupContainer.destroy();
-          if (popupBox) popupBox.destroy();
-          if (this.popupBook) this.popupBook.destroy();
-          if (this.popupText) this.popupText.destroy();
-          this.popupContainer = null;
-          this.popupBook = null;
-          this.popupText = null;
-        };
-
-        this.input.off('pointerdown', closePopup, this);
-        this.input.on('pointerdown', closePopup, this);
-
-        this.dialogueUI.onLineComplete = () => {
-          closePopup();
-          this.currentLine++;
-          this.showCurrentLine();
-        };
-      });
+      this.showPopup("You received a heart map!\nUse it to navigate the body.", 'book');
     } else if (
       nextLine.speaker === "Senior Red Blood Cell" &&
       nextLine.text.includes("main routes")
     ) {
-      this.dialogueUI.startDialogue([nextLine]);
-
-      this.time.delayedCall(600, () => {
-        if (this.popupContainer) return;
-        this.popupContainer = this.add.rectangle(512, 360, 1024, 800, 0x000000, 0.5)
-          .setOrigin(0.5).setDepth(299).setInteractive();
-
-        const popupBox = this.add.rectangle(512, 320, 500, 200, 0xc7c7c7, 1)
-          .setOrigin(0.5).setDepth(300).setInteractive();
-
-        this.popupText = this.add.text(512, 320, "Learn the main routes: atria, ventricles, arteries, veins.", {
-          fontSize: '28px',
-          color: '#222',
-          align: 'center',
-          wordWrap: { width: 450 }
-        }).setOrigin(0.5).setDepth(301);
-
-        this.popupContainer.on('pointerdown', (pointer) => {
-          const px = pointer.x, py = pointer.y;
-          if (
-            px < popupBox.x - popupBox.width / 2 ||
-            px > popupBox.x + popupBox.width / 2 ||
-            py < popupBox.y - popupBox.height / 2 ||
-            py > popupBox.y + popupBox.height / 2
-          ) {
-            this.popupContainer.destroy();
-            popupBox.destroy();
-            this.popupText.destroy();
-            this.popupContainer = null;
-            this.popupText = null;
-          }
-        });
-
-        const closePopup = () => {
-          if (this.popupContainer) this.popupContainer.destroy();
-          if (popupBox) popupBox.destroy();
-          if (this.popupText) this.popupText.destroy();
-          this.popupContainer = null;
-          this.popupText = null;
-        };
-
-        this.input.off('pointerdown', closePopup, this);
-        this.input.on('pointerdown', closePopup, this);
-
-        this.dialogueUI.onLineComplete = () => {
-          closePopup();
-          this.currentLine++;
-          this.showCurrentLine();
-        };
-      });
+      this.showPopup("Learn the main routes: atria, ventricles, arteries, veins.");
     } else {
-      // Normal dialogue play
       this.dialogueUI.startDialogue([nextLine]);
-
-      // Play audio if available
       if (nextLine.audioKey) {
-        this.voiceNarrator.play(nextLine.audioKey);
+        this.voiceNarrator.play(nextLine.audioKey, { volume: 1 }); // adjust volume here
       }
-
-      // Set what happens after user clicks to continue
       this.dialogueUI.onLineComplete = () => {
-        this.currentLine++;
-        this.showCurrentLine();
+        // Automatically advance dialogue when line finishes
+        this.advanceDialogue();
       };
     }
+  }
+
+  showPopup(text, iconKey = null) {
+    if (this.popupContainer) return; // prevent multiple popups
+
+    this.popupContainer = this.add.rectangle(512, 360, 1024, 800, 0x000000, 0.5)
+      .setOrigin(0.5).setDepth(299).setInteractive();
+
+    const popupBox = this.add.rectangle(512, 320, 500, 200, 0xc7c7c7, 1)
+      .setOrigin(0.5).setDepth(300).setInteractive();
+
+    if (iconKey) {
+      this.popupBook = this.add.image(332, 320, iconKey)
+        .setOrigin(0.5)
+        .setDisplaySize(80, 80)
+        .setDepth(301);
+    }
+
+    this.popupText = this.add.text(547, 320, text, {
+      fontSize: '28px',
+      color: '#222',
+      wordWrap: { width: 340 }
+    }).setOrigin(0.5).setDepth(301);
+
+    const closePopup = () => {
+      if (this.popupContainer) this.popupContainer.destroy();
+      if (popupBox) popupBox.destroy();
+      if (this.popupBook) this.popupBook.destroy();
+      if (this.popupText) this.popupText.destroy();
+      this.popupContainer = null;
+      this.popupBook = null;
+      this.popupText = null;
+    };
+
+    this.popupContainer.on('pointerdown', (pointer) => {
+      const px = pointer.x, py = pointer.y;
+      if (
+        px < popupBox.x - popupBox.width / 2 ||
+        px > popupBox.x + popupBox.width / 2 ||
+        py < popupBox.y - popupBox.height / 2 ||
+        py > popupBox.y + popupBox.height / 2
+      ) {
+        closePopup();
+        this.advanceDialogue();
+      }
+    });
+
+    this.dialogueUI.startDialogue([this.script[this.currentLine]]);
+    if (this.script[this.currentLine].audioKey) {
+      this.voiceNarrator.play(this.script[this.currentLine].audioKey, { volume: 1 });
+    }
+    this.dialogueUI.onLineComplete = () => {
+      closePopup();
+      this.advanceDialogue();
+    };
   }
 }
