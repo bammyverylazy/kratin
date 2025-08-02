@@ -11,7 +11,7 @@ export class Chapter1game extends Phaser.Scene {
     this.correctCount = 0;
     this.totalCount = 0;
     this.progressText = null;
-    this.soundEnabled = true; // track sound enabled state
+    this.soundEnabled = true;
   }
 
   preload() {
@@ -24,7 +24,6 @@ export class Chapter1game extends Phaser.Scene {
     this.load.image('tryAgain', '/assets/tryAgain.png');
     this.load.image('quest1', '/assets/quest1.png');
 
-    // 🔊 Load audio files
     this.load.audio('bgm', '/assets/audio/backgroundmusic.mp3');
     this.load.audio('correctSound', '/assets/audio/correctsound.mp3');
     this.load.audio('wrongSound', '/assets/audio/wrongsound.mp3');
@@ -38,19 +37,14 @@ export class Chapter1game extends Phaser.Scene {
     console.log('userId:', userId, 'currentChapter:', currentChapter);
     saveGameProgress(userId, currentChapter);
 
-    // Restore sound enabled state from localStorage (default true)
     const storedSound = localStorage.getItem('soundEnabled');
     this.soundEnabled = storedSound === null ? true : (storedSound === 'true');
-
-    // Setup audio objects
-    this.bgm = this.sound.add('bgm', { loop: true, volume: 0.5 });
-    this.correctSound = this.sound.add('correctSound');
-    this.wrongSound = this.sound.add('wrongSound');
-
-    // Set global mute state based on soundEnabled
     this.sound.mute = !this.soundEnabled;
 
-    // Play bgm AFTER first user interaction (required by many browsers)
+    this.bgm = this.sound.add('bgm', { loop: true, volume: 0.4 });
+    this.correctSound = this.sound.add('correctSound', { volume: 1 });
+    this.wrongSound = this.sound.add('wrongSound', { volume: 1 });
+
     this.input.once('pointerdown', () => {
       if (this.soundEnabled && !this.bgm.isPlaying) {
         this.bgm.play();
@@ -58,7 +52,6 @@ export class Chapter1game extends Phaser.Scene {
       }
     });
 
-    // Register cleanup on scene shutdown or destroy
     this.events.on('shutdown', () => this.stopAllSounds());
     this.events.on('destroy', () => this.stopAllSounds());
 
@@ -83,8 +76,11 @@ export class Chapter1game extends Phaser.Scene {
       const x = spacing * (i + 1);
       const y = 380;
       const img = this.add.image(x, y, data.key).setScale(0.15).setOrigin(0.5);
-      const zone = this.add.zone(x, y, img.displayWidth, img.displayHeight).setRectangleDropZone(img.displayWidth, img.displayHeight);
-      this.add.text(x, y + img.displayHeight / 2 + 30, data.label, { fontSize: '22px', color: '#000' }).setOrigin(0.5);
+      const zone = this.add.zone(x, y, img.displayWidth, img.displayHeight)
+        .setRectangleDropZone(img.displayWidth, img.displayHeight);
+      this.add.text(x, y + img.displayHeight / 2 + 30, data.label, {
+        fontSize: '22px', color: '#000'
+      }).setOrigin(0.5);
       zone.zoneType = data.type;
       this.dropZones[data.type] = zone;
     });
@@ -112,12 +108,14 @@ export class Chapter1game extends Phaser.Scene {
     });
 
     this.input.on('drop', (pointer, box, dropZone) => {
-      if (!dropZone || !box) return;
+      if (!dropZone || typeof dropZone !== 'object' || !box || typeof box !== 'object') {
+        console.warn('Invalid drop detected:', { dropZone, box });
+        return;
+      }
 
       if (dropZone.zoneType === box.propType) {
         this.correctCount++;
         this.progressText.setText(`${this.correctCount}/${this.totalCount}`);
-
         if (this.soundEnabled) this.correctSound.play();
 
         this.showImagePopup('correct', () => {
@@ -142,7 +140,9 @@ export class Chapter1game extends Phaser.Scene {
     });
 
     this.add.text(screenWidth / 2, 170, 'Match the property to the\ncorrect blood vessel type!', {
-      fontSize: '30px', color: '#222', fontStyle: 'bold'
+      fontSize: '30px',
+      color: '#222',
+      fontStyle: 'bold'
     }).setOrigin(0.5);
   }
 
@@ -165,21 +165,34 @@ export class Chapter1game extends Phaser.Scene {
   }
 
   showNextProperty() {
-    if (this.currentIndex >= this.properties.length) {
-      const overlay = this.add.rectangle(512, 384, 1024, 768, 0x000000, 0.85)
-        .setOrigin(0.5).setDepth(1000);
-      const text = this.add.text(512, 384, 'All done!\nContinue to Chapter 2...', {
-        fontSize: '32px',
-        color: '#fff',
-        align: 'center'
-      }).setOrigin(0.5).setDepth(1001);
+  if (this.currentIndex >= this.properties.length) {
+    const overlay = this.add.rectangle(512, 384, 1024, 768, 0x000000, 0.85)
+      .setOrigin(0.5)
+      .setDepth(1000)
+      .setInteractive();
 
-      this.time.delayedCall(1000, () => {
-        this.cameras.main.setBackgroundColor(null);
-        this.scene.start('Chapter2');
-      });
-      return;
-    }
+    this.add.text(512, 300, 'All Done!ヽ(*。>Д<)o゜', {
+      fontSize: '38px',
+      color: '#ffffff',
+      align: 'center'
+    }).setOrigin(0.5).setDepth(1001);
+
+    const continueBtn = this.add.text(512, 420, '▶ Continue to Chapter 2', {
+      fontSize: '30px',
+      backgroundColor: '#ffffff',
+      color: '#000',
+      padding: { left: 20, right: 20, top: 10, bottom: 10 },
+      borderRadius: 10
+    }).setOrigin(0.5).setDepth(1001).setInteractive({ useHandCursor: true });
+
+    continueBtn.on('pointerdown', () => {
+      this.cameras.main.setBackgroundColor(null);
+      this.scene.start('Chapter2');
+    });
+
+    return;
+  }
+
 
     const prop = this.properties[this.currentIndex++];
     const x = this.sys.game.config.width / 2;
@@ -187,8 +200,10 @@ export class Chapter1game extends Phaser.Scene {
     const boxWidth = 360;
 
     const tempText = this.add.text(0, 0, prop.text, {
-      fontSize: '18px', color: '#000', wordWrap: { width: boxWidth - 20 }
-    }).setWordWrapWidth(boxWidth - 20).setVisible(false);
+      fontSize: '18px',
+      color: '#000',
+      wordWrap: { width: boxWidth - 20 }
+    }).setVisible(false);
 
     const textHeight = tempText.height;
     tempText.destroy();
@@ -201,7 +216,10 @@ export class Chapter1game extends Phaser.Scene {
       .setInteractive({ draggable: true });
 
     const text = this.add.text(x, y, prop.text, {
-      fontSize: '18px', color: '#000', wordWrap: { width: boxWidth - 20 }, align: 'center'
+      fontSize: '18px',
+      color: '#000',
+      wordWrap: { width: boxWidth - 20 },
+      align: 'center'
     }).setOrigin(0.5).setDepth(4);
 
     box.propType = prop.type;
@@ -233,11 +251,10 @@ export class Chapter1game extends Phaser.Scene {
       this.cameras.main.centerX,
       this.cameras.main.centerY,
       key
-    )
-      .setOrigin(0.5)
-      .setDepth(999)
-      .setScale(0.8)
-      .setAlpha(0);
+    ).setOrigin(0.5)
+     .setDepth(999)
+     .setScale(0.8)
+     .setAlpha(0);
 
     this.tweens.add({
       targets: popup,

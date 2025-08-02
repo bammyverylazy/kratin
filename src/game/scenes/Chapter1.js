@@ -145,19 +145,20 @@ export class Chapter1 extends Phaser.Scene {
     });
   }
 
-  playMusic() {
-    if (this.musicStarted) return;
-    this.musicStarted = true;
+ playMusic() {
+  if (this.musicStarted) return;
+  this.musicStarted = true;
 
-    const opening = this.sound.add('openingsong', { volume: 1 });
-    const bgm = this.sound.add('backgroundmusic', { volume: 0.3, loop: true });
+  const opening = this.sound.add('openingsong', { volume: 1 });
+  this.bgm = this.sound.add('backgroundmusic', { volume: 0.3, loop: true }); // ✅ Assign to this.bgm
 
-    opening.play();
-    this.time.delayedCall(opening.duration * 1000, () => {
-      opening.stop();
-      bgm.play();
-    });
-  }
+  opening.play();
+  this.time.delayedCall(opening.duration * 1000, () => {
+    opening.stop();
+    this.bgm.play();
+  });
+}
+
 
   startStorySequence() {
     if (this.background) this.background.destroy();
