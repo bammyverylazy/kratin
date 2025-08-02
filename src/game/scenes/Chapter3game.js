@@ -78,6 +78,7 @@ export class Chapter3game extends Phaser.Scene {
       image.label = info.label;
     });
 
+    // Initialize hearts with star size and depth matching Chapter2game
     for (let i = 0; i < 3; i++) {
       const star = this.add.image(100 + i * 40, 70, 'star')
         .setScrollFactor(0)
@@ -102,10 +103,8 @@ export class Chapter3game extends Phaser.Scene {
       fontStyle: 'bold',
     }).setOrigin(0.5).setDepth(11);
 
-    // Drag event handler for dragging currentItem horizontally
     this.input.on('drag', (pointer, gameObject, dragX, dragY) => {
       if (gameObject === this.currentItem) {
-        // Clamp X to game bounds (adjust if your game width changes)
         gameObject.x = Phaser.Math.Clamp(dragX, 50, 974);
       }
     });
@@ -181,7 +180,6 @@ export class Chapter3game extends Phaser.Scene {
     container.body.setVelocityY(100);
     container.setData('target', itemData.target);
 
-    // Make container interactive and draggable horizontally
     container.setInteractive(new Phaser.Geom.Rectangle(-50, -20, 100, 40), Phaser.Geom.Rectangle.Contains);
     this.input.setDraggable(container);
 
@@ -191,16 +189,14 @@ export class Chapter3game extends Phaser.Scene {
   update() {
     if (!this.currentItem || this.timer <= 0) return;
 
-    // Keyboard controls move the current item left/right
     if (this.cursors.left.isDown) {
       this.currentItem.x -= 4;
-      if (this.currentItem.x < 50) this.currentItem.x = 50;  // clamp left bound
+      if (this.currentItem.x < 50) this.currentItem.x = 50;
     } else if (this.cursors.right.isDown) {
       this.currentItem.x += 4;
-      if (this.currentItem.x > 974) this.currentItem.x = 974; // clamp right bound
+      if (this.currentItem.x > 974) this.currentItem.x = 974;
     }
 
-    // Check if the item reached near bottom to evaluate
     if (this.currentItem.y >= 620) {
       this.evaluateItem();
     }
@@ -222,21 +218,20 @@ export class Chapter3game extends Phaser.Scene {
 
       if (this.hearts < 3) {
         const heart = this.heartIcons[this.hearts];
-        heart.setAlpha(1).setVisible(true).setScale(0.5);
+        heart.setAlpha(1).setVisible(true).setScale(0.2);
 
-     // Pulse effect tween:
-      this.tweens.add({
-      targets: heart,
-      scale: { from: 0.28, to: 0.35 },
-      yoyo: true,
-      repeat: 2,
-      duration: 200,
-      ease: 'Sine.easeInOut',
-      onComplete: () => {
-        heart.setScale(0.28);
-      },
-    });
-
+        // Pulse tween with smaller subtle scaling, like Chapter2game
+        this.tweens.add({
+          targets: heart,
+          scale: { from: 0.28, to: 0.35 },
+          yoyo: true,
+          repeat: 2,
+          duration: 200,
+          ease: 'Sine.easeInOut',
+          onComplete: () => {
+            heart.setScale(0.2);
+          },
+        });
 
         this.hearts++;
       }
@@ -265,6 +260,7 @@ export class Chapter3game extends Phaser.Scene {
           alpha: 0,
           duration: 300,
           scale: 0.1,
+          ease: 'Back.easeIn',
         });
       }
 
