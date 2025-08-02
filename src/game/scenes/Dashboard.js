@@ -97,28 +97,38 @@ sessions.sort((a, b) => {
 const maxY = Math.max(...sessions.map(s => Math.max(s.score, s.hintsUsed || 0)), 1);
 const scaleY = graphHeight / maxY;
 
-// Y-axis
-this.add.line(0, 0, graphX, graphY, graphX, graphY - graphHeight, 0x000000).setLineWidth(2);
-// X-axis
-this.add.line(0, 0, graphX, graphY + graphHeight, graphX - graphWidth, graphY + graphHeight, 0x000000).setLineWidth(2);
 
+const graphMarginX = 120;  // push the whole graph right
+const graphMarginY = 180;  // push the whole graph down
+const graphWidth = w - 2 * graphMarginX;
+const graphHeight = 220;
+const barWidth = 30;
+const barGap = 30;
+
+const baseY = graphMarginY + graphHeight;  // bottom of the graph
+// Y-axis: shifted right
+this.add.line(0, 0, graphMarginX, baseY, graphMarginX, graphMarginY, 0x000000).setLineWidth(2);
+
+// X-axis: aligned to graph bottom
+this.add.line(0, 0, graphMarginX, baseY, graphMarginX + graphWidth, baseY, 0x000000).setLineWidth(2);
 sessions.forEach((session, index) => {
-  const groupX = graphX + 10 + index * (2 * barWidth + barGap);
+  const groupX = graphMarginX + 20 + index * (2 * barWidth + barGap);
   const scoreHeight = session.score * scaleY;
   const hintHeight = (session.hintsUsed || 0) * scaleY;
 
   // Score bar (Blue)
-  this.add.rectangle(groupX, graphY + graphHeight, barWidth, scoreHeight, 0x3366ff).setOrigin(0, 1);
+  this.add.rectangle(groupX, baseY, barWidth, scoreHeight, 0x3366ff).setOrigin(0, 1);
 
-  // Hint bar (Pink)
-  this.add.rectangle(groupX + barWidth, graphY + graphHeight, barWidth, hintHeight, 0xfa821a).setOrigin(0, 1);
+  // Hint bar (Orange)
+  this.add.rectangle(groupX + barWidth, baseY, barWidth, hintHeight, 0xfa821a).setOrigin(0, 1);
 
-  // Labels below
-  this.add.text(groupX + barWidth, graphY + graphHeight + 5, `#${index + 1}`, {
+  // Label under group
+  this.add.text(groupX + barWidth, baseY + 5, `#${index + 1}`, {
     fontSize: '14px',
     color: '#000',
   }).setOrigin(0.5, 0);
 });
+
 
 // Updated legend (Score + Hints)
 this.add.rectangle(legendBaseX, legendY, 20, 20, 0x3366ff).setOrigin(0, 0);
