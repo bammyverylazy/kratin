@@ -1,4 +1,3 @@
-// UIscene.js
 import { saveGameProgress } from '../utils/saveProgress.js';
 
 export function addStoryModeUI(scene, options = {}) {
@@ -16,18 +15,25 @@ export function addStoryModeUI(scene, options = {}) {
         popupButtons = [];
     }
 
-    function openPopup(contentFn, withButtons = false) {
+    function openPopup(contentFn, withButtons = false, useBox = true) {
         if (popupOverlay) return; // Only one popup at a time
         popupOverlay = scene.add.rectangle(512, 384, 1024, 768, 0x000000, 0.66)
             .setOrigin(0.5).setDepth(199)
             .setInteractive()
             .on('pointerdown', () => { if (!withButtons) closePopup(); });
-        popupBox = scene.add.rectangle(512, 370, 850, 550, 0xffffff, 0.5)
-            .setOrigin(0.5).setDepth(200);
+
+        if (useBox) {
+            popupBox = scene.add.rectangle(512, 370, 850, 550, 0xffffff, 0.5)
+                .setOrigin(0.5).setDepth(200);
+        }
+
         popupContent = contentFn ? contentFn(scene, popupBox) : null;
-        popupBox.setInteractive().on('pointerdown', (pointer, localX, localY, event) => {
-            if (event) event.stopPropagation();
-        });
+
+        if (useBox) {
+            popupBox.setInteractive().on('pointerdown', (pointer, localX, localY, event) => {
+                if (event) event.stopPropagation();
+            });
+        }
     }
 
     // Top-right UI icons
@@ -38,7 +44,7 @@ export function addStoryModeUI(scene, options = {}) {
         {
             key: 'book',
             x: startX,
-            cb: () => openPopup(options.onBook || defaultBook)
+            cb: () => openPopup(options.onBook || defaultBook, true, false) // ✅ no box
         },
         {
             key: 'magnifying',
@@ -81,7 +87,7 @@ export function addStoryModeUI(scene, options = {}) {
 
         try {
             if (userId && currentChapter) {
-                await saveProgress(userId, currentChapter);
+                await saveGameProgress(userId, currentChapter);
                 console.log('✅ Progress saved on quit:', currentChapter);
             } else {
                 console.warn('⚠️ Missing userId or currentChapter; progress not saved.');
@@ -153,160 +159,155 @@ export function addStoryModeUI(scene, options = {}) {
         };
     }
 
-   function defaultSettings(scene, box) {
-    const label = scene.add.text(box.x - 120, box.y - 60, 'Sound:', {
-        fontSize: '28px',
-        color: '#222',
-    }).setOrigin(0, 0.5).setDepth(201);
+    function defaultSettings(scene, box) {
+        const label = scene.add.text(box.x - 120, box.y - 60, 'Sound:', {
+            fontSize: '28px',
+            color: '#222',
+        }).setOrigin(0, 0.5).setDepth(201);
 
-    const checkboxBg = scene.add.rectangle(box.x + 40, box.y - 60, 32, 32, 0xffffff)
-        .setStrokeStyle(2, 0x888888)
-        .setOrigin(0, 0.5)
-        .setDepth(201)
-        .setInteractive({ useHandCursor: true });
+        const checkboxBg = scene.add.rectangle(box.x + 40, box.y - 60, 32, 32, 0xffffff)
+            .setStrokeStyle(2, 0x888888)
+            .setOrigin(0, 0.5)
+            .setDepth(201)
+            .setInteractive({ useHandCursor: true });
 
-    const checkmark = scene.add.text(box.x + 46, box.y - 60, '✓', {
-        fontSize: '28px',
-        color: '#222',
-    }).setOrigin(0, 0.5).setDepth(202);
+        const checkmark = scene.add.text(box.x + 46, box.y - 60, '✓', {
+            fontSize: '28px',
+            color: '#222',
+        }).setOrigin(0, 0.5).setDepth(202);
 
-    const soundEnabled = localStorage.getItem('soundEnabled');
-    let isChecked = soundEnabled === null ? true : (soundEnabled === 'true');
-    checkmark.setVisible(isChecked);
-
-    const toggleSound = () => {
-        isChecked = !isChecked;
+        const soundEnabled = localStorage.getItem('soundEnabled');
+        let isChecked = soundEnabled === null ? true : (soundEnabled === 'true');
         checkmark.setVisible(isChecked);
-        localStorage.setItem('soundEnabled', isChecked);
-        scene.sound.mute = !isChecked;
-        if (scene.bgm) {
-            isChecked ? scene.bgm.play() : scene.bgm.stop();
-        }
-    };
 
-    checkboxBg.on('pointerdown', toggleSound);
-    label.on('pointerdown', toggleSound);
+        const toggleSound = () => {
+            isChecked = !isChecked;
+            checkmark.setVisible(isChecked);
+            localStorage.setItem('soundEnabled', isChecked);
+            scene.sound.mute = !isChecked;
+            if (scene.bgm) {
+                isChecked ? scene.bgm.play() : scene.bgm.stop();
+            }
+        };
 
-    // 🔊 Volume Slider
-    const volumeLabel = scene.add.text(box.x - 120, box.y + 20, 'Volume:', {
-        fontSize: '28px',
-        color: '#222'
-    }).setOrigin(0, 0.5).setDepth(201);
+        checkboxBg.on('pointerdown', toggleSound);
+        label.on('pointerdown', toggleSound);
 
-    const sliderBg = scene.add.rectangle(box.x + 30, box.y + 20, 200, 10, 0xcccccc)
-        .setOrigin(0, 0.5).setDepth(201);
+        const volumeLabel = scene.add.text(box.x - 120, box.y + 20, 'Volume:', {
+            fontSize: '28px',
+            color: '#222'
+        }).setOrigin(0, 0.5).setDepth(201);
 
-    const savedVolume = parseFloat(localStorage.getItem('voiceVolume') || '1');
-    const knobX = box.x + 30 + savedVolume * 200;
+        const sliderBg = scene.add.rectangle(box.x + 30, box.y + 20, 200, 10, 0xcccccc)
+            .setOrigin(0, 0.5).setDepth(201);
 
-    const sliderKnob = scene.add.circle(knobX, box.y + 20, 12, 0x666666)
-        .setDepth(202).setInteractive({ draggable: true });
+        const savedVolume = parseFloat(localStorage.getItem('voiceVolume') || '1');
+        const knobX = box.x + 30 + savedVolume * 200;
 
-    scene.input.setDraggable(sliderKnob);
+        const sliderKnob = scene.add.circle(knobX, box.y + 20, 12, 0x666666)
+            .setDepth(202).setInteractive({ draggable: true });
 
-    sliderKnob.on('drag', (pointer, dragX) => {
-        const minX = box.x + 30;
-        const maxX = box.x + 230;
-        dragX = Phaser.Math.Clamp(dragX, minX, maxX);
-        sliderKnob.x = dragX;
+        scene.input.setDraggable(sliderKnob);
 
-        const volume = Phaser.Math.Clamp((dragX - minX) / 200, 0, 1);
-        localStorage.setItem('voiceVolume', volume.toFixed(2));
-        if (scene.sound) scene.sound.volume = volume;
-    });
+        sliderKnob.on('drag', (pointer, dragX) => {
+            const minX = box.x + 30;
+            const maxX = box.x + 230;
+            dragX = Phaser.Math.Clamp(dragX, minX, maxX);
+            sliderKnob.x = dragX;
 
-    // Set initial volume globally
-    if (scene.sound) scene.sound.volume = savedVolume;
+            const volume = Phaser.Math.Clamp((dragX - minX) / 200, 0, 1);
+            localStorage.setItem('voiceVolume', volume.toFixed(2));
+            if (scene.sound) scene.sound.volume = volume;
+        });
 
-    return {
-        destroy: () => {
-            label.destroy();
-            checkboxBg.destroy();
-            checkmark.destroy();
-            volumeLabel.destroy();
-            sliderBg.destroy();
-            sliderKnob.destroy();
-        }
-    };
-}
+        if (scene.sound) scene.sound.volume = savedVolume;
 
-    function defaultBook(scene, box) {
-    const pages = [
-        "📖 Page 1:\nWelcome to your notebook!\n\nHere you can read story notes or clues.",
-        "📖 Page 2:\nDid you know?\nRed blood cells carry oxygen.",
-        "📖 Page 3:\nTip:\nPay attention to what each organ does in your journey!",
-        "📖 Page 4:\nYou can customize each page\nwith helpful reminders or story points."
-    ];
-    let currentPage = 0;
-    const popupDepth = 201;
-
-    // Notebook background image
-    const notebookImage = scene.add.image(box.x, box.y, 'notebook')
-        .setDisplaySize(850, 550)
-        .setDepth(popupDepth);
-
-    // Text field
-    const text = scene.add.text(box.x, box.y, pages[currentPage], {
-        fontSize: '24px',
-        color: '#222',
-        align: 'center',
-        wordWrap: { width: 700, useAdvancedWrap: true }
-    }).setOrigin(0.5).setDepth(popupDepth + 1);
-
-    // Page navigation buttons
-    const prevBtn = scene.add.text(box.x - 300, box.y + 230, 'Previous', {
-        fontSize: '24px',
-        color: '#fff',
-        backgroundColor: '#444',
-        padding: { left: 12, right: 12, top: 6, bottom: 6 }
-    }).setOrigin(0.5).setDepth(popupDepth + 2).setInteractive({ useHandCursor: true });
-
-    const nextBtn = scene.add.text(box.x + 300, box.y + 230, 'Next', {
-        fontSize: '24px',
-        color: '#fff',
-        backgroundColor: '#444',
-        padding: { left: 12, right: 12, top: 6, bottom: 6 }
-    }).setOrigin(0.5).setDepth(popupDepth + 2).setInteractive({ useHandCursor: true });
-
-    function updatePage() {
-        text.setText(pages[currentPage]);
-        prevBtn.setAlpha(currentPage === 0 ? 0.5 : 1).setInteractive(currentPage > 0);
-        nextBtn.setAlpha(currentPage === pages.length - 1 ? 0.5 : 1).setInteractive(currentPage < pages.length - 1);
+        return {
+            destroy: () => {
+                label.destroy();
+                checkboxBg.destroy();
+                checkmark.destroy();
+                volumeLabel.destroy();
+                sliderBg.destroy();
+                sliderKnob.destroy();
+            }
+        };
     }
 
-    prevBtn.on('pointerdown', () => {
-        if (currentPage > 0) {
-            currentPage--;
-            updatePage();
+    function defaultBook(scene) {
+        const centerX = 512;
+        const centerY = 370;
+        const popupDepth = 201;
+
+        const pages = [
+            "📖 Page 1:\nWelcome to your notebook!\n\nHere you can read story notes or clues.",
+            "📖 Page 2:\nDid you know?\nRed blood cells carry oxygen.",
+            "📖 Page 3:\nTip:\nPay attention to what each organ does in your journey!",
+            "📖 Page 4:\nYou can customize each page\nwith helpful reminders or story points."
+        ];
+        let currentPage = 0;
+
+        const notebookImage = scene.add.image(centerX, centerY, 'notebook')
+            .setDisplaySize(850, 550)
+            .setDepth(popupDepth);
+
+        const text = scene.add.text(centerX, centerY, pages[currentPage], {
+            fontSize: '24px',
+            color: '#222',
+            align: 'center',
+            wordWrap: { width: 700, useAdvancedWrap: true }
+        }).setOrigin(0.5).setDepth(popupDepth + 1);
+
+        const prevBtn = scene.add.text(centerX - 300, centerY + 230, 'Previous', {
+            fontSize: '24px',
+            color: '#fff',
+            backgroundColor: '#444',
+            padding: { left: 12, right: 12, top: 6, bottom: 6 }
+        }).setOrigin(0.5).setDepth(popupDepth + 2).setInteractive({ useHandCursor: true });
+
+        const nextBtn = scene.add.text(centerX + 300, centerY + 230, 'Next', {
+            fontSize: '24px',
+            color: '#fff',
+            backgroundColor: '#444',
+            padding: { left: 12, right: 12, top: 6, bottom: 6 }
+        }).setOrigin(0.5).setDepth(popupDepth + 2).setInteractive({ useHandCursor: true });
+
+        function updatePage() {
+            text.setText(pages[currentPage]);
+            prevBtn.setAlpha(currentPage === 0 ? 0.5 : 1).setInteractive(currentPage > 0);
+            nextBtn.setAlpha(currentPage === pages.length - 1 ? 0.5 : 1).setInteractive(currentPage < pages.length - 1);
         }
-    });
 
-    nextBtn.on('pointerdown', () => {
-        if (currentPage < pages.length - 1) {
-            currentPage++;
-            updatePage();
-        }
-    });
+        prevBtn.on('pointerdown', () => {
+            if (currentPage > 0) {
+                currentPage--;
+                updatePage();
+            }
+        });
 
-    updatePage();
+        nextBtn.on('pointerdown', () => {
+            if (currentPage < pages.length - 1) {
+                currentPage++;
+                updatePage();
+            }
+        });
 
-    // Cleanup on scene shutdown
-    scene.events.once('shutdown', () => {
-        notebookImage.destroy();
-        text.destroy();
-        prevBtn.destroy();
-        nextBtn.destroy();
-    });
+        updatePage();
 
-    // Return destroyable group
-    return {
-        destroy: () => {
+        scene.events.once('shutdown', () => {
             notebookImage.destroy();
             text.destroy();
             prevBtn.destroy();
             nextBtn.destroy();
-        }
-    };
-}
+        });
 
+        return {
+            destroy: () => {
+                notebookImage.destroy();
+                text.destroy();
+                prevBtn.destroy();
+                nextBtn.destroy();
+            }
+        };
+    }
 }
