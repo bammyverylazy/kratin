@@ -81,11 +81,6 @@ export class Chapter3game extends Phaser.Scene {
     this.add.video(0, 0, 'bloodflow').setOrigin(0, 0).play(true).setLoop(true);
 
     addStoryModeUI(this, {
-      onSettings: (scene, box) =>
-        scene
-          .add.text(box.x, box.y, 'Settings', { fontSize: '24px', color: '#222' })
-          .setOrigin(0.5)
-          .setDepth(201),
       onBook: (scene, box) =>
         scene
           .add.text(box.x, box.y, 'Book', { fontSize: '24px', color: '#222' })

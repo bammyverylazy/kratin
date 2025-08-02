@@ -63,9 +63,7 @@ export class Chapter2game extends Phaser.Scene {
     this.add.image(512, 384, 'map').setDepth(0);
 
     addStoryModeUI(this, {
-      onSettings: (scene, box) =>
-        scene.add.text(box.x, box.y, 'Custom Settings', { fontSize: '32px', color: '#222' }).setOrigin(0.5).setDepth(201),
-      onBook: (scene, box) =>
+       onBook: (scene, box) =>
         scene.add.text(box.x, box.y, 'Custom Book', { fontSize: '32px', color: '#222' }).setOrigin(0.5).setDepth(201),
     });
 

@@ -63,7 +63,6 @@ export class Chapter4 extends Scene {
     }).setOrigin(0.5).setDepth(10).setInteractive({ useHandCursor: true });
 
     addStoryModeUI(this, {
-      onSettings: (scene, box) => scene.add.text(box.x, box.y, 'Settings', { fontSize: '28px', color: '#222' }).setOrigin(0.5).setDepth(201),
       onBook: (scene, box) => scene.add.text(box.x, box.y, 'Book', { fontSize: '28px', color: '#222' }).setOrigin(0.5).setDepth(201),
     });
 

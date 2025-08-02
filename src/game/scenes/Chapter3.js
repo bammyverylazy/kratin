@@ -12,6 +12,8 @@ export class Chapter3 extends Scene {
     this.currentWiggleTween = null;
     this.propertyText = null;
     this.hasShaken = false;
+    this.bgm = null;
+    this.voiceAudio = null; // for voice narration audio object
   }
 
   preload() {
@@ -32,18 +34,21 @@ export class Chapter3 extends Scene {
     this.load.image('8.png', '/assets/8.png');
     this.load.image('9.png', '/assets/9.png');
     this.load.image('quest3', '/assets/quest3.png');
+
+    this.load.audio('sadBgm', '/assets/audio/sadbackgroundmusic.mp3');
   }
 
   create() {
+    const user = JSON.parse(localStorage.getItem('currentUser'));
+    const userId = user?._id;
+    const currentChapter = 'Chapter3';
 
-      const user = JSON.parse(localStorage.getItem('currentUser'));
-      const userId = user?._id;
-      const currentChapter = 'Chapter3';
-
-      console.log('userId:', userId, 'currentChapter:', currentChapter);
-      saveGameProgress(userId, currentChapter);
+    saveGameProgress(userId, currentChapter);
 
     this.cameras.main.setBackgroundColor('#000000');
+
+    this.bgm = this.sound.add('sadBgm', { loop: true, volume: 0.5 });
+    this.bgm.play();
 
     this.coverImage = this.add.image(0, 0, 'Chapter3scene1')
       .setOrigin(0, 0)
@@ -62,8 +67,7 @@ export class Chapter3 extends Scene {
     ).setOrigin(0.5).setDepth(10).setInteractive({ useHandCursor: true });
 
     addStoryModeUI(this, {
-      onSettings: (scene, box) => scene.add.text(box.x, box.y, 'Settings', { fontSize: '32px', color: '#222' }).setOrigin(0.5).setDepth(201),
-      onBook: (scene, box) => scene.add.text(box.x, box.y, 'Book', { fontSize: '32px', color: '#222' }).setOrigin(0.5).setDepth(201),
+          onBook: (scene, box) => scene.add.text(box.x, box.y, 'Book', { fontSize: '32px', color: '#222' }).setOrigin(0.5).setDepth(201),
     });
 
     this.script = [
@@ -106,6 +110,28 @@ export class Chapter3 extends Scene {
         this.startButton.emit('pointerdown');
       }
     });
+
+    // Stop music when scene shuts down or destroyed
+    this.events.on('shutdown', () => this.stopAudio());
+    this.events.on('destroy', () => this.stopAudio());
+  }
+
+  // Stub function to play voice narration (future implementation)
+  playVoiceNarration(key) {
+    // If there's a currently playing narration, stop it
+    if (this.voiceAudio) {
+      this.voiceAudio.stop();
+      this.voiceAudio.destroy();
+      this.voiceAudio = null;
+    }
+
+    // TODO: Implement loading & playing of voice narration audio based on `key`
+    // For now, just log the request
+    console.log(`Voice narration requested for key: ${key}`);
+
+    // Example placeholder:
+    // this.voiceAudio = this.sound.add(key);
+    // this.voiceAudio.play();
   }
 
   startStorySequence() {
@@ -166,120 +192,136 @@ export class Chapter3 extends Scene {
     this.currentLine = 0;
     this.showCurrentLine();
   }
-showCurrentLine() {
-  if (this.currentLine >= this.script.length) {
-    this.triggerEarthquakePopup(); // ⬅ NEW
-    return;
-  }
 
-  const line = this.script[this.currentLine];
-
-  if (this.currentWiggleTween) {
-    this.currentWiggleTween.stop();
-    this.currentWiggleTween = null;
-  }
-
-  Object.values(this.characterSprites).forEach(sprite => {
-    this.tweens.killTweensOf(sprite);
-    sprite.setScale(0.5);
-    sprite.setAngle(0);
-  });
-
-  if (line.character && this.characterSprites[line.character]) {
-    const char = this.characterSprites[line.character];
-    char.setScale(0.65);
-
-    this.currentWiggleTween = this.tweens.add({
-      targets: char,
-      angle: { from: -6, to: 6 },
-      duration: 150,
-      yoyo: true,
-      repeat: -1
-    });
-  }
-
-  if (this.propertyText) this.propertyText.destroy();
-
-  if (line.property) {
-    // Add emoji based on character
-    let emoji = '';
-    switch (line.character) {
-      case 'rbc': emoji = '🧬 '; break;
-      case 'wbc': emoji = '🛡️ '; break;
-      case 'platelet': emoji = '🩹 '; break;
-      case 'plasma': emoji = '💧 '; break;
+  showCurrentLine() {
+    if (this.currentLine >= this.script.length) {
+      this.triggerEarthquakePopup();
+      return;
     }
 
-    const decoratedProperty = line.property
-      .split('\n')
-      .map(line => `${emoji}${line}`)
-      .join('\n');
+    const line = this.script[this.currentLine];
 
-    this.propertyText = this.add.text(540, 160, decoratedProperty, {
-      fontSize: '26px',
-      color: '#ffffff',
-      wordWrap: { width: 480 },
-      backgroundColor: 'rgba(0,0,0,0.4)',
-      padding: { left: 16, right: 16, top: 10, bottom: 10 }
-    }).setAlpha(0).setDepth(200);
+    if (this.currentWiggleTween) {
+      this.currentWiggleTween.stop();
+      this.currentWiggleTween = null;
+    }
 
-    this.tweens.add({
-      targets: this.propertyText,
-      alpha: 1,
-      duration: 400,
-      ease: 'Power2'
+    Object.values(this.characterSprites).forEach(sprite => {
+      this.tweens.killTweensOf(sprite);
+      sprite.setScale(0.5);
+      sprite.setAngle(0);
+    });
+
+    if (line.character && this.characterSprites[line.character]) {
+      const char = this.characterSprites[line.character];
+      char.setScale(0.65);
+
+      this.currentWiggleTween = this.tweens.add({
+        targets: char,
+        angle: { from: -6, to: 6 },
+        duration: 150,
+        yoyo: true,
+        repeat: -1
+      });
+    }
+
+    if (this.propertyText) this.propertyText.destroy();
+
+    if (line.property) {
+      let emoji = '';
+      switch (line.character) {
+        case 'rbc': emoji = '🧬 '; break;
+        case 'wbc': emoji = '🛡️ '; break;
+        case 'platelet': emoji = '🩹 '; break;
+        case 'plasma': emoji = '💧 '; break;
+      }
+
+      const decoratedProperty = line.property
+        .split('\n')
+        .map(line => `${emoji}${line}`)
+        .join('\n');
+
+      this.propertyText = this.add.text(540, 160, decoratedProperty, {
+        fontSize: '26px',
+        color: '#ffffff',
+        wordWrap: { width: 480 },
+        backgroundColor: 'rgba(0,0,0,0.4)',
+        padding: { left: 16, right: 16, top: 10, bottom: 10 }
+      }).setAlpha(0).setDepth(200);
+
+      this.tweens.add({
+        targets: this.propertyText,
+        alpha: 1,
+        duration: 400,
+        ease: 'Power2'
+      });
+    }
+
+    this.backButton.setVisible(this.currentLine > 0);
+
+    this.dialogueUI.onLineComplete = () => {
+      // Here you can add voice narration trigger, e.g.
+      // this.playVoiceNarration(`line_${this.currentLine}`);
+
+      this.currentLine++;
+      this.showCurrentLine();
+    };
+
+    this.dialogueUI.startDialogue([line]);
+  }
+
+  triggerEarthquakePopup() {
+    if (this.hasShaken) return;
+    this.hasShaken = true;
+
+    this.cameras.main.shake(900, 0.04);
+
+    this.time.delayedCall(1400, () => {
+      const overlay = this.add.rectangle(512, 384, 1024, 768, 0x000000, 0.7)
+        .setOrigin(0.5)
+        .setInteractive()
+        .setDepth(1000);
+
+      const popup = this.add.image(512, 384, 'quest3')
+        .setOrigin(0.5)
+        .setDepth(1001)
+        .setScale(0.48);
+
+      const startBtn = this.add.text(512, 680, 'Start Game', {
+        fontSize: '28px',
+        color: '#FFD700',
+        backgroundColor: '#333',
+        padding: { left: 20, right: 20, top: 10, bottom: 10 },
+      })
+        .setOrigin(0.5)
+        .setDepth(1002)
+        .setInteractive({ useHandCursor: true });
+
+      startBtn.on('pointerdown', () => {
+        overlay.destroy();
+        popup.destroy();
+        startBtn.destroy();
+
+        this.scene.start('Chapter3game');
+      });
     });
   }
 
-  this.backButton.setVisible(this.currentLine > 0);
-
-  this.dialogueUI.onLineComplete = () => {
-    this.currentLine++;
-    this.showCurrentLine();
-  };
-
-  this.dialogueUI.startDialogue([line]);
-}
-
-
-  triggerEarthquakePopup() {
-  if (this.hasShaken) return;
-  this.hasShaken = true;
-
-  this.cameras.main.shake(900, 0.04);
-
-  this.time.delayedCall(1400, () => {
-    // Add a semi-transparent dark overlay
-    const overlay = this.add.rectangle(512, 384, 1024, 768, 0x000000, 0.7)
-      .setOrigin(0.5)
-      .setInteractive()
-      .setDepth(1000);
-
-    // Show the quest3 image as popup background
-    const popup = this.add.image(512, 384, 'quest3')
-      .setOrigin(0.5)
-      .setDepth(1001)
-      .setScale(0.48);
-
-    // Add a "Start Game" button below the popup
-    const startBtn = this.add.text(512, 680, 'Start Game', {
-      fontSize: '28px',
-      color: '#FFD700',
-      backgroundColor: '#333',
-      padding: { left: 20, right: 20, top: 10, bottom: 10 },
-    })
-      .setOrigin(0.5)
-      .setDepth(1002)
-      .setInteractive({ useHandCursor: true });
-
-    startBtn.on('pointerdown', () => {
-      overlay.destroy();
-      popup.destroy();
-      startBtn.destroy();
-       
-      this.scene.start('Chapter3game');
-    });
-  });
-}
-
+  stopAudio() {
+    if (this.bgm) {
+      this.bgm.stop();
+      this.bgm.destroy();
+      this.bgm = null;
+    }
+    if (this.voiceAudio) {
+      this.voiceAudio.stop();
+      this.voiceAudio.destroy();
+      this.voiceAudio = null;
+    }
+    if (this.bgVideo) {
+      this.bgVideo.stop();
+      this.bgVideo.destroy();
+      this.bgVideo = null;
+    }
+  }
 }
