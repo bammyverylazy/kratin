@@ -30,7 +30,7 @@ export class Chapter3game extends Phaser.Scene {
     this.load.audio('correctSound', '/assets/audio/correctsound.mp3');
     this.load.audio('wrongSound', '/assets/audio/wrongsound.mp3');
     this.load.audio('walkSound', '/assets/audio/walkingsound.mp3');
-    this.load.audio('tick', '/assets/audio/tick.mp3'); // ✅ Ticking sound
+    this.load.audio('tick', '/assets/audio/tick.mp3');
   }
 
   create() {
@@ -44,7 +44,7 @@ export class Chapter3game extends Phaser.Scene {
     this.correctSound = this.sound.add('correctSound');
     this.wrongSound = this.sound.add('wrongSound');
     this.walkSound = this.sound.add('walkSound', { loop: true, volume: 0.3 });
-    this.tickSound = this.sound.add('tick', { volume: 0.3 }); // ✅ Ticking volume lower
+    this.tickSound = this.sound.add('tick', { volume: 0.3 });
 
     this.sound.mute = !this.soundEnabled;
 
@@ -129,7 +129,6 @@ export class Chapter3game extends Phaser.Scene {
 
         if (this.soundEnabled) {
           if (this.timer <= 5) {
-            // Switch to faster ticking every 500ms
             if (this.tickTimer.delay !== 500) {
               this.tickTimer.reset({ delay: 500, loop: true, callback: this.tickTimer.callback, callbackScope: this });
             }
