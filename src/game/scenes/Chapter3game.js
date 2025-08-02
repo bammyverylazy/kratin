@@ -224,18 +224,19 @@ export class Chapter3game extends Phaser.Scene {
         const heart = this.heartIcons[this.hearts];
         heart.setAlpha(1).setVisible(true).setScale(0.5);
 
-        // Pulse effect tween:
-        this.tweens.add({
-          targets: heart,
-          scale: { from: 0.5, to: 0.65 },
-          yoyo: true,
-          repeat: 2,
-          duration: 200,
-          ease: 'Sine.easeInOut',
-          onComplete: () => {
-            heart.setScale(0.5);
-          },
-        });
+     // Pulse effect tween:
+      this.tweens.add({
+      targets: heart,
+      scale: { from: 0.28, to: 0.35 },
+      yoyo: true,
+      repeat: 2,
+      duration: 200,
+      ease: 'Sine.easeInOut',
+      onComplete: () => {
+        heart.setScale(0.28);
+      },
+    });
+
 
         this.hearts++;
       }
