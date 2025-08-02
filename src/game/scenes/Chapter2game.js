@@ -178,24 +178,29 @@ export class Chapter2game extends Phaser.Scene {
       if (this.soundEnabled) this.wrongSound.play();
 
       this.showImagePopup('tryAgain', () => {
-        this.hearts--;
-        if (this.heartIcons[this.hearts]) {
-          this.tweens.add({
-            targets: this.heartIcons[this.hearts],
-            alpha: 0,
-            duration: 300,
-            onComplete: () => this.heartIcons[this.hearts].setVisible(false)
-          });
-          this.cameras.main.shake(200, 0.01);
-        }
+      this.hearts--;
 
-        if (this.hearts <= 0) {
-          this.endGame(false);
-        } else {
-          this.player.setPosition(100, 700);
-          this.askQuestion();
-        }
-      });
+      const lostHeartIcon = this.heartIcons[this.hearts];
+      if (lostHeartIcon) {
+        this.tweens.add({
+          targets: lostHeartIcon,
+          alpha: 0,
+          duration: 300,
+          onComplete: () => {
+            lostHeartIcon.setVisible(false);
+          }
+        });
+        this.cameras.main.shake(200, 0.01);
+      }
+
+      if (this.hearts <= 0) {
+        this.endGame(false);
+      } else {
+        this.player.setPosition(100, 700);
+        this.askQuestion();
+      }
+    });
+
     }
   }
 
