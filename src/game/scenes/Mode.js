@@ -74,7 +74,7 @@ export class Mode extends Scene {
 
     newGameBtn.on('pointerdown', async () => {
       if (!user?._id) return;
-      await fetch(`${backendURL}progress/save`, {
+      await fetch(`${backendURL}/progress/save`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId: user._id, scene: "Chapter1" })
@@ -92,7 +92,7 @@ export class Mode extends Scene {
     const userId = user?._id;
     if (!userId) throw new Error('User ID missing');
 
-    const response = await fetch(`${backendURL}progress/load/${userId}`);
+    const response = await fetch(`${backendURL}/progress/load/${userId}`);
     if (!response.ok) throw new Error(`Failed to load progress: ${response.statusText}`);
 
     const data = await response.json();

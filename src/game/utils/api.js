@@ -3,7 +3,7 @@ const backendURL = 'https://cellvivor-backend.onrender.com';
 
 export async function saveProgress(userId, scene) {
   if (!userId || !scene) throw new Error("Missing userId or scene");
-  const res = await fetch(`${backendURL}progress/save`, {
+  const res = await fetch(`${backendURL}/progress/save`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ userId, scene }),
