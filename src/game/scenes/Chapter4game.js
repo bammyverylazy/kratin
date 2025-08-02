@@ -35,6 +35,7 @@ export class Chapter4game extends Phaser.Scene {
     this.load.image('book', '/assets/book.png');
     this.load.image('correct', '/assets/correct.png');
     this.load.image('End', '/assets/End.png'); 
+    this.load.image('notebook', '/assets/notebook.png');
   }
 
   create() {

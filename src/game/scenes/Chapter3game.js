@@ -24,6 +24,7 @@ export class Chapter3game extends Phaser.Scene {
     this.load.image('wbc', '/assets/wbc.png');
     this.load.image('platelet', '/assets/platelet.png');
     this.load.image('plasma', '/assets/plasma.png');
+    this.load.image('notebook', '/assets/notebook.png');
 
     this.load.audio('bgm', '/assets/audio/gamemusic.mp3');
     this.load.audio('correctSound', '/assets/audio/correctsound.mp3');
@@ -57,8 +58,6 @@ export class Chapter3game extends Phaser.Scene {
     this.add.video(0, 0, 'bloodflow').setOrigin(0, 0).play(true).setLoop(true);
 
     addStoryModeUI(this, {
-      onBook: (scene, box) =>
-        scene.add.text(box.x, box.y, 'Book', { fontSize: '24px', color: '#222' }).setOrigin(0.5).setDepth(201),
     });
 
     this.cursors = this.input.keyboard.createCursorKeys();

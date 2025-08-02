@@ -23,6 +23,7 @@ export class Chapter1game extends Phaser.Scene {
     this.load.image('correct', '/assets/correct.png');
     this.load.image('tryAgain', '/assets/tryAgain.png');
     this.load.image('quest1', '/assets/quest1.png');
+    this.load.image('notebook', '/assets/notebook.png');
 
     this.load.audio('bgm', '/assets/audio/backgroundmusic.mp3');
     this.load.audio('correctSound', '/assets/audio/correctsound.mp3');
@@ -56,11 +57,6 @@ export class Chapter1game extends Phaser.Scene {
     this.events.on('destroy', () => this.stopAllSounds());
 
     addStoryModeUI(this, {
-      onBook: (scene, box) =>
-        scene.add.text(box.x, box.y, 'Custom Book', {
-          fontSize: '32px',
-          color: '#222'
-        }).setOrigin(0.5).setDepth(201),
     });
 
     const zoneData = [

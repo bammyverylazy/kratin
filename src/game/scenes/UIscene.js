@@ -1,7 +1,6 @@
 // UIscene.js
 import { saveGameProgress } from '../utils/saveProgress.js';
 
-
 export function addStoryModeUI(scene, options = {}) {
     let popupOverlay = null;
     let popupBox = null;
@@ -232,11 +231,82 @@ export function addStoryModeUI(scene, options = {}) {
 }
 
     function defaultBook(scene, box) {
-        return scene.add.text(box.x, box.y, 'Book\n\nBook content goes here.', {
-            fontSize: '32px',
-            color: '#222',
-            align: 'center',
-            wordWrap: { width: 750 }
-        }).setOrigin(0.5).setDepth(201);
+    const pages = [
+        "📖 Page 1:\nWelcome to your notebook!\n\nHere you can read story notes or clues.",
+        "📖 Page 2:\nDid you know?\nRed blood cells carry oxygen.",
+        "📖 Page 3:\nTip:\nPay attention to what each organ does in your journey!",
+        "📖 Page 4:\nYou can customize each page\nwith helpful reminders or story points."
+    ];
+    let currentPage = 0;
+    const popupDepth = 201;
+
+    // Notebook background image
+    const notebookImage = scene.add.image(box.x, box.y, 'notebook')
+        .setDisplaySize(850, 550)
+        .setDepth(popupDepth);
+
+    // Text field
+    const text = scene.add.text(box.x, box.y, pages[currentPage], {
+        fontSize: '24px',
+        color: '#222',
+        align: 'center',
+        wordWrap: { width: 700, useAdvancedWrap: true }
+    }).setOrigin(0.5).setDepth(popupDepth + 1);
+
+    // Page navigation buttons
+    const prevBtn = scene.add.text(box.x - 300, box.y + 230, 'Previous', {
+        fontSize: '24px',
+        color: '#fff',
+        backgroundColor: '#444',
+        padding: { left: 12, right: 12, top: 6, bottom: 6 }
+    }).setOrigin(0.5).setDepth(popupDepth + 2).setInteractive({ useHandCursor: true });
+
+    const nextBtn = scene.add.text(box.x + 300, box.y + 230, 'Next', {
+        fontSize: '24px',
+        color: '#fff',
+        backgroundColor: '#444',
+        padding: { left: 12, right: 12, top: 6, bottom: 6 }
+    }).setOrigin(0.5).setDepth(popupDepth + 2).setInteractive({ useHandCursor: true });
+
+    function updatePage() {
+        text.setText(pages[currentPage]);
+        prevBtn.setAlpha(currentPage === 0 ? 0.5 : 1).setInteractive(currentPage > 0);
+        nextBtn.setAlpha(currentPage === pages.length - 1 ? 0.5 : 1).setInteractive(currentPage < pages.length - 1);
     }
+
+    prevBtn.on('pointerdown', () => {
+        if (currentPage > 0) {
+            currentPage--;
+            updatePage();
+        }
+    });
+
+    nextBtn.on('pointerdown', () => {
+        if (currentPage < pages.length - 1) {
+            currentPage++;
+            updatePage();
+        }
+    });
+
+    updatePage();
+
+    // Cleanup on scene shutdown
+    scene.events.once('shutdown', () => {
+        notebookImage.destroy();
+        text.destroy();
+        prevBtn.destroy();
+        nextBtn.destroy();
+    });
+
+    // Return destroyable group
+    return {
+        destroy: () => {
+            notebookImage.destroy();
+            text.destroy();
+            prevBtn.destroy();
+            nextBtn.destroy();
+        }
+    };
+}
+
 }

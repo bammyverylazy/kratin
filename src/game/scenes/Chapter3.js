@@ -24,6 +24,7 @@ export class Chapter3 extends Scene {
     this.load.image('wbc', '/assets/wbc.png');
     this.load.image('platelet', '/assets/platelet.png');
     this.load.image('plasma', '/assets/plasma.png');
+    this.load.image('notebook', '/assets/notebook.png');
 
     this.load.image('magnifying', '/assets/magnifying.png');
     this.load.image('setting', '/assets/setting.png');
@@ -67,8 +68,7 @@ export class Chapter3 extends Scene {
     ).setOrigin(0.5).setDepth(10).setInteractive({ useHandCursor: true });
 
     addStoryModeUI(this, {
-          onBook: (scene, box) => scene.add.text(box.x, box.y, 'Book', { fontSize: '32px', color: '#222' }).setOrigin(0.5).setDepth(201),
-    });
+            });
 
     this.script = [
       { speaker: "Narrator", text: "Let’s meet the blood components.", sceneStep: 1 },

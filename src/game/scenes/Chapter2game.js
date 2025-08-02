@@ -31,6 +31,7 @@ export class Chapter2game extends Phaser.Scene {
     this.load.image('correct', '/assets/correct.png');
     this.load.image('tryAgain', '/assets/tryAgain.png');
     this.load.image('quest2', '/assets/quest2.png');
+    this.load.image('notebook', '/assets/notebook.png');
 
     this.load.audio('bgm', '/assets/audio/gamemusic.mp3');
     this.load.audio('correctSound', '/assets/audio/correctsound.mp3');
@@ -63,9 +64,7 @@ export class Chapter2game extends Phaser.Scene {
     this.add.image(512, 384, 'map').setDepth(0);
 
     addStoryModeUI(this, {
-       onBook: (scene, box) =>
-        scene.add.text(box.x, box.y, 'Custom Book', { fontSize: '32px', color: '#222' }).setOrigin(0.5).setDepth(201),
-    });
+        });
 
     this.questions = Phaser.Utils.Array.Shuffle([
       { room: 'Right Atrium', text: 'The Right Atrium receives blood from the vena cava.' },

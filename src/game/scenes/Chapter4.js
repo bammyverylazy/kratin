@@ -27,6 +27,7 @@ export class Chapter4 extends Scene {
     this.load.image('setting', '/assets/setting.png');
     this.load.image('book', '/assets/book.png');
     this.load.image('quest4', '/assets/quest4.png');
+    this.load.image('notebook', '/assets/notebook.png');
 
     // Audio
     this.load.audio('fastHeart', '/assets/audio/fastheartbeatingsound.mp3');
