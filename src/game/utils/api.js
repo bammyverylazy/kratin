@@ -11,11 +11,3 @@ export async function saveProgress(userId, scene) {
   if (!res.ok) throw new Error('Failed to save progress');
   return true;
 }
-
-export async function loadProgress(userId) {
-  if (!userId) throw new Error("Missing userId");
-  const res = await fetch(`${backendURL}/progress/load/${userId}`);
-  if (!res.ok) throw new Error('Failed to load progress');
-  const data = await res.json();
-  return data.lastScene || 'Chapter1';
-}

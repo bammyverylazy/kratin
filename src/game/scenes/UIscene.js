@@ -1,5 +1,7 @@
+// UIscene.js
+import { saveProgress } from '../utils/api.js'; // make sure this path is correct
+
 export function addStoryModeUI(scene, options = {}) {
-    // Popup state
     let popupOverlay = null;
     let popupBox = null;
     let popupContent = null;
@@ -28,14 +30,14 @@ export function addStoryModeUI(scene, options = {}) {
         });
     }
 
-    // Top right icons
+    // Top-right UI icons
     const iconSpacing = 70;
     const startX = 820;
     const y = 90;
     [
-                {
+        {
             key: 'book',
-            x: startX  ,
+            x: startX,
             cb: () => openPopup(options.onBook || defaultBook)
         },
         {
@@ -45,10 +47,9 @@ export function addStoryModeUI(scene, options = {}) {
         },
         {
             key: 'setting',
-            x: startX + iconSpacing*2,
+            x: startX + iconSpacing * 2,
             cb: () => openPopup(options.onSettings || defaultSettings)
         },
-
     ].forEach(icon => {
         scene.add.image(icon.x, y, icon.key)
             .setOrigin(0.5)
@@ -60,6 +61,8 @@ export function addStoryModeUI(scene, options = {}) {
                 icon.cb();
             });
     });
+
+    // Quit arrow button
     const arrow = scene.add.text(60, 90, '<', {
         fontSize: '48px',
         color: '#ffffffff',
@@ -67,58 +70,57 @@ export function addStoryModeUI(scene, options = {}) {
         borderRadius: 12
     }).setOrigin(0.5).setDepth(200).setInteractive({ useHandCursor: true });
 
-arrow.on('pointerdown', () => {
-    if (popupOverlay) return;
-    const confirmQuit = window.confirm('Do you want to quit the storyboard mode?');
-    if (confirmQuit) {
-        console.log('User chose to quit the game.');
-        scene.scene.start('MainMenu'); // ✅ use passed scene reference
-        scene.scene.stop();    
-        scene.children.removeAll(); 
-    } else {
-        console.log('User chose to stay in the game.');
-    }
-});
+    arrow.on('pointerdown', async () => {
+        if (popupOverlay) return;
 
+        const confirmQuit = window.confirm('Do you want to quit the storyboard mode?');
+        if (!confirmQuit) return;
 
-      
-    };
+        const userId = options.userId || scene.registry.get('userId');
+        const currentChapter = options.currentChapter || scene.scene.key;
 
-    // Default popup content functions
+        try {
+            if (userId && currentChapter) {
+                await saveProgress(userId, currentChapter);
+                console.log('✅ Progress saved on quit:', currentChapter);
+            } else {
+                console.warn('⚠️ Missing userId or currentChapter; progress not saved.');
+            }
+        } catch (err) {
+            console.error('❌ Failed to save progress on quit:', err);
+        }
+
+        scene.scene.start('MainMenu');
+        scene.scene.stop();
+        scene.children.removeAll();
+    });
+
+    // Default popup content handlers
     function defaultHowToPlay(scene, box) {
         const slides = ['5.png', '6.png', '7.png', '8.png', '9.png'];
         let current = 0;
-        const popupDepth = 201; // Slide and buttons should be above box (200)
+        const popupDepth = 201;
 
-        // Show the first slide
         let slideImage = scene.add.image(box.x, box.y, slides[current])
             .setDisplaySize(850, 550)
             .setDepth(popupDepth);
 
-        // Previous button
         const prevBtn = scene.add.text(box.x - 320, box.y + 300, 'Previous', {
             fontSize: '28px',
             color: '#fff',
-            //backgroundColor: '#007bff',
             padding: { left: 20, right: 20, top: 10, bottom: -1 }
         }).setOrigin(0.5).setDepth(popupDepth + 1).setInteractive({ useHandCursor: true });
 
-        // Next button
         const nextBtn = scene.add.text(box.x + 320, box.y + 300, 'Next', {
             fontSize: '28px',
             color: '#fff',
-            //backgroundColor: '#007bff',
             padding: { left: 20, right: 20, top: 10, bottom: -1 }
         }).setOrigin(0.5).setDepth(popupDepth + 1).setInteractive({ useHandCursor: true });
 
         function updateSlide() {
             slideImage.setTexture(slides[current]);
-            prevBtn.setAlpha(current === 0 ? 0.5 : 1);
-            prevBtn.disableInteractive();
-            nextBtn.setAlpha(current === slides.length - 1 ? 0.5 : 1);
-            nextBtn.disableInteractive();
-            if (current > 0) prevBtn.setInteractive({ useHandCursor: true });
-            if (current < slides.length - 1) nextBtn.setInteractive({ useHandCursor: true });
+            prevBtn.setAlpha(current === 0 ? 0.5 : 1).setInteractive(current > 0);
+            nextBtn.setAlpha(current === slides.length - 1 ? 0.5 : 1).setInteractive(current < slides.length - 1);
         }
 
         prevBtn.on('pointerdown', () => {
@@ -136,73 +138,97 @@ arrow.on('pointerdown', () => {
 
         updateSlide();
 
-        // Clean up when popup closes
         scene.events.once('shutdown', () => {
             slideImage.destroy();
             prevBtn.destroy();
             nextBtn.destroy();
         });
 
-        // No container, just return a dummy object for compatibility
-        return { destroy: () => { slideImage.destroy(); prevBtn.destroy(); nextBtn.destroy(); } };
+        return {
+            destroy: () => {
+                slideImage.destroy();
+                prevBtn.destroy();
+                nextBtn.destroy();
+            }
+        };
     }
-    function defaultSettings(scene, box) {
-  // Text label
-  const label = scene.add.text(box.x - 120, box.y, 'Sound:', {
-    fontSize: '28px',
-    color: '#222',
-  }).setOrigin(0, 0.5).setDepth(201);
 
-  // Checkbox background
-  const checkboxBg = scene.add.rectangle(box.x + 40, box.y, 32, 32, 0xffffff)
-    .setStrokeStyle(2, 0x888888)
-    .setOrigin(0, 0.5)
-    .setDepth(201)
-    .setInteractive({ useHandCursor: true });
+   function defaultSettings(scene, box) {
+    const label = scene.add.text(box.x - 120, box.y - 60, 'Sound:', {
+        fontSize: '28px',
+        color: '#222',
+    }).setOrigin(0, 0.5).setDepth(201);
 
-  // Checkmark text (✓)
-  const checkmark = scene.add.text(box.x + 46, box.y, '✓', {
-    fontSize: '28px',
-    color: '#222',
-  }).setOrigin(0, 0.5).setDepth(202);
+    const checkboxBg = scene.add.rectangle(box.x + 40, box.y - 60, 32, 32, 0xffffff)
+        .setStrokeStyle(2, 0x888888)
+        .setOrigin(0, 0.5)
+        .setDepth(201)
+        .setInteractive({ useHandCursor: true });
 
-  // Initialize checkmark visibility based on localStorage
-  const soundEnabled = localStorage.getItem('soundEnabled');
-  let isChecked = soundEnabled === null ? true : (soundEnabled === 'true');
-  checkmark.setVisible(isChecked);
+    const checkmark = scene.add.text(box.x + 46, box.y - 60, '✓', {
+        fontSize: '28px',
+        color: '#222',
+    }).setOrigin(0, 0.5).setDepth(202);
 
-  // Toggle function
-  const toggleSound = () => {
-    isChecked = !isChecked;
+    const soundEnabled = localStorage.getItem('soundEnabled');
+    let isChecked = soundEnabled === null ? true : (soundEnabled === 'true');
     checkmark.setVisible(isChecked);
-    localStorage.setItem('soundEnabled', isChecked);
 
-    // Update scene mute/unmute
-    if (scene.sound) {
-      scene.sound.mute = !isChecked;
+    const toggleSound = () => {
+        isChecked = !isChecked;
+        checkmark.setVisible(isChecked);
+        localStorage.setItem('soundEnabled', isChecked);
+        scene.sound.mute = !isChecked;
+        if (scene.bgm) {
+            isChecked ? scene.bgm.play() : scene.bgm.stop();
+        }
+    };
 
-      if (isChecked) {
-        if (!scene.bgm.isPlaying) scene.bgm.play();
-      } else {
-        if (scene.bgm.isPlaying) scene.bgm.stop();
-      }
-    }
-  };
+    checkboxBg.on('pointerdown', toggleSound);
+    label.on('pointerdown', toggleSound);
 
-  checkboxBg.on('pointerdown', toggleSound);
-  label.on('pointerdown', toggleSound);
+    // 🔊 Volume Slider
+    const volumeLabel = scene.add.text(box.x - 120, box.y + 20, 'Volume:', {
+        fontSize: '28px',
+        color: '#222'
+    }).setOrigin(0, 0.5).setDepth(201);
 
-  // Return a container-like object for cleanup
-  return {
-    destroy: () => {
-      label.destroy();
-      checkboxBg.destroy();
-      checkmark.destroy();
-    }
-  };
+    const sliderBg = scene.add.rectangle(box.x + 30, box.y + 20, 200, 10, 0xcccccc)
+        .setOrigin(0, 0.5).setDepth(201);
+
+    const savedVolume = parseFloat(localStorage.getItem('voiceVolume') || '1');
+    const knobX = box.x + 30 + savedVolume * 200;
+
+    const sliderKnob = scene.add.circle(knobX, box.y + 20, 12, 0x666666)
+        .setDepth(202).setInteractive({ draggable: true });
+
+    scene.input.setDraggable(sliderKnob);
+
+    sliderKnob.on('drag', (pointer, dragX) => {
+        const minX = box.x + 30;
+        const maxX = box.x + 230;
+        dragX = Phaser.Math.Clamp(dragX, minX, maxX);
+        sliderKnob.x = dragX;
+
+        const volume = Phaser.Math.Clamp((dragX - minX) / 200, 0, 1);
+        localStorage.setItem('voiceVolume', volume.toFixed(2));
+        if (scene.sound) scene.sound.volume = volume;
+    });
+
+    // Set initial volume globally
+    if (scene.sound) scene.sound.volume = savedVolume;
+
+    return {
+        destroy: () => {
+            label.destroy();
+            checkboxBg.destroy();
+            checkmark.destroy();
+            volumeLabel.destroy();
+            sliderBg.destroy();
+            sliderKnob.destroy();
+        }
+    };
 }
-
-
 
     function defaultBook(scene, box) {
         return scene.add.text(box.x, box.y, 'Book\n\nBook content goes here.', {
@@ -212,4 +238,4 @@ arrow.on('pointerdown', () => {
             wordWrap: { width: 750 }
         }).setOrigin(0.5).setDepth(201);
     }
-
+}

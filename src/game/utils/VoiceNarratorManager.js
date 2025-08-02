@@ -1,39 +1,43 @@
 export default class VoiceNarratorManager {
   constructor(scene) {
     this.scene = scene;
-    this.playedKeys = new Set();
     this.currentSound = null;
   }
 
   play(audioKey) {
     if (!audioKey) return;
 
-    // หยุดเสียงก่อนหน้า ถ้ามี
-    if (this.currentSound && this.currentSound.isPlaying) {
-      this.currentSound.stop();
-    }
+    // Stop current sound if needed
+    this.stop();
 
-    // ถ้าเคยเล่นแล้ว — ข้าม
-    if (this.playedKeys.has(audioKey)) return;
+    const volume = parseFloat(localStorage.getItem('voiceVolume') || '1');
 
-    // ถ้าเสียงนี้โหลดอยู่
-    if (this.scene.sound.get(audioKey)) {
-      this.currentSound = this.scene.sound.add(audioKey);
+    if (this.scene.cache.audio.exists(audioKey)) {
+      this.currentSound = this.scene.sound.add(audioKey, { volume });
       this.currentSound.play();
-      this.playedKeys.add(audioKey);
     } else {
-      console.warn(`VoiceNarratorManager: Sound not found: ${audioKey}`);
+      console.warn(`VoiceNarratorManager: Audio not loaded: ${audioKey}`);
+
+      this.scene.load.audio(audioKey, `/assets/audio/chapter1/${audioKey}.mp3`);
+      this.scene.load.once(`filecomplete-audio-${audioKey}`, () => {
+        this.currentSound = this.scene.sound.add(audioKey, { volume });
+        this.currentSound.play();
+      });
+      this.scene.load.start();
     }
   }
 
   stop() {
-    if (this.currentSound && this.currentSound.isPlaying) {
-      this.currentSound.stop();
+    if (this.currentSound) {
+      if (this.currentSound.isPlaying) {
+        this.currentSound.stop();
+      }
+      this.currentSound.destroy();
+      this.currentSound = null;
     }
   }
 
   reset() {
-    this.playedKeys.clear();
     this.stop();
   }
 }
