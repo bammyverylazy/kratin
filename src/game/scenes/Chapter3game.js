@@ -218,13 +218,19 @@ export class Chapter3game extends Phaser.Scene {
       this.progressText.setText(`Progress: ${this.correctCount}/${this.totalItems}`);
     } else {
       if (this.soundEnabled) this.wrongSound.play();
-      if (this.hearts > 0) {
-        this.hearts--;
-        this.tweens.add({ targets: this.heartIcons[this.hearts], alpha: 0, duration: 300, scale: 0.1 });
-      }
+    if (this.hearts > 0) {
+      this.hearts--;
+      const lostHeart = this.heartIcons[this.hearts];
+      this.tweens.add({
+        targets: lostHeart,
+        alpha: 0,
+        duration: 300,
+        onComplete: () => {
+          lostHeart.setVisible(false);
+        }
+      });
       this.cameras.main.shake(200, 0.01);
-    }
-
+     }
     this.currentItem.destroy(true);
     this.currentItem = null;
 
