@@ -47,17 +47,20 @@ export class Dashboard extends Scene {
 
   renderDashboard(w, h, currentChapterIndex, userId) {
     const graphX = 100;
-    const graphY = 100;
+    const graphY = 240;
     const graphWidth = w - 2 * graphX;
-    const maxHeight = 250;
+    const maxHeight = 200;
     const barWidth = 30;
     const barGap = 15;
 
-    // Graph Background
-    this.add.rectangle(graphX - 20, graphY - 60, graphWidth + 40, maxHeight + 140, 0xffffff, 0.9).setOrigin(0, 0);
+    const graphBg = this.add.rectangle(graphX - 20, graphY - 60, graphWidth + 40, maxHeight + 200, 0xffffff)
+      .setOrigin(0, 0)
+      .setStrokeStyle(2, 0xaaaaaa)
+      .setInteractive({ useHandCursor: false });
+    if (graphBg.setCornerRadius) graphBg.setCornerRadius(20);
 
-    this.add.text(w / 2, graphY - 40, 'Recent Game Scores & Hints Used', {
-      fontSize: '28px',
+    this.add.text(w / 2, graphY - 20, 'Recent Game Scores & Hints Used', {
+      fontSize: '36px',
       fontStyle: 'bold',
       color: '#000',
     }).setOrigin(0.5);
@@ -75,14 +78,15 @@ export class Dashboard extends Scene {
 
         const totalScore = sessions.reduce((sum, s) => sum + s.score, 0);
         const avgScore = (totalScore / sessions.length).toFixed(2);
-        this.add.text(graphX, graphY - 10, `Average Score: ${avgScore}`, {
-          fontSize: '20px',
+        const missedKeywords = Array.from(new Set(sessions.flatMap(s => s.missedKeywords || [])));
+
+        this.add.text(graphX, graphY + maxHeight + 20, `Average Score: ${avgScore}`, {
+          fontSize: '22px',
           color: '#000',
         });
 
-        const missedKeywords = ['bone marrow', 'arteries', 'platelets']; // Example fallback
-        this.add.text(graphX + 250, graphY - 10, `Missed Keywords: ${missedKeywords.join(', ')}`, {
-          fontSize: '20px',
+        this.add.text(graphX + 300, graphY + maxHeight + 20, `Missed Keywords: ${missedKeywords.join(', ')}`, {
+          fontSize: '22px',
           color: '#000',
         });
 
@@ -109,7 +113,10 @@ export class Dashboard extends Scene {
             color: '#000',
           }).setOrigin(0.5, 1);
 
-          const dateStr = new Date(session.timestamp).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+          let dateStr = 'Invalid';
+          try {
+            dateStr = new Date(session.timestamp).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+          } catch (e) {}
           this.add.text(x + barWidth, graphY + maxHeight + 10, dateStr, {
             fontSize: '12px',
             color: '#000',
