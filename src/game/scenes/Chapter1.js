@@ -60,27 +60,39 @@ export class Chapter1 extends Phaser.Scene {
   preload() {
     this.load.audio('openingsong', '/assets/audio/openingsong.mp3');
     this.load.audio('backgroundmusic', '/assets/audio/backgroundmusic.mp3');
-
     for (let i = 0; i < this.script.length; i++) {
       const audioKey = `Chapter1_line${i}`;
       this.load.audio(audioKey, `/assets/audio/chapter1/${audioKey}.mp3`);
     }
 
     this.load.image('Chapter1scene1', '/assets/Chapter1scene1.png');
-    this.bgSteps.forEach(key => {
-      if (!this.textures.exists(key)) {
-        this.load.image(key, `/assets/${key}.png`);
-      }
-    });
+    this.load.image('Chapter1scene2', '/assets/Chapter1scene2.png');
+    this.load.image('bone', '/assets/Bone.png');
+    this.load.image('bone1', '/assets/Bone1.png');
+    this.load.image('bone2', '/assets/Bone2.png');
+    this.load.image('Bonemarrow', '/assets/Bonemarrow.png');
+    this.load.image('noobysleep', '/assets/noobysleep.png');
+    this.load.image('noobywake', '/assets/noobywake.png');
+    this.load.image('BloodVessel', '/assets/BloodVessel.png');
+    this.load.image('BloodVesselA', '/assets/BloodVesselA.png');
+    this.load.image('BloodVesselB', '/assets/BloodVesselB.png');
 
-    // Load videos if not loaded by default
-    const videoKeys = ['CellBorn', 'Blood', 'body', 'bloodvess', 'noobywalkyellow', 'RBCIntro', 'RBCwalkpink'];
-    videoKeys.forEach(key => this.load.video(key, `/assets/${key}.mp4`));
+    this.load.video('CellBorn', '/assets/CellBorn.mp4');
+    this.load.video('Blood', '/assets/Blood.mp4');
+    this.load.video('body', '/assets/body.mp4');
+    this.load.video('bloodvess', '/assets/bloodvess.mp4');
+    this.load.video('noobywalkyellow', '/assets/noobywalkyellow.mp4');
+    this.load.video('RBCIntro', '/assets/RBCIntro.mp4');
+    this.load.video('RBCwalkpink', '/assets/RBCwalkpink.mp4');
 
-    // UI assets
     this.load.image('magnifying', '/assets/magnifying.png');
     this.load.image('setting', '/assets/setting.png');
     this.load.image('book', '/assets/book.png');
+    this.load.image('5.png', '/assets/5.png');
+    this.load.image('6.png', '/assets/6.png');
+    this.load.image('7.png', '/assets/7.png');
+    this.load.image('8.png', '/assets/8.png');
+    this.load.image('9.png', '/assets/9.png');
   }
 
   create() {
@@ -94,9 +106,6 @@ export class Chapter1 extends Phaser.Scene {
     addStoryModeUI(this, {
       userId: this.userId,
       currentChapter: this.currentChapter,
-      onSettings: (scene, box) => scene.add.text(box.x, box.y, 'Custom Settings', {
-        fontSize: '32px', color: '#222'
-      }).setOrigin(0.5).setDepth(201),
       onBook: (scene, box) => scene.add.text(box.x, box.y, 'Custom Book', {
         fontSize: '32px', color: '#222'
       }).setOrigin(0.5).setDepth(201)
