@@ -146,14 +146,47 @@ arrow.on('pointerdown', () => {
         // No container, just return a dummy object for compatibility
         return { destroy: () => { slideImage.destroy(); prevBtn.destroy(); nextBtn.destroy(); } };
     }
-    function defaultSettings(scene, box) {
-        return scene.add.text(box.x, box.y, 'Settings\n\nSettings options go here.', {
-            fontSize: '32px',
-            color: '#222',
-            align: 'center',
-            wordWrap: { width: 750 }
-        }).setOrigin(0.5).setDepth(201);
-    }
+function defaultSettings(scene, box) {
+  const popupDepth = 201;
+  const soundEnabled = scene.sound.mute === false;
+
+  const settingText = scene.add.text(box.x, box.y - 40, 'Sound Settings', {
+    fontSize: '36px',
+    color: '#000',
+    align: 'center'
+  }).setOrigin(0.5).setDepth(popupDepth);
+
+  const toggleBtn = scene.add.text(box.x, box.y + 20, soundEnabled ? '🔊 Sound: ON' : '🔇 Sound: OFF', {
+    fontSize: '28px',
+    color: '#007bff',
+    backgroundColor: '#eee',
+    padding: { left: 20, right: 20, top: 10, bottom: 10 }
+  }).setOrigin(0.5).setDepth(popupDepth)
+    .setInteractive({ useHandCursor: true })
+    .on('pointerdown', () => {
+      const newState = !scene.sound.mute;
+      scene.sound.mute = newState;
+      localStorage.setItem('soundEnabled', !newState);
+
+      toggleBtn.setText(!newState ? '🔊 Sound: ON' : '🔇 Sound: OFF');
+
+      // Start or stop BGM as needed
+      if (scene.bgm) {
+        if (!newState && !scene.bgm.isPlaying) scene.bgm.play();
+        else if (newState) scene.bgm.stop();
+      }
+    });
+
+  // Cleanup on popup close
+  scene.events.once('shutdown', () => {
+    settingText.destroy();
+    toggleBtn.destroy();
+  });
+
+  return { destroy: () => { settingText.destroy(); toggleBtn.destroy(); } };
+}
+
+
     function defaultBook(scene, box) {
         return scene.add.text(box.x, box.y, 'Book\n\nBook content goes here.', {
             fontSize: '32px',

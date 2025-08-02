@@ -122,6 +122,7 @@
     - 9.png
     - Artery.png
     - audio
+      - backgroundmusic.mp3
       - chapter1
         - Chapter1_line0.mp3
         - Chapter1_line1.mp3
@@ -143,6 +144,27 @@
         - Chapter1_line7.mp3
         - Chapter1_line8.mp3
         - Chapter1_line9.mp3
+      - chapter2
+        - Chapter2_line0.mp3
+        - Chapter2_line1.mp3
+        - Chapter2_line2.mp3
+        - Chapter2_line3.mp3
+        - Chapter2_line4.mp3
+        - Chapter2_line5.mp3
+        - Chapter2_line6.mp3
+        - Chapter2_line7.mp3
+        - Chapter2_line8.mp3
+        - Chapter2_line9.mp3
+      - correctsound.mp3
+      - fastheartbeatingsound.mp3
+      - gamemusic.mp3
+      - heartbeatingsound.mp3
+      - openingsong.mp3
+      - openingsong2.mp3
+      - pressurebackgroundmusic.mp3
+      - sadbackgroundmusic.mp3
+      - walkingsound.mp3
+      - wrongsound.mp3
     - bg.png
     - Blood.mp4
     - bloodflow.mp4
@@ -162,8 +184,10 @@
     - Chapter1scene1.png
     - Chapter1scene2.png
     - Chapter2fr.mp4
+    - Chapter2scene1Intro.png
     - Chapter3scene1.png
     - Chapter4scene1.mp4
+    - Chapter4scene1Intro.png
     - ContinueButton.png
     - correct.png
     - D1F243E9-3E55-450A-93AC-5B75BE6C27F7.png
@@ -172,6 +196,7 @@
     - heartbeat.mp4
     - hint.png
     - jogging.png
+    - lock-icon.png
     - logo.png
     - magnifying.png
     - map.jpg

@@ -19,25 +19,39 @@ export class Chapter1game extends Phaser.Scene {
     this.load.image('Artery', '/assets/Artery.png');
     this.load.image('setting', '/assets/setting.png');
     this.load.image('book', '/assets/book.png');
-    this.load.image('correct', '/assets/correct.png');     
+    this.load.image('correct', '/assets/correct.png');
     this.load.image('tryAgain', '/assets/tryAgain.png');
-    this.load.image('quest1', '/assets/quest1.png');     
+    this.load.image('quest1', '/assets/quest1.png');
+
+    // 🔊 Load audio files
+    this.load.audio('bgm', '/assets/audio/backgroundmusic.mp3');
+    this.load.audio('correctSound', '/assets/audio/correctsound.mp3');
+    this.load.audio('wrongSound', '/assets/audio/wrongsound.mp3');
   }
 
   create() {
+    const user = JSON.parse(localStorage.getItem('currentUser'));
+    const userId = user?._id;
+    const currentChapter = 'Chapter1game';
 
-      const user = JSON.parse(localStorage.getItem('currentUser'));
-      const userId = user?._id;
-      const currentChapter = 'Chapter1game';
+    console.log('userId:', userId, 'currentChapter:', currentChapter);
+    saveGameProgress(userId, currentChapter);
 
-      console.log('userId:', userId, 'currentChapter:', currentChapter);
-      saveGameProgress(userId, currentChapter);
+    // 🔊 Setup audio
+    this.bgm = this.sound.add('bgm', { loop: true, volume: 0.5 });
+    this.correctSound = this.sound.add('correctSound');
+    this.wrongSound = this.sound.add('wrongSound');
+
+    const soundEnabled = localStorage.getItem('soundEnabled') !== 'false';
+    this.sound.mute = !soundEnabled;
+    if (soundEnabled) this.bgm.play();
 
     addStoryModeUI(this, {
-      onSettings: (scene, box) =>
-        scene.add.text(box.x, box.y, 'Custom Settings', { fontSize: '32px', color: '#222' }).setOrigin(0.5).setDepth(201),
       onBook: (scene, box) =>
-        scene.add.text(box.x, box.y, 'Custom Book', { fontSize: '32px', color: '#222' }).setOrigin(0.5).setDepth(201),
+        scene.add.text(box.x, box.y, 'Custom Book', {
+          fontSize: '32px',
+          color: '#222'
+        }).setOrigin(0.5).setDepth(201),
     });
 
     const zoneData = [
@@ -88,6 +102,8 @@ export class Chapter1game extends Phaser.Scene {
         this.correctCount++;
         this.progressText.setText(`${this.correctCount}/${this.totalCount}`);
 
+        this.correctSound.play(); // 🔊 Correct answer sound
+
         this.showImagePopup('correct', () => {
           box.textObj.destroy();
           box.destroy();
@@ -95,6 +111,8 @@ export class Chapter1game extends Phaser.Scene {
         });
 
       } else {
+        this.wrongSound.play(); // 🔊 Wrong answer sound
+
         this.showImagePopup('tryAgain', () => {
           this.tweens.add({
             targets: [box, box.textObj],
@@ -124,7 +142,6 @@ export class Chapter1game extends Phaser.Scene {
 
       this.time.delayedCall(1000, () => {
         this.cameras.main.setBackgroundColor(null);
-        
         this.scene.start('Chapter2');
       });
       return;
@@ -167,7 +184,6 @@ export class Chapter1game extends Phaser.Scene {
       text.y = dragY;
     });
   }
-
 
   showImagePopup(key, onDone) {
     const overlay = this.add.rectangle(
