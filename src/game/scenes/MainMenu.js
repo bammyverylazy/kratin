@@ -16,6 +16,8 @@ export class MainMenu extends Scene {
         this.load.image('8.png', '/assets/8.png');
         this.load.image('9.png', '/assets/9.png');
         this.load.image('star', '/assets/star.png');
+        this.load.video('heartbeat', '/assets/heartbeat.mp4');
+
     }
 
     create() { 
@@ -35,12 +37,13 @@ if (currentUser && currentUser.name) {
     const starSize = 32;
     const cameraHeight = this.cameras.main.height;
 
-    // Add star icon
-    const star = this.add.image(30, cameraHeight - 50, 'star')
-        .setOrigin(0, 1)
-        .setDisplaySize(starSize, starSize)
-        .setDepth(110)
-        .setInteractive({ useHandCursor: true });
+    const heartbeatVideo = this.add.video(30, cameraHeight - 50, 'heartbeat')
+    .setOrigin(0, 1)
+    .setScale(0.1)  // Adjust scale as needed
+    .setDepth(110)
+    .setInteractive({ useHandCursor: true });
+
+heartbeatVideo.play(true); // loop the video
 
     // Add welcome text next to star
     const welcomeText = this.add.text(star.x + starSize + padding, cameraHeight - 50, `Welcome, ${currentUser.name}!`, {
