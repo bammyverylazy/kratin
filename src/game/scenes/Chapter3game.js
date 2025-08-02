@@ -12,6 +12,13 @@ export class Chapter3game extends Phaser.Scene {
     this.currentItem = null;
     this.totalItems = 7;
     this.correctCount = 0;
+
+    this.soundEnabled = true;
+
+    this.bgm = null;
+    this.correctSound = null;
+    this.wrongSound = null;
+    this.walkSound = null;
   }
 
   preload() {
@@ -24,6 +31,12 @@ export class Chapter3game extends Phaser.Scene {
     this.load.image('wbc', '/assets/wbc.png');
     this.load.image('platelet', '/assets/platelet.png');
     this.load.image('plasma', '/assets/plasma.png');
+
+    // Audio assets
+    this.load.audio('bgm', '/assets/audio/gamemusic.mp3');         // background music
+    this.load.audio('correctSound', '/assets/audio/correctsound.mp3');
+    this.load.audio('wrongSound', '/assets/audio/wrongsound.mp3');
+    this.load.audio('walkSound', '/assets/audio/walkingsound.mp3'); // walking sound
   }
 
   create() {
@@ -33,6 +46,30 @@ export class Chapter3game extends Phaser.Scene {
 
     console.log('userId:', userId, 'currentChapter:', currentChapter);
     saveGameProgress(userId, currentChapter);
+
+    // Load sound preference
+    const storedSound = localStorage.getItem('soundEnabled');
+    this.soundEnabled = storedSound === null ? true : (storedSound === 'true');
+
+    // Setup sounds
+    this.bgm = this.sound.add('bgm', { loop: true, volume: 0.5 });
+    this.correctSound = this.sound.add('correctSound');
+    this.wrongSound = this.sound.add('wrongSound');
+    this.walkSound = this.sound.add('walkSound', { loop: true, volume: 0.3 });
+
+    this.sound.mute = !this.soundEnabled;
+
+    // Play bgm on first interaction
+    this.input.once('pointerdown', () => {
+      if (this.soundEnabled && !this.bgm.isPlaying) {
+        this.bgm.play();
+        console.log('Background music started after user interaction');
+      }
+    });
+
+    // Stop and destroy sounds on scene shutdown/destroy
+    this.events.on('shutdown', () => this.stopAllSounds());
+    this.events.on('destroy', () => this.stopAllSounds());
 
     this.timer = 60;
     this.score = 0;
@@ -78,7 +115,7 @@ export class Chapter3game extends Phaser.Scene {
       image.label = info.label;
     });
 
-    // Initialize hearts with star size and depth matching Chapter2game
+    // Initialize hearts
     for (let i = 0; i < 3; i++) {
       const star = this.add.image(100 + i * 40, 70, 'star')
         .setScrollFactor(0)
@@ -189,12 +226,29 @@ export class Chapter3game extends Phaser.Scene {
   update() {
     if (!this.currentItem || this.timer <= 0) return;
 
+    let isMoving = false;
+
     if (this.cursors.left.isDown) {
       this.currentItem.x -= 4;
       if (this.currentItem.x < 50) this.currentItem.x = 50;
+      isMoving = true;
     } else if (this.cursors.right.isDown) {
       this.currentItem.x += 4;
       if (this.currentItem.x > 974) this.currentItem.x = 974;
+      isMoving = true;
+    }
+
+    // Play walking sound when moving, pause otherwise
+    if (this.soundEnabled) {
+      if (isMoving) {
+        if (!this.walkSound.isPlaying) {
+          this.walkSound.play();
+        }
+      } else {
+        if (this.walkSound.isPlaying) {
+          this.walkSound.pause();
+        }
+      }
     }
 
     if (this.currentItem.y >= 620) {
@@ -211,6 +265,8 @@ export class Chapter3game extends Phaser.Scene {
     const matched = targetBox && targetBox.label === correctTarget;
 
     if (matched) {
+      if (this.soundEnabled) this.correctSound.play();
+
       this.score += 10;
       this.correctCount++;
       this.scoreText.setText('Score: ' + this.score);
@@ -220,7 +276,6 @@ export class Chapter3game extends Phaser.Scene {
         const heart = this.heartIcons[this.hearts];
         heart.setAlpha(1).setVisible(true).setScale(0.2);
 
-        // Pulse tween with smaller subtle scaling, like Chapter2game
         this.tweens.add({
           targets: heart,
           scale: { from: 0.28, to: 0.35 },
@@ -253,6 +308,8 @@ export class Chapter3game extends Phaser.Scene {
         onComplete: () => scoreText.destroy(),
       });
     } else {
+      if (this.soundEnabled) this.wrongSound.play();
+
       if (this.hearts > 0) {
         this.hearts--;
         this.tweens.add({
@@ -332,5 +389,29 @@ export class Chapter3game extends Phaser.Scene {
     nextBtn.on('pointerdown', () => {
       this.scene.start('Chapter4');
     });
+  }
+
+  stopAllSounds() {
+    if (this.bgm) {
+      if (this.bgm.isPlaying) this.bgm.stop();
+      this.bgm.destroy();
+      this.bgm = null;
+    }
+    if (this.correctSound) {
+      if (this.correctSound.isPlaying) this.correctSound.stop();
+      this.correctSound.destroy();
+      this.correctSound = null;
+    }
+    if (this.wrongSound) {
+      if (this.wrongSound.isPlaying) this.wrongSound.stop();
+      this.wrongSound.destroy();
+      this.wrongSound = null;
+    }
+    if (this.walkSound) {
+      if (this.walkSound.isPlaying) this.walkSound.stop();
+      this.walkSound.destroy();
+      this.walkSound = null;
+    }
+    console.log('All sounds stopped and destroyed');
   }
 }
