@@ -23,7 +23,7 @@ export class Chapter1 extends Phaser.Scene {
     this.musicStarted = false;
 
     this.script = [
-      { speaker: "Narrator:", text: 'Welcome to your journey inside the body, This is "CELLVIVOR".' },
+      { speaker: "Narrator:", text: 'Welcome to your journey inside the body, This is "CELLVIVOR".', sceneStep: 0 },
       { speaker: "Narrator:", text: " a vast network of cells works relentlessly to keep us alive.", sceneStep: 2 },
       { speaker: "Narrator", text: "And here, deep inside, is the marrow.", sceneStep: 3 },
       { speaker: "Narrator:", text: "The marrow is bustling with activity.", sceneStep: 4 },
@@ -51,7 +51,7 @@ export class Chapter1 extends Phaser.Scene {
       'CellBorn', 'Blood', 'body', 'bloodvess', 'noobywalkyellow', 'RBCIntro',
       'RBCwalkpink', 'BloodVessel', 'BloodVesselA', 'BloodVesselB'
     ];
-    this.bgStepIndex = 0;
+    this.bgStepIndex = -1; // Start with -1 so first sceneStep 0 triggers load
   }
   preload() {
     this.load.audio('openingsong', '/assets/audio/openingsong.mp3');
@@ -143,6 +143,7 @@ export class Chapter1 extends Phaser.Scene {
       }
     });
   }
+
   playMusic() {
     if (this.musicStarted) return;
     this.musicStarted = true;
@@ -159,8 +160,46 @@ export class Chapter1 extends Phaser.Scene {
 
   startStorySequence() {
     this.dialogueUI = new DialogueUI(this, this.script);
-    this.voiceNarrator = new VoiceNarratorManager(this);
+    this.voiceNarrator = new VoiceNarratorManager(this, { volume: 1 }); // volume increased
+
     this.showCurrentLine();
+
+    // Create Next button
+    this.nextButton = this.add.text(this.sys.game.config.width - 150, this.sys.game.config.height - 80, 'Next', {
+      fontSize: '32px',
+      color: '#fff',
+      backgroundColor: '#000',
+      padding: { left: 20, right: 20, top: 10, bottom: 10 },
+      borderRadius: 6
+    })
+      .setOrigin(0.5)
+      .setDepth(300)
+      .setInteractive({ useHandCursor: true });
+
+    this.nextButton.on('pointerdown', () => {
+      this.dialogueUI.onLineComplete();
+    });
+
+    // Create Back button
+    this.backButton = this.add.text(150, this.sys.game.config.height - 80, 'Back', {
+      fontSize: '32px',
+      color: '#fff',
+      backgroundColor: '#000',
+      padding: { left: 20, right: 20, top: 10, bottom: 10 },
+      borderRadius: 6
+    })
+      .setOrigin(0.5)
+      .setDepth(300)
+      .setInteractive({ useHandCursor: true });
+
+    this.backButton.on('pointerdown', () => {
+      if (this.currentLine > 0) {
+        this.currentLine--;
+        this.showCurrentLine();
+      }
+    });
+
+    this.backButton.setVisible(false);
   }
 
   showCurrentLine() {
@@ -216,6 +255,7 @@ export class Chapter1 extends Phaser.Scene {
       }
     }
 
+    // Show/hide Back button
     if (this.backButton) {
       this.backButton.setVisible(this.currentLine > 0);
     }
@@ -289,7 +329,6 @@ export class Chapter1 extends Phaser.Scene {
     ) {
       this.dialogueUI.startDialogue([nextLine]);
 
-      // Popup for main routes
       this.time.delayedCall(600, () => {
         if (this.popupContainer) return;
         this.popupContainer = this.add.rectangle(512, 360, 1024, 800, 0x000000, 0.5)
@@ -339,20 +378,19 @@ export class Chapter1 extends Phaser.Scene {
         };
       });
     } else {
-  // Normal dialogue play
-  this.dialogueUI.startDialogue([nextLine]);
-  
-  // Play audio if available
-  if (nextLine.audioKey) {
-    this.voiceNarrator.play(nextLine.audioKey);
-  }
+      // Normal dialogue play
+      this.dialogueUI.startDialogue([nextLine]);
 
-  // Set what happens after user clicks to continue
-  this.dialogueUI.onLineComplete = () => {
-    this.currentLine++;
-    this.showCurrentLine();
-  };
-}
+      // Play audio if available
+      if (nextLine.audioKey) {
+        this.voiceNarrator.play(nextLine.audioKey);
+      }
 
+      // Set what happens after user clicks to continue
+      this.dialogueUI.onLineComplete = () => {
+        this.currentLine++;
+        this.showCurrentLine();
+      };
+    }
   }
 }
