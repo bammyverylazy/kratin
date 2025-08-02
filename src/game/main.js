@@ -5,7 +5,6 @@ import { Preloader } from './scenes/Preloader';
 import { MainMenu } from './scenes/MainMenu';
 import { Mode } from './scenes/Mode';
 import { Game } from './scenes/Game';
-import { Storyboard } from './scenes/storyboard';
 import { GameOver } from './scenes/GameOver';
 import { Chapter1 } from './scenes/Chapter1';
 import { Chapter2 } from './scenes/Chapter2';
@@ -31,7 +30,6 @@ const config = {
         MainMenu,    // Preloader will start MainMenu
         Mode,
         Game,
-        Storyboard,
         GameOver,
         Chapter1,
         Chapter2,
