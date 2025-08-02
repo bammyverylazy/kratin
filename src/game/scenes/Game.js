@@ -190,7 +190,7 @@ export class Game extends Scene {
       delay: 1000,
       callback: () => {
         const elapsed = Math.floor((Date.now() - this.startTime) / 1000);
-        const remaining = Math.max(0, 300 - elapsed);
+        const remaining = Math.max(0, 60 - elapsed);
         timerText.setText(this.formatTime(remaining));
         if (remaining <= 0) {
           this.scene.start('GameOver', {
