@@ -47,20 +47,22 @@ export class Dashboard extends Scene {
 
   renderDashboard(w, h, currentChapterIndex, userId) {
     const graphX = 100;
-    const graphY = 240;
+    const graphY = 180; 
     const graphWidth = w - 2 * graphX;
     const maxHeight = 200;
     const barWidth = 30;
     const barGap = 15;
 
-    const graphBg = this.add.rectangle(graphX - 20, graphY - 60, graphWidth + 40, maxHeight + 200, 0xffffff)
+    // White background rectangle
+    const graphBg = this.add.rectangle(graphX - 20, graphY - 60, graphWidth + 40, maxHeight + 130, 0xffffff)
       .setOrigin(0, 0)
       .setStrokeStyle(2, 0xaaaaaa)
       .setInteractive({ useHandCursor: false });
     if (graphBg.setCornerRadius) graphBg.setCornerRadius(20);
 
-    this.add.text(w / 2, graphY - 20, 'Recent Game Scores & Hints Used', {
-      fontSize: '36px',
+    // Title above graph
+    this.add.text(w / 2, graphY - 30, 'Recent Game Scores & Hints Used', {
+      fontSize: '40px',
       fontStyle: 'bold',
       color: '#000',
     }).setOrigin(0.5);
@@ -80,16 +82,21 @@ export class Dashboard extends Scene {
         const avgScore = (totalScore / sessions.length).toFixed(2);
         const missedKeywords = Array.from(new Set(sessions.flatMap(s => s.missedKeywords || [])));
 
-        this.add.text(graphX, graphY + maxHeight + 20, `Average Score: ${avgScore}`, {
-          fontSize: '22px',
+        // Average score and missed keywords text 
+        this.add.text(graphX, graphY + maxHeight + 10, `Average Score: ${avgScore}`, {
+          fontSize: '26px',
           color: '#000',
+          fontStyle: 'bold',
         });
 
-        this.add.text(graphX + 300, graphY + maxHeight + 20, `Missed Keywords: ${missedKeywords.join(', ')}`, {
-          fontSize: '22px',
+        this.add.text(graphX + 350, graphY + maxHeight + 10, `Missed Keywords: ${missedKeywords.join(', ')}`, {
+          fontSize: '26px',
           color: '#000',
+          fontStyle: 'bold',
+          wordWrap: { width: w - graphX - 350 - 40 }
         });
 
+        // Graph bars scaling
         const maxScore = Math.max(...sessions.map(s => s.score));
         const maxHints = Math.max(...sessions.map(s => s.hintsUsed));
         const scaleScore = maxScore > 0 ? maxHeight / maxScore : 0;
@@ -100,19 +107,25 @@ export class Dashboard extends Scene {
           const scoreHeight = session.score * scaleScore;
           const hintsHeight = session.hintsUsed * scaleHints;
 
+          // Blue bars for scores
           this.add.rectangle(x, graphY + maxHeight, barWidth, -scoreHeight, 0x3366ff).setOrigin(0, 1);
+          // Orange bars for hints used
           this.add.rectangle(x + barWidth + barGap, graphY + maxHeight, barWidth, -hintsHeight, 0xff9933).setOrigin(0, 1);
 
+          // Score numbers above bars
           this.add.text(x + barWidth / 2, graphY + maxHeight - scoreHeight - 10, session.score, {
-            fontSize: '14px',
+            fontSize: '16px',
             color: '#000',
+            fontStyle: 'bold',
           }).setOrigin(0.5, 1);
 
           this.add.text(x + barWidth + barGap + barWidth / 2, graphY + maxHeight - hintsHeight - 10, session.hintsUsed, {
-            fontSize: '14px',
+            fontSize: '16px',
             color: '#000',
+            fontStyle: 'bold',
           }).setOrigin(0.5, 1);
 
+          /*
           let dateStr = 'Invalid';
           try {
             dateStr = new Date(session.timestamp).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
@@ -121,6 +134,7 @@ export class Dashboard extends Scene {
             fontSize: '12px',
             color: '#000',
           }).setOrigin(0.5, 0);
+          */
         });
       });
 
