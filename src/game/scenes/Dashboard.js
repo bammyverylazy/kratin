@@ -105,7 +105,7 @@ this.add.text(legendBaseX + 128, legendY + 1, 'Hints Used', { fontSize: '18px', 
 this.add.line(0, 0, graphMarginX, graphMarginY +100, graphMarginX, baseY +100, 0x000000).setLineWidth(2);
 
 // X-axis (horizontal, aligned straight at baseY)
-this.add.line(15, 0, 15, baseY, graphMarginX + 600, baseY, 0x000000).setLineWidth(2);
+this.add.line(0, 0, 100, baseY, graphMarginX + 6000, baseY, 0x000000).setLineWidth(2);
 
       sessions.forEach((session, index) => {
         const groupX = graphMarginX + 20 + index * (2 * barWidth + barGap);
