@@ -53,7 +53,6 @@ export class Chapter1 extends Phaser.Scene {
     ];
     this.bgStepIndex = 0;
   }
-
   preload() {
     this.load.audio('openingsong', '/assets/audio/openingsong.mp3');
     this.load.audio('backgroundmusic', '/assets/audio/backgroundmusic.mp3');
@@ -146,6 +145,7 @@ export class Chapter1 extends Phaser.Scene {
   }
 
   playMusic() {
+    
     if (this.musicStarted) return;
     this.musicStarted = true;
 
@@ -159,6 +159,7 @@ export class Chapter1 extends Phaser.Scene {
       bgm.play();
     });
   }
+  
   showCurrentLine() {
     if (this.currentLine >= this.script.length) {
       this.cameras.main.setBackgroundColor(null);
@@ -335,8 +336,20 @@ export class Chapter1 extends Phaser.Scene {
         };
       });
     } else {
-      // Normal dialogue play
-      this.dialogueUI.startDialogue([nextLine]);
-    }
+  // Normal dialogue play
+  this.dialogueUI.startDialogue([nextLine]);
+  
+  // Play audio if available
+  if (nextLine.audioKey) {
+    this.voiceNarrator.play(nextLine.audioKey);
+  }
+
+  // Set what happens after user clicks to continue
+  this.dialogueUI.onLineComplete = () => {
+    this.currentLine++;
+    this.showCurrentLine();
+  };
+}
+
   }
 }
