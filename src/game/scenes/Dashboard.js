@@ -158,7 +158,7 @@ this.add.line(0, 0, 100, baseY, graphMarginX + 6000, baseY, 0x000000).setLineWid
     }).setOrigin(0.5);
 
     const chapters = [
-      { key: 'Chapter1scene1', label: 'Chapter 1', scene: 'Chapter1game' },
+      { key: 'Chapter1scene1', label: 'Chapter 1', scene: 'Chapter2game' },
       { key: 'Chapter2scene1', label: 'Chapter 2', scene: 'Chapter2game' },
       { key: 'Chapter3scene1', label: 'Chapter 3', scene: 'Chapter3game' },
       { key: 'Chapter4scene1', label: 'Chapter 4', scene: 'Chapter4game' },
@@ -197,7 +197,8 @@ this.add.line(0, 0, 100, baseY, graphMarginX + 6000, baseY, 0x000000).setLineWid
         playBtn.on('pointerdown', () => {
           this.scene.start(ch.scene);
         });
-      } else {
+      } 
+      else {
         this.add.image(x + thumbWidth / 2, mapsY + thumbHeight + 40, 'lock')
           .setDisplaySize(32, 32)
           .setOrigin(0.5);
