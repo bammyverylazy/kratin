@@ -6,35 +6,37 @@ export function addStoryModeUI(scene, options = {}) {
     let popupContent = null;
     let popupButtons = [];
 
-    function closePopup() {
-        if (popupOverlay) popupOverlay.destroy();
-        if (popupBox) popupBox.destroy();
-        if (popupContent) popupContent.destroy();
-        popupButtons.forEach(btn => btn.destroy());
-        popupOverlay = popupBox = popupContent = null;
-        popupButtons = [];
-    }
+function closePopup() {
+    if (popupOverlay) popupOverlay.destroy();
+    if (popupBox) popupBox.destroy();
+    if (popupContent && popupContent.destroy) popupContent.destroy(); 
+    popupButtons.forEach(btn => btn.destroy());
+    popupOverlay = popupBox = popupContent = null;
+    popupButtons = [];
+}
 
     function openPopup(contentFn, withButtons = false, useBox = true) {
-        if (popupOverlay) return; // Only one popup at a time
-        popupOverlay = scene.add.rectangle(512, 384, 1024, 768, 0x000000, 0.66)
-            .setOrigin(0.5).setDepth(199)
+    if (popupOverlay) return;
+
+    popupOverlay = scene.add.rectangle(512, 384, 1024, 768, 0x000000, 0.66)
+        .setOrigin(0.5).setDepth(199)
+        .setInteractive()
+        .on('pointerdown', () => {
+            if (!withButtons) closePopup();
+        });
+
+    if (useBox) {
+        popupBox = scene.add.rectangle(512, 370, 850, 550, 0xffffff, 0.5)
+            .setOrigin(0.5).setDepth(200)
             .setInteractive()
-            .on('pointerdown', () => { if (!withButtons) closePopup(); });
-
-        if (useBox) {
-            popupBox = scene.add.rectangle(512, 370, 850, 550, 0xffffff, 0.5)
-                .setOrigin(0.5).setDepth(200);
-        }
-
-        popupContent = contentFn ? contentFn(scene, popupBox) : null;
-
-        if (useBox) {
-            popupBox.setInteractive().on('pointerdown', (pointer, localX, localY, event) => {
-                if (event) event.stopPropagation();
+            .on('pointerdown', (pointer, localX, localY, event) => {
+                if (event) event.stopPropagation(); 
             });
-        }
     }
+
+    popupContent = contentFn ? contentFn(scene, popupBox) : null;
+}
+
 
     // Top-right UI icons
     const iconSpacing = 70;
