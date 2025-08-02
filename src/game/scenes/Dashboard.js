@@ -92,9 +92,9 @@ export class Dashboard extends Scene {
         const missedKeywords = Array.from(new Set(sessions.flatMap(s => (Array.isArray(s.missedKeywords) ? s.missedKeywords : []))));
 
         // Y-axis
-        this.add.line(0, 0, graphX, graphY, graphX, graphY + graphHeight, 0x000000).setLineWidth(2);
+        this.add.line(0, 0, graphX, graphY+100, graphX, graphY + graphHeight, 0x000000).setLineWidth(2);
         // X-axis
-        this.add.line(0, 0, graphX, graphY + graphHeight, graphX + graphWidth, graphY + graphHeight, 0x000000).setLineWidth(2);
+        this.add.line(0, 0, graphX+100, graphY + graphHeight, graphX + graphWidth, graphY + graphHeight, 0x000000).setLineWidth(2);
 
         const maxScore = Math.max(...sessions.map(s => s.score), 1);
         const scaleY = graphHeight / maxScore;
@@ -104,10 +104,10 @@ export class Dashboard extends Scene {
           const scoreHeight = session.score * scaleY;
 
           // Score bar
-          this.add.rectangle(x, graphY + graphHeight, barWidth, -scoreHeight, 0x3366ff).setOrigin(0, 1);
+          this.add.rectangle(x, graphY - graphHeight, barWidth, -scoreHeight, 0x3366ff).setOrigin(0, 1);
 
           // Hint count above bar
-          this.add.text(x + barWidth / 2, graphY + graphHeight - scoreHeight - 10, session.hintsUsed || 0, {
+          this.add.text(x + barWidth / 2, graphY - graphHeight - scoreHeight - 10, session.hintsUsed || 0, {
             fontSize: '16px',
             color: '#000',
           }).setOrigin(0.5, 1);
@@ -120,16 +120,16 @@ export class Dashboard extends Scene {
         });
 
         // Missed Keywords
-        this.add.text(graphX + 280, graphY + graphHeight + 30, `Missed Keywords:`, {
+        this.add.text(graphX + 280, graphY + graphHeight + 30, `Missed Keywords: ${missedKeywords}`, {
           fontSize: '24px',
           color: '#000',
         });
 
-        this.add.text(graphX + 280, graphY + graphHeight + 65, missedKeywords.join(', ') || 'None', {
-          fontSize: '20px',
-          color: '#333',
-          wordWrap: { width: w - graphX - 300 },
-        });
+        // this.add.text(graphX + 280, graphY + graphHeight + 65, missedKeywords.join(', ') || 'None', {
+        //   fontSize: '20px',
+        //   color: '#333',
+        //   wordWrap: { width: w - graphX - 300 },
+        // });
       });
 
     // === Game Maps ===
