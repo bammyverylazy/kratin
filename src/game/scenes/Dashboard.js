@@ -54,7 +54,7 @@ export class Dashboard extends Scene {
     const barGap = 30;
 
     // White background container
-    const bg = this.add.rectangle(graphX - 40, graphY - 80, graphWidth + 80, graphHeight + 160, 0xffffff)
+    const bg = this.add.rectangle(graphX - 40, graphY - 80, graphWidth + 80, graphHeight + 220, 0xffffff)
       .setOrigin(0, 0)
       .setStrokeStyle(2, 0xaaaaaa);
     if (bg.setCornerRadius) bg.setCornerRadius(20);
@@ -89,36 +89,37 @@ export class Dashboard extends Scene {
 
         const totalScore = sessions.reduce((sum, s) => sum + s.score, 0);
         const avgScore = (totalScore / sessions.length).toFixed(2);
-        const missedKeywords = Array.from(new Set(sessions.flatMap(s => s.missedKeywords || [])));
+        const missedKeywords = Array.from(new Set(sessions.flatMap(s => (Array.isArray(s.missedKeywords) ? s.missedKeywords : []))));
 
-        // Y-axis line
-        this.add.line(0, 0, graphX - 10, graphY, graphX - 10, graphY + graphHeight, 0x000000).setLineWidth(2);
-        // X-axis line
-        this.add.line(0, 0, graphX - 10, graphY + graphHeight, graphX + graphWidth, graphY + graphHeight, 0x000000).setLineWidth(2);
+        // Y-axis
+        this.add.line(0, 0, graphX, graphY, graphX, graphY + graphHeight, 0x000000).setLineWidth(2);
+        // X-axis
+        this.add.line(0, 0, graphX, graphY + graphHeight, graphX + graphWidth, graphY + graphHeight, 0x000000).setLineWidth(2);
 
-        const maxScore = Math.max(...sessions.map(s => s.score), 1); // avoid divide by 0
+        const maxScore = Math.max(...sessions.map(s => s.score), 1);
         const scaleY = graphHeight / maxScore;
 
         sessions.forEach((session, index) => {
-          const x = graphX + index * (barWidth + barGap);
+          const x = graphX + 10 + index * (barWidth + barGap);
           const scoreHeight = session.score * scaleY;
 
-          // Blue score bar
+          // Score bar
           this.add.rectangle(x, graphY + graphHeight, barWidth, -scoreHeight, 0x3366ff).setOrigin(0, 1);
 
-          // Hint used text
+          // Hint count above bar
           this.add.text(x + barWidth / 2, graphY + graphHeight - scoreHeight - 10, session.hintsUsed || 0, {
             fontSize: '16px',
             color: '#000',
           }).setOrigin(0.5, 1);
         });
 
-        // Average Score and Missed Keywords text
+        // Average Score
         this.add.text(graphX, graphY + graphHeight + 30, `Average Score: ${avgScore}`, {
           fontSize: '24px',
           color: '#000',
         });
 
+        // Missed Keywords
         this.add.text(graphX + 280, graphY + graphHeight + 30, `Missed Keywords:`, {
           fontSize: '24px',
           color: '#000',
