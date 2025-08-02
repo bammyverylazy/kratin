@@ -27,13 +27,12 @@ export class Chapter3game extends Phaser.Scene {
   }
 
   create() {
+    const user = JSON.parse(localStorage.getItem('currentUser'));
+    const userId = user?._id;
+    const currentChapter = 'Chapter3game';
 
-      const user = JSON.parse(localStorage.getItem('currentUser'));
-      const userId = user?._id;
-      const currentChapter = 'Chapter3game';
-
-      console.log('userId:', userId, 'currentChapter:', currentChapter);
-      saveGameProgress(userId, currentChapter);
+    console.log('userId:', userId, 'currentChapter:', currentChapter);
+    saveGameProgress(userId, currentChapter);
 
     this.timer = 60;
     this.score = 0;
@@ -102,6 +101,14 @@ export class Chapter3game extends Phaser.Scene {
       color: '#fff',
       fontStyle: 'bold',
     }).setOrigin(0.5).setDepth(11);
+
+    // Drag event handler for dragging currentItem horizontally
+    this.input.on('drag', (pointer, gameObject, dragX, dragY) => {
+      if (gameObject === this.currentItem) {
+        // Clamp X to game bounds (adjust if your game width changes)
+        gameObject.x = Phaser.Math.Clamp(dragX, 50, 974);
+      }
+    });
 
     this.startCountdown(() => this.startGame());
   }
@@ -173,18 +180,27 @@ export class Chapter3game extends Phaser.Scene {
     this.physics.world.enable(container);
     container.body.setVelocityY(100);
     container.setData('target', itemData.target);
+
+    // Make container interactive and draggable horizontally
+    container.setInteractive(new Phaser.Geom.Rectangle(-50, -20, 100, 40), Phaser.Geom.Rectangle.Contains);
+    this.input.setDraggable(container);
+
     this.currentItem = container;
   }
 
   update() {
     if (!this.currentItem || this.timer <= 0) return;
 
+    // Keyboard controls move the current item left/right
     if (this.cursors.left.isDown) {
       this.currentItem.x -= 4;
+      if (this.currentItem.x < 50) this.currentItem.x = 50;  // clamp left bound
     } else if (this.cursors.right.isDown) {
       this.currentItem.x += 4;
+      if (this.currentItem.x > 974) this.currentItem.x = 974; // clamp right bound
     }
 
+    // Check if the item reached near bottom to evaluate
     if (this.currentItem.y >= 620) {
       this.evaluateItem();
     }
@@ -207,16 +223,20 @@ export class Chapter3game extends Phaser.Scene {
       if (this.hearts < 3) {
         const heart = this.heartIcons[this.hearts];
         heart.setAlpha(1).setVisible(true).setScale(0.5);
+
+        // Pulse effect tween:
         this.tweens.add({
           targets: heart,
-          scale: { from: 0.5, to: 1.2 },
+          scale: { from: 0.5, to: 0.65 },
           yoyo: true,
-          duration: 300,
+          repeat: 2,
+          duration: 200,
           ease: 'Sine.easeInOut',
           onComplete: () => {
             heart.setScale(0.5);
           },
         });
+
         this.hearts++;
       }
 
@@ -257,7 +277,7 @@ export class Chapter3game extends Phaser.Scene {
           duration: 100,
           yoyo: true,
           ease: 'Quad.easeInOut',
-          onComplete: () => box.setScale(0.5), 
+          onComplete: () => box.setScale(0.5),
         });
       });
     }
@@ -299,7 +319,7 @@ export class Chapter3game extends Phaser.Scene {
       .setInteractive({ useHandCursor: true });
 
     playAgainBtn.on('pointerdown', () => {
-      this.scene.restart(); // everything resets
+      this.scene.restart();
     });
 
     const nextBtn = this.add.text(512, 470, 'Proceed to Chapter 4', {
@@ -313,7 +333,6 @@ export class Chapter3game extends Phaser.Scene {
       .setInteractive({ useHandCursor: true });
 
     nextBtn.on('pointerdown', () => {
-       
       this.scene.start('Chapter4');
     });
   }
