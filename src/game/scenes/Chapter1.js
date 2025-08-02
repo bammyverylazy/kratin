@@ -143,9 +143,7 @@ export class Chapter1 extends Phaser.Scene {
       }
     });
   }
-
   playMusic() {
-    
     if (this.musicStarted) return;
     this.musicStarted = true;
 
@@ -153,13 +151,18 @@ export class Chapter1 extends Phaser.Scene {
     const bgm = this.sound.add('backgroundmusic', { volume: 0.3, loop: true });
 
     opening.play();
-
     this.time.delayedCall(opening.duration * 1000, () => {
       opening.stop();
       bgm.play();
     });
   }
-  
+
+  startStorySequence() {
+    this.dialogueUI = new DialogueUI(this, this.script);
+    this.voiceNarrator = new VoiceNarratorManager(this);
+    this.showCurrentLine();
+  }
+
   showCurrentLine() {
     if (this.currentLine >= this.script.length) {
       this.cameras.main.setBackgroundColor(null);
