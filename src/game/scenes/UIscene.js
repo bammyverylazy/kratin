@@ -67,18 +67,19 @@ export function addStoryModeUI(scene, options = {}) {
         borderRadius: 12
     }).setOrigin(0.5).setDepth(200).setInteractive({ useHandCursor: true });
 
-    arrow.on('pointerdown', () => {
-        if (popupOverlay) return;
-        const confirmQuit = window.confirm('Do you want to quit the storyboard mode?');
-        if (confirmQuit) {
-            console.log('User chose to quit the game.');
-            this.scene.start('MainMenu');
-            this.scene.stop();    
-            this.children.removeAll(); 
-        } else {
-            console.log('User chose to stay in the game.');
-        }
-    });
+arrow.on('pointerdown', () => {
+    if (popupOverlay) return;
+    const confirmQuit = window.confirm('Do you want to quit the storyboard mode?');
+    if (confirmQuit) {
+        console.log('User chose to quit the game.');
+        scene.scene.start('MainMenu'); // ✅ use passed scene reference
+        scene.scene.stop();    
+        scene.children.removeAll(); 
+    } else {
+        console.log('User chose to stay in the game.');
+    }
+});
+
 
       
     };
