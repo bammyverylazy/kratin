@@ -38,7 +38,7 @@ export class Chapter2game extends Phaser.Scene {
     this.load.audio('bgm', '/assets/audio/gamemusic.mp3');          // renamed from backgroundmusic.mp3
     this.load.audio('correctSound', '/assets/audio/correctsound.mp3');
     this.load.audio('wrongSound', '/assets/audio/wrongsound.mp3');
-    this.load.audio('walkSound', '/assets/audio/walking.mp3');      // walking sound effect
+    this.load.audio('walkSound', '/assets/audio/walkingsound.mp3');      // walking sound effect
   }
 
   create() {
