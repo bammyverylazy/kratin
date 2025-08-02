@@ -180,6 +180,7 @@ export class Dashboard extends Scene {
         .setDisplaySize(thumbWidth, thumbHeight)
         .setOrigin(0, 0);
 
+      // Add chapter label under thumbnail
       this.add.text(x + thumbWidth / 2, mapsY + thumbHeight + 10, ch.label, {
         fontSize: '18px',
         color: isUnlocked ? '#000' : '#888',
@@ -191,8 +192,6 @@ export class Dashboard extends Scene {
         thumb.on('pointerdown', () => {
           this.scene.start(ch.scene);
         });
-        thumb.on('pointerover', () => thumb.setScale(1.05));
-        thumb.on('pointerout', () => thumb.setScale(1));
 
         // Add "Play" button
         const playBtn = this.add.text(x + thumbWidth / 2, mapsY + thumbHeight + 40, '▶ Play', {

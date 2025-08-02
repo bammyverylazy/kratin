@@ -7,7 +7,6 @@ export class Chapter3game extends Phaser.Scene {
     super('Chapter3game');
     this.timer = 60;
     this.score = 0;
-    this.hearts = 3;
     this.heartIcons = [];
     this.currentItem = null;
     this.totalItems = 7;
@@ -58,7 +57,8 @@ export class Chapter3game extends Phaser.Scene {
     this.add.video(0, 0, 'bloodflow').setOrigin(0, 0).play(true).setLoop(true);
 
     addStoryModeUI(this, {
-      onBook: (scene, box) => scene.add.text(box.x, box.y, 'Book', { fontSize: '24px', color: '#222' }).setOrigin(0.5).setDepth(201),
+      onBook: (scene, box) =>
+        scene.add.text(box.x, box.y, 'Book', { fontSize: '24px', color: '#222' }).setOrigin(0.5).setDepth(201),
     });
 
     this.cursors = this.input.keyboard.createCursorKeys();
@@ -80,8 +80,12 @@ export class Chapter3game extends Phaser.Scene {
       image.label = info.label;
     });
 
-    for (let i = 0; i < 3; i++) {
-      const star = this.add.image(100 + i * 40, 70, 'star').setScrollFactor(0).setDisplaySize(28, 28).setDepth(10);
+    for (let i = 0; i < this.totalItems; i++) {
+      const star = this.add.image(100 + i * 40, 70, 'star')
+        .setScrollFactor(0)
+        .setDisplaySize(28, 28)
+        .setDepth(10)
+        .setAlpha(0); 
       this.heartIcons.push(star);
     }
 
@@ -128,14 +132,10 @@ export class Chapter3game extends Phaser.Scene {
         this.timerText.setText('Time: ' + this.timer);
 
         if (this.soundEnabled) {
-          if (this.timer <= 5) {
-            if (this.tickTimer.delay !== 500) {
-              this.tickTimer.reset({ delay: 500, loop: true, callback: this.tickTimer.callback, callbackScope: this });
-            }
+          if (this.timer <= 5 && this.tickTimer.delay !== 500) {
+            this.tickTimer.reset({ delay: 500, loop: true, callback: this.tickTimer.callback, callbackScope: this });
           }
-          if (this.timer <= 10) {
-            this.tickSound.play();
-          }
+          if (this.timer <= 10) this.tickSound.play();
         }
 
         if (this.timer <= 0) {
@@ -216,27 +216,23 @@ export class Chapter3game extends Phaser.Scene {
       this.correctCount++;
       this.scoreText.setText('Score: ' + this.score);
       this.progressText.setText(`Progress: ${this.correctCount}/${this.totalItems}`);
+
+      const earnedStar = this.heartIcons[this.correctCount - 1];
+      if (earnedStar) {
+        this.tweens.add({
+          targets: earnedStar,
+          alpha: 1,
+          duration: 300
+        });
+      }
     } else {
       if (this.soundEnabled) this.wrongSound.play();
-      if (this.hearts > 0) {
-        this.hearts--;
-        const lostHeart = this.heartIcons[this.hearts];
-        this.tweens.add({
-          targets: lostHeart,
-          alpha: 0,
-          duration: 300,
-          onComplete: () => {
-            lostHeart.setVisible(false);
-          }
-        });
-        this.cameras.main.shake(200, 0.01);
-      }
+      this.cameras.main.shake(200, 0.01);
     }
 
     this.currentItem.destroy(true);
     this.currentItem = null;
 
-    if (this.hearts <= 0) this.endGame(false);
     if (this.correctCount >= this.totalItems) this.endGame(true);
   }
 
