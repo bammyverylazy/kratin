@@ -11,6 +11,7 @@ export class Chapter1game extends Phaser.Scene {
     this.correctCount = 0;
     this.totalCount = 0;
     this.progressText = null;
+    this.soundEnabled = true; // track sound enabled state
   }
 
   preload() {
@@ -37,14 +38,25 @@ export class Chapter1game extends Phaser.Scene {
     console.log('userId:', userId, 'currentChapter:', currentChapter);
     saveGameProgress(userId, currentChapter);
 
-    // 🔊 Setup audio
+    // Restore sound enabled state from localStorage (default true)
+    const storedSound = localStorage.getItem('soundEnabled');
+    this.soundEnabled = storedSound === null ? true : (storedSound === 'true');
+
+    // Setup audio objects
     this.bgm = this.sound.add('bgm', { loop: true, volume: 0.5 });
     this.correctSound = this.sound.add('correctSound');
     this.wrongSound = this.sound.add('wrongSound');
 
-    const soundEnabled = localStorage.getItem('soundEnabled') !== 'false';
-    this.sound.mute = !soundEnabled;
-    if (soundEnabled) this.bgm.play();
+    // Set global mute state based on soundEnabled
+    this.sound.mute = !this.soundEnabled;
+
+    // Play bgm AFTER first user interaction (required by many browsers)
+    this.input.once('pointerdown', () => {
+      if (this.soundEnabled && !this.bgm.isPlaying) {
+        this.bgm.play();
+        console.log('Background music started after user interaction');
+      }
+    });
 
     addStoryModeUI(this, {
       onBook: (scene, box) =>
@@ -102,7 +114,7 @@ export class Chapter1game extends Phaser.Scene {
         this.correctCount++;
         this.progressText.setText(`${this.correctCount}/${this.totalCount}`);
 
-        this.correctSound.play(); // 🔊 Correct answer sound
+        if (this.soundEnabled) this.correctSound.play();
 
         this.showImagePopup('correct', () => {
           box.textObj.destroy();
@@ -111,7 +123,7 @@ export class Chapter1game extends Phaser.Scene {
         });
 
       } else {
-        this.wrongSound.play(); // 🔊 Wrong answer sound
+        if (this.soundEnabled) this.wrongSound.play();
 
         this.showImagePopup('tryAgain', () => {
           this.tweens.add({

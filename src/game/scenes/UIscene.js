@@ -146,45 +146,62 @@ arrow.on('pointerdown', () => {
         // No container, just return a dummy object for compatibility
         return { destroy: () => { slideImage.destroy(); prevBtn.destroy(); nextBtn.destroy(); } };
     }
-function defaultSettings(scene, box) {
-  const popupDepth = 201;
-  const soundEnabled = scene.sound.mute === false;
-
-  const settingText = scene.add.text(box.x, box.y - 40, 'Sound Settings', {
-    fontSize: '36px',
-    color: '#000',
-    align: 'center'
-  }).setOrigin(0.5).setDepth(popupDepth);
-
-  const toggleBtn = scene.add.text(box.x, box.y + 20, soundEnabled ? '🔊 Sound: ON' : '🔇 Sound: OFF', {
+    function defaultSettings(scene, box) {
+  // Text label
+  const label = scene.add.text(box.x - 120, box.y, 'Sound:', {
     fontSize: '28px',
-    color: '#007bff',
-    backgroundColor: '#eee',
-    padding: { left: 20, right: 20, top: 10, bottom: 10 }
-  }).setOrigin(0.5).setDepth(popupDepth)
-    .setInteractive({ useHandCursor: true })
-    .on('pointerdown', () => {
-      const newState = !scene.sound.mute;
-      scene.sound.mute = newState;
-      localStorage.setItem('soundEnabled', !newState);
+    color: '#222',
+  }).setOrigin(0, 0.5).setDepth(201);
 
-      toggleBtn.setText(!newState ? '🔊 Sound: ON' : '🔇 Sound: OFF');
+  // Checkbox background
+  const checkboxBg = scene.add.rectangle(box.x + 40, box.y, 32, 32, 0xffffff)
+    .setStrokeStyle(2, 0x888888)
+    .setOrigin(0, 0.5)
+    .setDepth(201)
+    .setInteractive({ useHandCursor: true });
 
-      // Start or stop BGM as needed
-      if (scene.bgm) {
-        if (!newState && !scene.bgm.isPlaying) scene.bgm.play();
-        else if (newState) scene.bgm.stop();
+  // Checkmark text (✓)
+  const checkmark = scene.add.text(box.x + 46, box.y, '✓', {
+    fontSize: '28px',
+    color: '#222',
+  }).setOrigin(0, 0.5).setDepth(202);
+
+  // Initialize checkmark visibility based on localStorage
+  const soundEnabled = localStorage.getItem('soundEnabled');
+  let isChecked = soundEnabled === null ? true : (soundEnabled === 'true');
+  checkmark.setVisible(isChecked);
+
+  // Toggle function
+  const toggleSound = () => {
+    isChecked = !isChecked;
+    checkmark.setVisible(isChecked);
+    localStorage.setItem('soundEnabled', isChecked);
+
+    // Update scene mute/unmute
+    if (scene.sound) {
+      scene.sound.mute = !isChecked;
+
+      if (isChecked) {
+        if (!scene.bgm.isPlaying) scene.bgm.play();
+      } else {
+        if (scene.bgm.isPlaying) scene.bgm.stop();
       }
-    });
+    }
+  };
 
-  // Cleanup on popup close
-  scene.events.once('shutdown', () => {
-    settingText.destroy();
-    toggleBtn.destroy();
-  });
+  checkboxBg.on('pointerdown', toggleSound);
+  label.on('pointerdown', toggleSound);
 
-  return { destroy: () => { settingText.destroy(); toggleBtn.destroy(); } };
+  // Return a container-like object for cleanup
+  return {
+    destroy: () => {
+      label.destroy();
+      checkboxBg.destroy();
+      checkmark.destroy();
+    }
+  };
 }
+
 
 
     function defaultBook(scene, box) {
