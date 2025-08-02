@@ -47,25 +47,44 @@ export class Dashboard extends Scene {
 
   renderDashboard(w, h, currentChapterIndex, userId) {
     const graphX = 100;
-    const graphY = 180; 
+    const graphY = 180;
     const graphWidth = w - 2 * graphX;
     const maxHeight = 200;
     const barWidth = 30;
-    const barGap = 15;
+    const barGap = 30; // increased gap for better spacing
 
     // White background rectangle
-    const graphBg = this.add.rectangle(graphX - 20, graphY - 60, graphWidth + 40, maxHeight + 130, 0xffffff)
+    const graphBg = this.add.rectangle(graphX - 20, graphY - 30, graphWidth + 40, maxHeight + 150, 0xffffff)
       .setOrigin(0, 0)
       .setStrokeStyle(2, 0xaaaaaa)
       .setInteractive({ useHandCursor: false });
     if (graphBg.setCornerRadius) graphBg.setCornerRadius(20);
 
     // Title above graph
-    this.add.text(w / 2, graphY - 30, 'Recent Game Scores & Hints Used', {
-      fontSize: '40px',
+    this.add.text(w / 2, graphY - 60, 'Recent Game Scores & Hints Used', {
+      fontSize: '35px',
       fontStyle: 'bold',
-      color: '#000',
+      color: '#5a3e1b',
     }).setOrigin(0.5);
+
+    // Legend
+    const legendX = graphX;
+    const legendY = graphY - 10;
+    // Score Legend
+    this.add.rectangle(legendX, legendY, 20, 20, 0x3366ff).setOrigin(0, 0);
+    this.add.text(legendX + 25, legendY + 2, 'Score', {
+      fontSize: '18px',
+      color: '#000',
+      fontStyle: 'bold',
+    }).setOrigin(0, 0);
+
+    // Hints Used Legend
+    this.add.rectangle(legendX + 120, legendY, 20, 20, 0xff9933).setOrigin(0, 0);
+    this.add.text(legendX + 145, legendY + 2, 'Hints Used', {
+      fontSize: '18px',
+      color: '#000',
+      fontStyle: 'bold',
+    }).setOrigin(0, 0);
 
     fetch(`${backendURL}/api/user/${userId}/gameplay-history`)
       .then(res => res.json())
@@ -89,11 +108,19 @@ export class Dashboard extends Scene {
           fontStyle: 'bold',
         });
 
-        this.add.text(graphX + 350, graphY + maxHeight + 10, `Missed Keywords: ${missedKeywords.join(', ')}`, {
+        this.add.text(graphX + 350, graphY + maxHeight + 10, `Missed Keywords:`, {
           fontSize: '26px',
           color: '#000',
           fontStyle: 'bold',
-          wordWrap: { width: w - graphX - 350 - 40 }
+        });
+
+        // Wrap missed keywords below that label, limited width & max height
+        this.add.text(graphX + 350, graphY + maxHeight + 50, missedKeywords.join(', ') || 'None', {
+          fontSize: '22px',
+          color: '#333',
+          wordWrap: { width: w - graphX - 350 - 40 },
+          maxLines: 3,
+          fixedWidth: w - graphX - 350 - 40,
         });
 
         // Graph bars scaling
@@ -103,14 +130,14 @@ export class Dashboard extends Scene {
         const scaleHints = maxHints > 0 ? maxHeight / maxHints : 0;
 
         sessions.forEach((session, index) => {
-          const x = graphX + index * (barWidth * 2 + barGap * 3);
+          const x = graphX + index * (barWidth * 2 + barGap * 2); // adjusted gaps for better fit
           const scoreHeight = session.score * scaleScore;
           const hintsHeight = session.hintsUsed * scaleHints;
 
           // Blue bars for scores
           this.add.rectangle(x, graphY + maxHeight, barWidth, -scoreHeight, 0x3366ff).setOrigin(0, 1);
           // Orange bars for hints used
-          this.add.rectangle(x + barWidth + barGap, graphY + maxHeight, barWidth, -hintsHeight, 0xff9933).setOrigin(0, 1);
+          this.add.rectangle(x + barWidth + barGap / 2, graphY + maxHeight, barWidth, -hintsHeight, 0xff9933).setOrigin(0, 1);
 
           // Score numbers above bars
           this.add.text(x + barWidth / 2, graphY + maxHeight - scoreHeight - 10, session.score, {
@@ -119,22 +146,11 @@ export class Dashboard extends Scene {
             fontStyle: 'bold',
           }).setOrigin(0.5, 1);
 
-          this.add.text(x + barWidth + barGap + barWidth / 2, graphY + maxHeight - hintsHeight - 10, session.hintsUsed, {
+          this.add.text(x + barWidth + barGap / 2 + barWidth / 2, graphY + maxHeight - hintsHeight - 10, session.hintsUsed, {
             fontSize: '16px',
             color: '#000',
             fontStyle: 'bold',
           }).setOrigin(0.5, 1);
-
-          /*
-          let dateStr = 'Invalid';
-          try {
-            dateStr = new Date(session.timestamp).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
-          } catch (e) {}
-          this.add.text(x + barWidth, graphY + maxHeight + 10, dateStr, {
-            fontSize: '12px',
-            color: '#000',
-          }).setOrigin(0.5, 0);
-          */
         });
       });
 
