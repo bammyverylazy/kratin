@@ -186,7 +186,6 @@ export class Chapter1game extends Phaser.Scene {
     }).setOrigin(0.5).setDepth(1001).setInteractive({ useHandCursor: true });
 
     continueBtn.on('pointerdown', () => {
-      this.cameras.main.setBackgroundColor(#000000);
       this.scene.start('Chapter2');
     });
 
