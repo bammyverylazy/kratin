@@ -248,21 +248,31 @@ app.patch('/api/users/:userId/add-weakness', async (req, res) => {
 app.get('/api/user/:id/gameplay-history', async (req, res) => {
   try {
     const { id } = req.params;
-    const sessions = await Gameplay.find({ userId: id }).sort({ createdAt: -1 }).limit(20);
+
+    const sessions = await Gameplay.find({ 'resultsPerPlayer.userId': id })
+      .sort({ createdAt: -1 })
+      .limit(20);
 
     const data = sessions.map(session => {
-      const totalMistakes = session.mistakes.length;
-      const hintCount = session.mistakes.filter(m => m.includes('FT')).length;
-      const timestamps = session.timestamps || []; // optional: if you stored time logs
-      const avgTime = timestamps.length > 1
-        ? (timestamps[timestamps.length - 1] - timestamps[0]) / (timestamps.length - 1)
+      const playerResults = session.resultsPerPlayer.filter(r => r.userId === id);
+
+      const totalHints = playerResults.filter(r => r.usedHint).length;
+      const totalScore = playerResults.reduce((sum, r) => {
+        if (r.result === 'TT') return sum + 2;
+        if (r.result === 'FT') return sum + 1;
+        return sum;
+      }, 0);
+
+      const times = playerResults.map(r => r.timestamp?.getTime()).filter(Boolean).sort((a, b) => a - b);
+      const avgTime = times.length > 1
+        ? (times[times.length - 1] - times[0]) / (times.length - 1)
         : 0;
 
       return {
         roomCode: session.roomCode,
-        score: session.score,
+        score: totalScore,
         avgTime: parseFloat(avgTime.toFixed(2)),
-        hintsUsed: hintCount,
+        hintsUsed: totalHints,
         timestamp: session.createdAt
       };
     });
@@ -273,6 +283,7 @@ app.get('/api/user/:id/gameplay-history', async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 });
+
 
 
 // Multiplayer-aware score lookup
@@ -434,3 +445,4 @@ const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
   console.log(`[Server] Running on port ${PORT}`);
 });
+
