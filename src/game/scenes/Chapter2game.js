@@ -17,6 +17,7 @@ export class Chapter2game extends Phaser.Scene {
     this.canCheckZone = false;
     this.soundEnabled = true;
     this.isWalking = false;
+    this.enemies = []; // <-- enemies array for enemy sprites
   }
 
   preload() {
@@ -78,7 +79,8 @@ export class Chapter2game extends Phaser.Scene {
     this.player = this.physics.add.sprite(100, 700, 'player').setDisplaySize(64, 64).setCollideWorldBounds(true);
     this.cursors = this.input.keyboard.createCursorKeys();
 
-    this.createZones();
+    this.createZones();   // uses Phaser.Geom.Rectangle again
+    this.createEnemies(); // creates enemies sprites and adds to this.enemies[]
 
     this.scoreText = this.add.text(80, 130, 'Score: 0', { fontSize: '24px', color: '#fff' });
     this.progressText = this.add.text(80, 100, 'Progress: 0/4', { fontSize: '24px', color: '#fff' });
@@ -91,75 +93,70 @@ export class Chapter2game extends Phaser.Scene {
     this.showHowToPlayPopup(() => this.askQuestion());
   }
 
-  update() {
-    if (!this.cursors) return;
-    let moving = false;
+  createZones() {
+    const zoneConfig = {
+      'Right Atrium': new Phaser.Geom.Rectangle(530, 270, 160, 100),
+      'Right Ventricle': new Phaser.Geom.Rectangle(520, 400, 200, 130),
+      'Left Atrium': new Phaser.Geom.Rectangle(310, 270, 180, 90),
+      'Left Ventricle': new Phaser.Geom.Rectangle(260, 390, 200, 130),
+    };
 
-    if (this.cursors.left.isDown) {
-      this.player.setVelocityX(-160);
-      moving = true;
-    } else if (this.cursors.right.isDown) {
-      this.player.setVelocityX(160);
-      moving = true;
-    } else {
-      this.player.setVelocityX(0);
-    }
-
-    if (this.cursors.up.isDown) {
-      this.player.setVelocityY(-160);
-      moving = true;
-    } else if (this.cursors.down.isDown) {
-      this.player.setVelocityY(160);
-      moving = true;
-    } else {
-      this.player.setVelocityY(0);
-    }
-
-    if (moving && !this.isWalking) {
-      if (this.soundEnabled) this.walkSound.play();
-      this.isWalking = true;
-    } else if (!moving && this.isWalking) {
-      this.walkSound.stop();
-      this.isWalking = false;
+    for (const [name, rect] of Object.entries(zoneConfig)) {
+      this.zones[name] = rect;
     }
   }
 
-  createZones() {
-    const zoneData = {
-      'Right Atrium': { x: 200, y: 150 },
-      'Right Ventricle': { x: 400, y: 250 },
-      'Left Atrium': { x: 600, y: 150 },
-      'Left Ventricle': { x: 800, y: 250 }
-    };
+  createEnemies() {
+    const positions = [
+      { x: 400, y: 300 },
+      { x: 600, y: 400 },
+    ];
 
-    for (const room in zoneData) {
-      const pos = zoneData[room];
-      const zone = this.add.zone(pos.x, pos.y, 120, 120).setOrigin(0.5).setName(room);
-      this.physics.world.enable(zone);
-      zone.body.setAllowGravity(false);
-      zone.body.setImmovable(true);
-      this.zones[room] = zone;
-
-      this.physics.add.overlap(this.player, zone, () => {
-        if (this.canCheckZone && !this.answeredRooms.has(room)) {
-          this.answeredRooms.add(room);
-          const correct = this.questions[this.questionIndex]?.room === room;
-          this.canCheckZone = false;
-          this.handleAnswer(correct);
-        }
-      }, null, this);
-    }
+    positions.forEach(pos => {
+      const enemy = this.physics.add.sprite(pos.x, pos.y, 'enemy');
+      enemy.setDisplaySize(48, 48);
+      this.enemies.push(enemy);
+    });
   }
 
   askQuestion() {
     this.canCheckZone = true;
     const currentQ = this.questions[this.questionIndex];
-    this.add.text(512, 40, currentQ.text, {
+
+    // Clear previous question text if any:
+    if (this.questionText) {
+      this.questionText.destroy();
+    }
+    this.questionText = this.add.text(512, 40, currentQ.text, {
       fontSize: '24px',
       color: '#ffffff',
       backgroundColor: '#000000',
       padding: { x: 12, y: 8 }
     }).setOrigin(0.5).setDepth(10);
+  }
+
+  checkZoneEntry() {
+    if (this.questionIndex >= this.questions.length) return;
+    const { x, y } = this.player;
+    const current = this.questions[this.questionIndex];
+
+    if (this.answeredRooms.has(current.room)) return;
+
+    const zone = this.zones[current.room];
+    if (zone && zone.contains(x, y)) {
+      this.answeredRooms.add(current.room);
+      this.canCheckZone = false;
+      this.handleAnswer(true);
+    } else {
+      // If player is inside any other zone (not the correct one)
+      for (const [name, z] of Object.entries(this.zones)) {
+        if (z.contains(x, y) && name !== current.room) {
+          this.canCheckZone = false;
+          this.handleAnswer(false);
+          break;
+        }
+      }
+    }
   }
 
   handleAnswer(correct) {
@@ -204,7 +201,64 @@ export class Chapter2game extends Phaser.Scene {
     }
   }
 
+  moveEnemies() {
+    this.enemies.forEach(enemy => {
+      if (!enemy || !enemy.body) return;
+      const dx = this.player.x - enemy.x;
+      const dy = this.player.y - enemy.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist > 0) {
+        const speed = 50;
+        enemy.setVelocity((dx / dist) * speed, (dy / dist) * speed);
+      }
+    });
+  }
+
+  checkEnemyCollisions() {
+    this.enemies.forEach(enemy => {
+      if (Phaser.Math.Distance.Between(enemy.x, enemy.y, this.player.x, this.player.y) < 30) {
+        this.canCheckZone = false;
+        this.handleAnswer(false);
+      }
+    });
+  }
+
+  handleMovement() {
+    const speed = 160;
+    this.player.setVelocity(0);
+    if (this.cursors.left.isDown) this.player.setVelocityX(-speed);
+    else if (this.cursors.right.isDown) this.player.setVelocityX(speed);
+    if (this.cursors.up.isDown) this.player.setVelocityY(-speed);
+    else if (this.cursors.down.isDown) this.player.setVelocityY(speed);
+  }
+
+  update() {
+    if (!this.player || !this.cursors) return;
+
+    this.handleMovement();
+
+    // Walking sound logic
+    const moving = this.player.body.velocity.x !== 0 || this.player.body.velocity.y !== 0;
+
+    if (moving && !this.isWalking) {
+      if (this.soundEnabled) this.walkSound.play();
+      this.isWalking = true;
+    } else if (!moving && this.isWalking) {
+      this.walkSound.stop();
+      this.isWalking = false;
+    }
+
+    if (this.canCheckZone) {
+      this.checkZoneEntry();
+    }
+
+    this.moveEnemies();
+    this.checkEnemyCollisions();
+  }
+
   endGame(success) {
+    this.physics.pause();
+
     const overlay = this.add.rectangle(512, 384, 1024, 768, 0x000000, 0.8).setDepth(1000);
     const message = success ? 'Well done!' : 'Game Over!';
     const nextText = success ? '▶ Continue to Chapter 3' : '⟳ Try Again';
