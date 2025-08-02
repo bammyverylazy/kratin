@@ -85,33 +85,48 @@ export class Dashboard extends Scene {
         }
 
         // Sort sessions by oldest to newest
-        sessions.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+      // Sort sessions by date (oldest first) if possible, fallback to score
+sessions.sort((a, b) => {
+  const dateA = new Date(a.timestamp);
+  const dateB = new Date(b.timestamp);
+  return isNaN(dateA) || isNaN(dateB)
+    ? a.score - b.score
+    : dateA - dateB;
+});
 
-        const totalScore = sessions.reduce((sum, s) => sum + s.score, 0);
-        const avgScore = (totalScore / sessions.length).toFixed(2);
-        const missedKeywords = Array.from(new Set(sessions.flatMap(s => (Array.isArray(s.missedKeywords) ? s.missedKeywords : []))));
+const maxY = Math.max(...sessions.map(s => Math.max(s.score, s.hintsUsed || 0)), 1);
+const scaleY = graphHeight / maxY;
 
-        // Y-axis
-        this.add.line(0, 0, graphX, graphY+100, graphX, graphY + graphHeight, 0x000000).setLineWidth(2);
-        // X-axis
-        this.add.line(0, 0, graphX+100, graphY + graphHeight, graphX + graphWidth, graphY + graphHeight, 0x000000).setLineWidth(2);
+// Y-axis
+this.add.line(0, 0, graphX, graphY, graphX, graphY + graphHeight, 0x000000).setLineWidth(2);
+// X-axis
+this.add.line(0, 0, graphX, graphY + graphHeight, graphX + graphWidth, graphY + graphHeight, 0x000000).setLineWidth(2);
 
-        const maxScore = Math.max(...sessions.map(s => s.score), 1);
-        const scaleY = graphHeight / maxScore;
+sessions.forEach((session, index) => {
+  const groupX = graphX + 10 + index * (2 * barWidth + barGap);
+  const scoreHeight = session.score * scaleY;
+  const hintHeight = (session.hintsUsed || 0) * scaleY;
 
-        sessions.forEach((session, index) => {
-          const x = graphX + 10 + index * (barWidth + barGap);
-          const scoreHeight = session.score * scaleY;
+  // Score bar (Blue)
+  this.add.rectangle(groupX, graphY + graphHeight, barWidth, -scoreHeight, 0x3366ff).setOrigin(0, 1);
 
-          // Score bar
-          this.add.rectangle(x, graphY - graphHeight, barWidth, -scoreHeight, 0x3366ff).setOrigin(0, 1);
+  // Hint bar (Pink)
+  this.add.rectangle(groupX + barWidth, graphY + graphHeight, barWidth, -hintHeight, 0xfa821a).setOrigin(0, 1);
 
-          // Hint count above bar
-          this.add.text(x + barWidth / 2, graphY - graphHeight - scoreHeight - 10, session.hintsUsed || 0, {
-            fontSize: '16px',
-            color: '#000',
-          }).setOrigin(0.5, 1);
-        });
+  // Labels below
+  this.add.text(groupX + barWidth, graphY + graphHeight + 5, `#${index + 1}`, {
+    fontSize: '14px',
+    color: '#000',
+  }).setOrigin(0.5, 0);
+});
+
+// Updated legend (Score + Hints)
+this.add.rectangle(legendBaseX, legendY, 20, 20, 0x3366ff).setOrigin(0, 0);
+this.add.text(legendBaseX + 28, legendY + 1, 'Score', { fontSize: '18px', color: '#000' });
+
+this.add.rectangle(legendBaseX + 100, legendY, 20, 20, 0xff6699).setOrigin(0, 0);
+this.add.text(legendBaseX + 128, legendY + 1, 'Hints Used', { fontSize: '18px', color: '#000' });
+
 
         // Average Score
         this.add.text(graphX, graphY + graphHeight + 30, `Average Score: ${avgScore}`, {
@@ -120,16 +135,16 @@ export class Dashboard extends Scene {
         });
 
         // Missed Keywords
-        this.add.text(graphX + 280, graphY + graphHeight + 30, `Missed Keywords: ${missedKeywords}`, {
+        this.add.text(graphX + 280, graphY + graphHeight + 30, `Missed Keywords:`, {
           fontSize: '24px',
           color: '#000',
         });
 
-        // this.add.text(graphX + 280, graphY + graphHeight + 65, missedKeywords.join(', ') || 'None', {
-        //   fontSize: '20px',
-        //   color: '#333',
-        //   wordWrap: { width: w - graphX - 300 },
-        // });
+        this.add.text(graphX + 280, graphY + graphHeight + 65, missedKeywords.join(', ') || 'None', {
+          fontSize: '20px',
+          color: '#333',
+          wordWrap: { width: w - graphX - 300 },
+        });
       });
 
     // === Game Maps ===
