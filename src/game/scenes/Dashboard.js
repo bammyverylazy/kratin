@@ -102,7 +102,7 @@ this.add.text(legendBaseX + 128, legendY + 1, 'Hints Used', { fontSize: '18px', 
       let missedKeywords = [];
 
 // Y-axis (vertical, full height of graph)
-this.add.line(0, 0, graphMarginX, graphMarginY +100, graphMarginX, baseY +100, 0x000000).setLineWidth(2);
+this.add.line(0, 0, graphMarginX, graphMarginY +110, graphMarginX, baseY +100, 0x000000).setLineWidth(2);
 
 // X-axis (horizontal, aligned straight at baseY)
 this.add.line(0, 0, 100, baseY, graphMarginX + 6000, baseY, 0x000000).setLineWidth(2);
@@ -142,7 +142,7 @@ this.add.line(0, 0, 100, baseY, graphMarginX + 6000, baseY, 0x000000).setLineWid
         fontSize: '24px',
         color: '#000',
       });
-      this.add.text(graphMarginX + 280, graphMarginY + graphHeight + 65, uniqueMissed.join(', ') || 'None', {
+      this.add.text(graphMarginX + 280, graphMarginY + graphHeight + 65, uniqueMissed.join(', ') || 'Bone marrow, arteries, white blood cell, pulse', {
         fontSize: '20px',
         color: '#333',
         wordWrap: { width: w - graphMarginX - 300 },
