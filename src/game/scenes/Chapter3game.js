@@ -243,7 +243,7 @@ export class Chapter3game extends Phaser.Scene {
           targets: this.heartIcons[this.hearts],
           alpha: 0,
           duration: 300,
-          scale: 0.5,
+          scale: 0.1,
         });
       }
 
