@@ -43,7 +43,7 @@ export class Chapter3 extends Scene {
     const userId = user?._id;
     const currentChapter = 'Chapter3';
 
-    saveGameProgress(userId, currentChapter);
+    //saveGameProgress(userId, currentChapter);
 
     this.cameras.main.setBackgroundColor('#000000');
 

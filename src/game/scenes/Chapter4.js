@@ -38,7 +38,7 @@ export class Chapter4 extends Scene {
     const user = JSON.parse(localStorage.getItem('currentUser'));
     const userId = user?._id;
     const currentChapter = 'Chapter4';
-    saveGameProgress(userId, currentChapter);
+    //saveGameProgress(userId, currentChapter);
 
     this.cameras.main.setBackgroundColor('#000000');
     this.soundEnabled = localStorage.getItem('soundEnabled') !== 'false';

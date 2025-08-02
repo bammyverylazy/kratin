@@ -1,5 +1,6 @@
 // UIscene.js
-import { saveProgress } from '../utils/api.js'; // make sure this path is correct
+import { saveGameProgress } from '../utils/saveProgress.js';
+
 
 export function addStoryModeUI(scene, options = {}) {
     let popupOverlay = null;

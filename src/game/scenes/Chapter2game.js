@@ -41,7 +41,7 @@ export class Chapter2game extends Phaser.Scene {
   create() {
     const user = JSON.parse(localStorage.getItem('currentUser'));
     const userId = user?._id;
-    saveGameProgress(userId, 'Chapter2game');
+    //saveGameProgress(userId, 'Chapter2game');
 
     this.soundEnabled = localStorage.getItem('soundEnabled') !== 'false';
     this.sound.mute = !this.soundEnabled;

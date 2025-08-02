@@ -52,7 +52,7 @@ export class Chapter2 extends Scene {
     const user = JSON.parse(localStorage.getItem('currentUser'));
     const userId = user?._id;
     const currentChapter = 'Chapter2';
-    saveGameProgress(userId, currentChapter);
+    //saveGameProgress(userId, currentChapter);
 
     const storedSound = localStorage.getItem('soundEnabled');
     this.soundEnabled = storedSound === null ? true : (storedSound === 'true');

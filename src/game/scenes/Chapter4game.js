@@ -44,7 +44,7 @@ export class Chapter4game extends Phaser.Scene {
       const currentChapter = 'Chapter4game';
 
       console.log('userId:', userId, 'currentChapter:', currentChapter);
-      saveGameProgress(userId, currentChapter);
+      //saveGameProgress(userId, currentChapter);
 
     this.cameras.main.setBackgroundColor('#000');
 
