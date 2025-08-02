@@ -82,8 +82,7 @@ export class Mode extends Scene {
       
       this.scene.start('Chapter1');
     });
-
-   continueBtn.on('pointerdown', async () => {
+continueBtn.on('pointerdown', async () => {
   try {
     const storedUser = localStorage.getItem('currentUser') || localStorage.getItem('user');
     if (!storedUser) throw new Error('No user data in localStorage');
@@ -91,6 +90,17 @@ export class Mode extends Scene {
     const user = JSON.parse(storedUser);
     const userId = user?._id;
     if (!userId) throw new Error('User ID missing');
+
+    const sceneMap = {
+      Chapter1: 'Chapter1',
+      Chapter2: 'Chapter2',
+      Chapter3: 'Chapter3',
+      Chapter4: 'Chapter4',
+      Chapter1game: 'Chapter1game',
+      Chapter2game: 'Chapter2game',
+      Chapter3game: 'Chapter3game',
+      Chapter4game: 'Chapter4game'
+    };
 
     const response = await fetch(`${backendURL}/progress/load/${userId}`);
     if (!response.ok) throw new Error(`Failed to load progress: ${response.statusText}`);
@@ -104,11 +114,9 @@ export class Mode extends Scene {
 
   } catch (err) {
     console.error('Error loading progress:', err);
-    
     this.scene.start('Chapter1'); // Fallback
   }
 });
-
 
 
     closeBtn.on('pointerdown', () => {

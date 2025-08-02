@@ -1,7 +1,88 @@
 - .env
 - .env.production
 - dist
+  - ai-model
+    - aiHelper.js
+    - group1-shard1of1.bin
+    - model.json
   - assets
+    - 48.jpg
+    - 49.jpg
+    - 5.png
+    - 50.jpg
+    - 52.jpg
+    - 53.jpg
+    - 54.jpg
+    - 6.png
+    - 7.png
+    - 8.png
+    - 9.png
+    - Artery.png
+    - bg.png
+    - Blood.mp4
+    - bloodflow.mp4
+    - bloodvess.mp4
+    - BloodVessel.png
+    - BloodVesselA.png
+    - BloodVesselB.png
+    - BloodVessel_Capi.png
+    - body.mp4
+    - Bone.png
+    - Bone1.png
+    - Bone2.png
+    - Bonemarrow.png
+    - book.png
+    - C2P1.jpg
+    - CellBorn.mp4
+    - Chapter1scene1.png
+    - Chapter1scene2.png
+    - Chapter2fr.mp4
+    - Chapter3scene1.png
+    - Chapter4scene1.mp4
+    - ContinueButton.png
+    - correct.png
+    - D1F243E9-3E55-450A-93AC-5B75BE6C27F7.png
+    - dialogue
+      - sampleDialogue.json
+    - End.png
+    - enemy.png
+    - heartbeat.mp4
+    - hint.png
+    - index-KDqP41Yq.js
+    - jogging.png
+    - logo.png
+    - magnifying.png
+    - map.jpg
+    - multimode.png
+    - NewgameButton.png
+    - noobynooby.png
+    - noobysleep.png
+    - noobywake.png
+    - noobywalkyellow.mp4
+    - noobyzom.png
+    - phaser-fBFBqv5x.js
+    - plasma.png
+    - platelet.png
+    - quest1.png
+    - quest2.png
+    - quest3.png
+    - quest4.png
+    - rbc.png
+    - RBCIntro.mp4
+    - RBCwalkpink.mp4
+    - relaxing.png
+    - resting.png
+    - running.png
+    - setting.png
+    - skipafter.png
+    - skipbefore.png
+    - spark.png
+    - star.png
+    - storymode.png
+    - tryAgain.png
+    - Vein.png
+    - walking.png
+    - wbc.png
   - favicon.png
   - index.html
   - style.css
@@ -10,24 +91,126 @@
   - EventBus.js
   - main.js
   - scenes
+    - Boot.js
+    - Game.js
+    - GameOver.js
+    - MainMenu.js
+    - Preloader.js
 - index.html
 - log.js
 - model
   - model.js
-- models.js
-- nodemon.json
 - package-lock.json
 - package.json
 - project_structure.text
 - public
+  - ai-model
+    - aiHelper.js
+    - group1-shard1of1.bin
+    - model.json
   - assets
+    - 48.jpg
+    - 49.jpg
+    - 5.png
+    - 50.jpg
+    - 52.jpg
+    - 53.jpg
+    - 54.jpg
+    - 6.png
+    - 7.png
+    - 8.png
+    - 9.png
+    - Artery.png
+    - audio
+      - chapter1
+        - Chapter1_line0.mp3
+        - Chapter1_line1.mp3
+        - Chapter1_line10.mp3
+        - Chapter1_line11.mp3
+        - Chapter1_line12.mp3
+        - Chapter1_line13.mp3
+        - Chapter1_line14.mp3
+        - Chapter1_line15.mp3
+        - Chapter1_line16.mp3
+        - Chapter1_line17.mp3
+        - Chapter1_line18.mp3
+        - Chapter1_line19.mp3
+        - Chapter1_line2.mp3
+        - Chapter1_line3.mp3
+        - Chapter1_line4.mp3
+        - Chapter1_line5.mp3
+        - Chapter1_line6.mp3
+        - Chapter1_line7.mp3
+        - Chapter1_line8.mp3
+        - Chapter1_line9.mp3
+    - bg.png
+    - Blood.mp4
+    - bloodflow.mp4
+    - bloodvess.mp4
+    - BloodVessel.png
+    - BloodVesselA.png
+    - BloodVesselB.png
+    - BloodVessel_Capi.png
+    - body.mp4
+    - Bone.png
+    - Bone1.png
+    - Bone2.png
+    - Bonemarrow.png
+    - book.png
+    - C2P1.jpg
+    - CellBorn.mp4
+    - Chapter1scene1.png
+    - Chapter1scene2.png
+    - Chapter2fr.mp4
+    - Chapter3scene1.png
+    - Chapter4scene1.mp4
+    - ContinueButton.png
+    - correct.png
+    - D1F243E9-3E55-450A-93AC-5B75BE6C27F7.png
+    - End.png
+    - enemy.png
+    - heartbeat.mp4
+    - hint.png
+    - jogging.png
+    - logo.png
+    - magnifying.png
+    - map.jpg
+    - multimode.png
+    - NewgameButton.png
+    - noobynooby.png
+    - noobysleep.png
+    - noobywake.png
+    - noobywalkyellow.mp4
+    - noobyzom.png
+    - plasma.png
+    - platelet.png
+    - quest1.png
+    - quest2.png
+    - quest3.png
+    - quest4.png
+    - rbc.png
+    - RBCIntro.mp4
+    - RBCwalkpink.mp4
+    - relaxing.png
+    - resting.png
+    - running.png
+    - setting.png
+    - skipafter.png
+    - skipbefore.png
+    - spark.png
+    - star.png
+    - storymode.png
+    - tryAgain.png
+    - Vein.png
+    - walking.png
+    - wbc.png
   - favicon.png
   - style.css
   - test-socket.html
 - README.md
-- server.js
-- socket.js
 - src
+  - ai
+    - getNextKeywordAI.js
   - App.jsx
   - game
     - EventBus.js
@@ -42,6 +225,7 @@
       - Chapter3game.js
       - Chapter4.js
       - Chapter4game.js
+      - Dashboard.js
       - DialogueUI.js
       - EndingeScene.js
       - Game.js
@@ -49,16 +233,17 @@
       - MainMenu.js
       - Mode.js
       - Preloader.js
-      - storyboard.js
       - UIdialogue.js
       - UIscene.js
     - utils
       - api.js
       - saveProgress.js
+      - VoiceNarratorManager.js
   - Login.jsx
   - main.jsx
   - model
     - model.js
+    - model.json
   - PhaserGame.jsx
   - Signin.jsx
   - socket.js
