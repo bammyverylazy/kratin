@@ -8,10 +8,10 @@ export class Dashboard extends Scene {
 
   preload() {
     this.load.image('Chapter1scene1', '/assets/Chapter1scene1.png');
-    this.load.video('Chapter2scene1', '/assets/Chapter2fr.mp4');
+    this.load.image('Chapter2scene1', '/assets/Chapter2scene1Intro.png');
     this.load.image('Chapter3scene1', '/assets/Chapter3scene1.png');
-    this.load.video('Chapter4scene1', '/assets/Chapter4scene1.mp4');
-    this.load.image('lock', '/assets/lock-icon.png'); // Optional lock icon
+    this.load.image('Chapter4scene1', '/assets/Chapter4scene1Intro.png');
+    this.load.image('lock', '/assets/lock-icon.png');
   }
 
   create() {
@@ -46,33 +46,50 @@ export class Dashboard extends Scene {
   }
 
   renderDashboard(w, h, currentChapterIndex, userId) {
-    const graphY = h * 0.25;
+    const graphX = 100;
+    const graphY = 100;
+    const graphWidth = w - 2 * graphX;
     const maxHeight = 250;
     const barWidth = 30;
     const barGap = 15;
+
+    // Graph Background
+    this.add.rectangle(graphX - 20, graphY - 60, graphWidth + 40, maxHeight + 140, 0xffffff, 0.9).setOrigin(0, 0);
+
+    this.add.text(w / 2, graphY - 40, 'Recent Game Scores & Hints Used', {
+      fontSize: '28px',
+      fontStyle: 'bold',
+      color: '#000',
+    }).setOrigin(0.5);
 
     fetch(`${backendURL}/api/user/${userId}/gameplay-history`)
       .then(res => res.json())
       .then((sessions) => {
         if (!sessions || sessions.length === 0) {
-          this.add.text(w / 2, h / 2, 'No gameplay data to show', {
+          this.add.text(w / 2, graphY + 80, 'No gameplay data to show', {
             fontSize: '24px',
             color: '#000',
           }).setOrigin(0.5);
           return;
         }
 
-        const graphX = 100;
+        const totalScore = sessions.reduce((sum, s) => sum + s.score, 0);
+        const avgScore = (totalScore / sessions.length).toFixed(2);
+        this.add.text(graphX, graphY - 10, `Average Score: ${avgScore}`, {
+          fontSize: '20px',
+          color: '#000',
+        });
+
+        const missedKeywords = ['bone marrow', 'arteries', 'platelets']; // Example fallback
+        this.add.text(graphX + 250, graphY - 10, `Missed Keywords: ${missedKeywords.join(', ')}`, {
+          fontSize: '20px',
+          color: '#000',
+        });
+
         const maxScore = Math.max(...sessions.map(s => s.score));
         const maxHints = Math.max(...sessions.map(s => s.hintsUsed));
         const scaleScore = maxScore > 0 ? maxHeight / maxScore : 0;
         const scaleHints = maxHints > 0 ? maxHeight / maxHints : 0;
-
-        this.add.text(w / 2, graphY - 40, 'Recent Game Scores & Hints Used', {
-          fontSize: '24px',
-          fontStyle: 'bold',
-          color: '#000',
-        }).setOrigin(0.5);
 
         sessions.forEach((session, index) => {
           const x = graphX + index * (barWidth * 2 + barGap * 3);
@@ -109,10 +126,10 @@ export class Dashboard extends Scene {
     }).setOrigin(0.5);
 
     const chapters = [
-      { key: 'Chapter1scene1', label: 'Chapter 1', type: 'image', scene: 'Chapter1game' },
-      { key: 'Chapter2scene1', label: 'Chapter 2', type: 'video', scene: 'Chapter2game' },
-      { key: 'Chapter3scene1', label: 'Chapter 3', type: 'image', scene: 'Chapter3game' },
-      { key: 'Chapter4scene1', label: 'Chapter 4', type: 'video', scene: 'Chapter4game' },
+      { key: 'Chapter1scene1', label: 'Chapter 1', scene: 'Chapter1game' },
+      { key: 'Chapter2scene1', label: 'Chapter 2', scene: 'Chapter2game' },
+      { key: 'Chapter3scene1', label: 'Chapter 3', scene: 'Chapter3game' },
+      { key: 'Chapter4scene1', label: 'Chapter 4', scene: 'Chapter4game' },
     ];
 
     const thumbWidth = 150;
@@ -126,17 +143,9 @@ export class Dashboard extends Scene {
       const x = startX + i * (thumbWidth + thumbGap);
       const isUnlocked = chapterIndex <= currentChapterIndex;
 
-      let thumb;
-      if (ch.type === 'video') {
-        thumb = this.add.video(x, mapsY, ch.key)
-          .setDisplaySize(thumbWidth, thumbHeight)
-          .setOrigin(0, 0)
-          .setPaused(true);
-      } else {
-        thumb = this.add.image(x, mapsY, ch.key)
-          .setDisplaySize(thumbWidth, thumbHeight)
-          .setOrigin(0, 0);
-      }
+      const thumb = this.add.image(x, mapsY, ch.key)
+        .setDisplaySize(thumbWidth, thumbHeight)
+        .setOrigin(0, 0);
 
       if (!isUnlocked) thumb.setAlpha(0.3);
 
