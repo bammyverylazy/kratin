@@ -68,7 +68,7 @@ export class Dashboard extends Scene {
   }).setOrigin(0.5);
 
   // Legend
-  const legendBaseX = graphMarginX + 10;
+  const legendBaseX = -graphMarginX - 10;
   const legendY = graphMarginY - 15;
   this.add.rectangle(legendBaseX, legendY, 20, 20, 0x3366ff).setOrigin(0, 0);
   this.add.text(legendBaseX + 28, legendY + 1, 'Score', { fontSize: '18px', color: '#000' });
@@ -101,8 +101,8 @@ export class Dashboard extends Scene {
       let missedKeywords = [];
 
       // Axes
-      this.add.line(0, 0, graphMarginX, baseY, graphMarginX, graphMarginY, 0x000000).setLineWidth(2);
-      this.add.line(0, 0, graphMarginX, baseY, graphMarginX + graphWidth, baseY, 0x000000).setLineWidth(2);
+      this.add.line(20, 100, graphMarginX, baseY, graphMarginX, graphMarginY, 0x000000).setLineWidth(2);
+      this.add.line(20, 100, graphMarginX, baseY, graphMarginX + graphWidth, baseY, 0x000000).setLineWidth(2);
 
       sessions.forEach((session, index) => {
         const groupX = graphMarginX + 20 + index * (2 * barWidth + barGap);
