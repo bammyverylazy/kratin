@@ -102,8 +102,8 @@ this.add.text(legendBaseX + 128, legendY + 1, 'Hints Used', { fontSize: '18px', 
       let missedKeywords = [];
 
       // Axes
-      this.add.line(15, 70, graphMarginX, baseY, graphMarginX, graphMarginY, 0x000000).setLineWidth(2);
-      this.add.line(15, 70, graphMarginX, baseY, graphMarginX + graphWidth, baseY, 0x000000).setLineWidth(2);
+      this.add.line(15, 50, graphMarginX, baseY, graphMarginX, graphMarginY, 0x000000).setLineWidth(2);//y
+      this.add.line(15, 50, graphMarginX, baseY, graphMarginX + graphWidth, baseY+10, 0x000000).setLineWidth(2);//x
 
       sessions.forEach((session, index) => {
         const groupX = graphMarginX + 20 + index * (2 * barWidth + barGap);
