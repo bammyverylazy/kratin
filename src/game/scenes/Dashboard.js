@@ -47,93 +47,91 @@ export class Dashboard extends Scene {
 
   renderDashboard(w, h, currentChapterIndex, userId) {
     const graphX = 100;
-    const graphY = 140;
+    const graphY = 160;
     const graphWidth = w - 2 * graphX;
-    const maxHeight = 200;
-    const barWidth = 30;
+    const graphHeight = 220;
+    const barWidth = 40;
     const barGap = 30;
 
-    this.add.text(w / 2, graphY - 60, 'Recent Game Performance', {
-      fontSize: '35px',
-      fontStyle: 'bold',
-      color: '#5a3e1b',
-    }).setOrigin(0.5);
-
-    const graphBg = this.add.rectangle(graphX - 30, graphY - 10, graphWidth + 60, maxHeight + 150, 0xffffff)
+    // White background container
+    const bg = this.add.rectangle(graphX - 40, graphY - 80, graphWidth + 80, graphHeight + 160, 0xffffff)
       .setOrigin(0, 0)
       .setStrokeStyle(2, 0xaaaaaa);
-    if (graphBg.setCornerRadius) graphBg.setCornerRadius(20);
+    if (bg.setCornerRadius) bg.setCornerRadius(20);
 
-    const legendY = graphY + maxHeight + 10;
-    this.add.rectangle(graphX, legendY, 20, 20, 0x3366ff).setOrigin(0, 0);
-    this.add.text(graphX + 25, legendY + 2, 'Score', {
-      fontSize: '18px',
-      color: '#000',
+    // Title
+    this.add.text(w / 2, graphY - 50, 'Recent Game Performance', {
+      fontSize: '36px',
+      color: '#5a3e1b',
       fontStyle: 'bold',
-    }).setOrigin(0, 0);
+    }).setOrigin(0.5);
 
-    this.add.rectangle(graphX + 120, legendY, 20, 20, 0xff9933).setOrigin(0, 0);
-    this.add.text(graphX + 145, legendY + 2, 'Hints Used', {
-      fontSize: '18px',
-      color: '#000',
-      fontStyle: 'bold',
-    }).setOrigin(0, 0);
+    // Legend
+    const legendBaseX = graphX + 10;
+    const legendY = graphY - 15;
+    this.add.rectangle(legendBaseX, legendY, 20, 20, 0x3366ff).setOrigin(0, 0);
+    this.add.text(legendBaseX + 28, legendY + 1, 'Score', { fontSize: '18px', color: '#000' });
+    this.add.text(legendBaseX + 120, legendY + 1, '(Hints shown above bars)', { fontSize: '16px', color: '#666' });
 
     fetch(`${backendURL}/api/user/${userId}/gameplay-history`)
       .then(res => res.json())
       .then((sessions) => {
         if (!sessions || sessions.length === 0) {
-          this.add.text(w / 2, graphY + 80, 'No gameplay data to show', {
+          this.add.text(w / 2, graphY + 100, 'No gameplay data to show', {
             fontSize: '24px',
             color: '#000',
           }).setOrigin(0.5);
           return;
         }
 
+        // Sort sessions by oldest to newest
         sessions.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
 
         const totalScore = sessions.reduce((sum, s) => sum + s.score, 0);
         const avgScore = (totalScore / sessions.length).toFixed(2);
         const missedKeywords = Array.from(new Set(sessions.flatMap(s => s.missedKeywords || [])));
 
-        const maxScore = Math.max(...sessions.map(s => s.score));
-        const scaleScore = maxScore > 0 ? maxHeight / maxScore : 0;
+        // Y-axis line
+        this.add.line(0, 0, graphX - 10, graphY, graphX - 10, graphY + graphHeight, 0x000000).setLineWidth(2);
+        // X-axis line
+        this.add.line(0, 0, graphX - 10, graphY + graphHeight, graphX + graphWidth, graphY + graphHeight, 0x000000).setLineWidth(2);
 
-        this.add.line(0, 0, graphX - 10, graphY, graphX - 10, graphY + maxHeight, 0x000000).setLineWidth(2);
-        this.add.line(0, 0, graphX - 10, graphY + maxHeight, graphX + sessions.length * (barWidth + barGap), graphY + maxHeight, 0x000000).setLineWidth(2);
+        const maxScore = Math.max(...sessions.map(s => s.score), 1); // avoid divide by 0
+        const scaleY = graphHeight / maxScore;
 
         sessions.forEach((session, index) => {
           const x = graphX + index * (barWidth + barGap);
-          const scoreHeight = session.score * scaleScore;
+          const scoreHeight = session.score * scaleY;
 
-          this.add.rectangle(x, graphY + maxHeight, barWidth, -scoreHeight, 0x3366ff).setOrigin(0, 1);
-          this.add.text(x + barWidth / 2, graphY + maxHeight - scoreHeight - 10, session.hintsUsed, {
+          // Blue score bar
+          this.add.rectangle(x, graphY + graphHeight, barWidth, -scoreHeight, 0x3366ff).setOrigin(0, 1);
+
+          // Hint used text
+          this.add.text(x + barWidth / 2, graphY + graphHeight - scoreHeight - 10, session.hintsUsed || 0, {
             fontSize: '16px',
             color: '#000',
-            fontStyle: 'bold',
           }).setOrigin(0.5, 1);
         });
 
-        const bottomY = graphY + maxHeight + 60;
-        this.add.text(graphX, bottomY, `Average Score: ${avgScore}`, {
+        // Average Score and Missed Keywords text
+        this.add.text(graphX, graphY + graphHeight + 30, `Average Score: ${avgScore}`, {
           fontSize: '24px',
           color: '#000',
-          fontStyle: 'bold',
         });
 
-        this.add.text(graphX + 300, bottomY, 'Missed Keywords:', {
+        this.add.text(graphX + 280, graphY + graphHeight + 30, `Missed Keywords:`, {
           fontSize: '24px',
           color: '#000',
-          fontStyle: 'bold',
         });
 
-        this.add.text(graphX + 300, bottomY + 30, missedKeywords.join(', ') || 'None', {
+        this.add.text(graphX + 280, graphY + graphHeight + 65, missedKeywords.join(', ') || 'None', {
           fontSize: '20px',
           color: '#333',
-          wordWrap: { width: w - graphX - 300 - 40 },
+          wordWrap: { width: w - graphX - 300 },
         });
       });
 
+    // === Game Maps ===
     const mapsY = h - 230;
     this.add.text(w / 2, mapsY - 40, 'Game Maps', {
       fontSize: '28px',
