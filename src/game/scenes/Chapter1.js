@@ -14,24 +14,20 @@ export class Chapter1 extends Phaser.Scene {
     this.background = null;
     this.startButton = null;
     this.dialogueUI = null;
+    this.bgVideo = null;
+    this.voiceNarrator = null;
 
-    // Audio music references
-    this.openingSong = null;
-    this.backgroundMusic = null;
-
-    // Prepare dialogue script with sceneStep for background changes
     this.script = [
-      { speaker: "Narrator:", text: 'Welcome to your journey inside the body, This is "CELLVIVOR".' }, //once upon a time
-      // bone
+      { speaker: "Narrator:", text: 'Welcome to your journey inside the body, This is "CELLVIVOR".' },
       { speaker: "Narrator:", text: " a vast network of cells works relentlessly to keep us alive.", sceneStep: 2 },
       { speaker: "Narrator", text: "And here, deep inside, is the marrow.", sceneStep: 3 },
-      { speaker: "Narrator:", text: "The marrow is bustling with activity.", sceneStep: 4 }, // stays on same scene for 2nd click
-      {speaker: "Noobyzom:", text: "☆*: .｡. o(≧▽≦)o .｡.:*☆", sceneStep: 5 }, // noobysleep
-      { speaker: "Narrator:", text: "You are Noobyzom", sceneStep: 6 }, // noobywake
-      { speaker: "Narrator:", text: "A newborn red blood cell, just created in the bone marrow, the body’s blood cell factory.", sceneStep: 7 }, // CellBorn
+      { speaker: "Narrator:", text: "The marrow is bustling with activity.", sceneStep: 4 },
+      { speaker: "Noobyzom:", text: "☆*: .｡. o(≧▽≦)o .｡.:*☆", sceneStep: 5 },
+      { speaker: "Narrator:", text: "You are Noobyzom", sceneStep: 6 },
+      { speaker: "Narrator:", text: "A newborn red blood cell, just created in the bone marrow, the body’s blood cell factory.", sceneStep: 7 },
       { speaker: "Narrator:", text: " Born from hematopoietic stem cells, you have developed into a biconcave, flexible, nucleus-free hero", sceneStep: 8 },
       { speaker: "Narrator:", text: "  perfectly designed to carry one of life’s most precious elements: oxygen.", sceneStep: 8 },
-      { speaker: "Narrator:", text: "Your journey starts here. From the bone marrow, \nyou will enter the bloodstream through the vessels.", sceneStep: 10 },//bloodvess 
+      { speaker: "Narrator:", text: "Your journey starts here. From the bone marrow, \nyou will enter the bloodstream through the vessels.", sceneStep: 10 },
       { speaker: "Narrator:", text: "Your mission: Deliver oxygen to every cell in the body and maintain life.", sceneStep: 9 },
       { speaker: "Narrator:", text: "This is not just a task — it's the purpose of your existence.", sceneStep: 11 },
       { speaker: "Senior Red Blood Cell:", text: " Ah, fresh from the marrow, huh? I’m your senior — a well-traveled, oxygen-delivering expert.", sceneStep:  12},
@@ -96,18 +92,21 @@ export class Chapter1 extends Phaser.Scene {
     this.load.image('8.png', '/assets/8.png');
     this.load.image('9.png', '/assets/9.png');
 
-    // audio for dialogue lines
+    // Audio for dialogue lines
     for (let i = 0; i < this.script.length; i++) {
       const audioKey = `Chapter1_line${i}`;
       this.load.audio(audioKey, `/assets/audio/chapter1/${audioKey}.mp3`);
     }
 
-    // Audio for opening and background music
+    // Background music
     this.load.audio('openingsong', '/assets/audio/openingsong.mp3');
     this.load.audio('backgroundmusic', '/assets/audio/backgroundmusic.mp3');
   }
 
   create() {
+    // Get userId from localStorage safely
+    const userId = localStorage.getItem('userId') || null;
+
     addStoryModeUI(this, {
       userId,
       currentChapter: this.currentChapter,
@@ -121,44 +120,13 @@ export class Chapter1 extends Phaser.Scene {
       }).setOrigin(0.5).setDepth(201)
     });
 
-    // Play opening song first, full volume
-    this.openingSong = this.sound.add('openingsong', {
-      volume: 1,
-      loop: false,
-    });
-    this.openingSong.play();
-
-    // When opening song ends, fade out then start background music
-    this.openingSong.once('complete', () => {
-      this.tweens.add({
-        targets: this.openingSong,
-        volume: 0,
-        duration: 2000,
-        onComplete: () => {
-          this.openingSong.stop();
-          this.openingSong.destroy();
-          this.openingSong = null;
-
-          // Start background music looped at lower volume
-          this.backgroundMusic = this.sound.add('backgroundmusic', {
-            volume: 0.2,  // lower volume
-            loop: true,
-          });
-          this.backgroundMusic.play();
-        }
-      });
-    });
-
-    // Start screen: black background
     this.cameras.main.setBackgroundColor('#000000');
 
-    // Show cover image (Chapter1scene1.png)
     this.coverImage = this.add.image(0, 0, 'Chapter1scene1')
       .setOrigin(0, 0)
       .setDepth(0)
       .setDisplaySize(this.sys.game.config.width, this.sys.game.config.height);
 
-    // Add Start button centered
     this.startButton = this.add.text(
       this.cameras.main.centerX,
       this.cameras.main.centerY + 300,
@@ -174,14 +142,14 @@ export class Chapter1 extends Phaser.Scene {
       .setDepth(10)
       .setInteractive({ useHandCursor: true });
 
-    // Start button click handler
     this.startButton.on('pointerdown', () => {
       this.startButton.destroy();
       this.coverImage.destroy();
+
+      this.playOpeningMusic();
       this.startStorySequence();
     });
 
-    // Allow pressing Enter/Space to start
     this.input.keyboard.on('keydown', (event) => {
       if ((event.code === 'Space' || event.code === 'Enter') && this.startButton && this.startButton.active) {
         this.startButton.emit('pointerdown');
@@ -189,18 +157,46 @@ export class Chapter1 extends Phaser.Scene {
     });
   }
 
+  playOpeningMusic() {
+    // Play openingsong once, then fade it out and play backgroundmusic at lower volume
+    this.openingSong = this.sound.add('openingsong', { volume: 1 });
+    this.backgroundMusic = this.sound.add('backgroundmusic', { volume: 0.2, loop: true });
+
+    this.openingSong.play();
+
+    this.openingSong.once('complete', () => {
+      // Fade out opening song in 1 second
+      this.tweens.add({
+        targets: this.openingSong,
+        volume: 0,
+        duration: 1000,
+        onComplete: () => {
+          this.openingSong.stop();
+          this.openingSong.destroy();
+          this.openingSong = null;
+
+          // Start background music loop
+          this.backgroundMusic.play();
+        }
+      });
+    });
+  }
+
   startStorySequence() {
     if (this.background) this.background.destroy();
+    if (this.bgVideo) {
+      this.bgVideo.destroy();
+      this.bgVideo = null;
+    }
+
     this.background = this.add.image(0, 0, this.bgSteps[0])
       .setOrigin(0, 0)
       .setDepth(0)
       .setDisplaySize(this.sys.game.config.width, this.sys.game.config.height);
 
-    // Remove old buttons if they exist
     if (this.nextButton) this.nextButton.destroy();
     if (this.backButton) this.backButton.destroy();
 
-    // Add Next button
     this.nextButton = this.add.text(900, 680, '▶ Next', {
       fontSize: '20px',
       fill: '#ffffff',
@@ -212,7 +208,6 @@ export class Chapter1 extends Phaser.Scene {
       this.dialogueUI.advance();
     });
 
-    // Add Back button
     this.backButton = this.add.text(820, 680, '◀ Back', {
       fontSize: '20px',
       fill: '#ffffff',
@@ -222,7 +217,7 @@ export class Chapter1 extends Phaser.Scene {
 
     this.backButton.on('pointerdown', () => {
       if (this.currentLine > 0) {
-        this.currentLine -= 2; // Go back one line (since showCurrentLine will increment)
+        this.currentLine -= 2;
         if (this.currentLine < 0) this.currentLine = 0;
         this.voiceNarrator.stop();
         this.voiceNarrator.play('Chapter1scene1');
@@ -230,7 +225,7 @@ export class Chapter1 extends Phaser.Scene {
       }
     });
 
-    // Keybinds for keyboard users
+    // Keyboard keybinds
     this.input.keyboard.on('keydown-ENTER', () => {
       this.dialogueUI.advance();
     });
@@ -249,25 +244,21 @@ export class Chapter1 extends Phaser.Scene {
     });
 
     this.currentLine = 0;
-
-    // Start the first line
-    this.showCurrentLine();
-
     this.voiceNarrator = new VoiceNarratorManager(this);
     this.dialogueUI = new DialogueUI(this, {
       onPlayVoice: (audioKey) => this.voiceNarrator.play(audioKey)
     });
+
+    this.showCurrentLine();
   }
 
   showCurrentLine() {
-    // Always use this function to step through the script
     if (this.currentLine >= this.script.length) {
-      // End of all dialogue
       this.cameras.main.setBackgroundColor(null);
-
-      this.scene.start('Chapter1game'); // Transition to Chapter1game scene
+      this.scene.start('Chapter1game');
       return;
     }
+
     const nextLine = this.script[this.currentLine];
 
     this.dialogueUI.onLineComplete = () => {
@@ -275,7 +266,6 @@ export class Chapter1 extends Phaser.Scene {
       this.showCurrentLine();
     };
 
-    // Handle background/video changes
     if (
       typeof nextLine.sceneStep === 'number' &&
       nextLine.sceneStep !== this.bgStepIndex &&
@@ -283,24 +273,24 @@ export class Chapter1 extends Phaser.Scene {
     ) {
       this.bgStepIndex = nextLine.sceneStep;
 
-      // Remove previous background
       if (this.background) {
         this.background.destroy();
         this.background = null;
       }
+      if (this.bgVideo) {
+        this.bgVideo.destroy();
+        this.bgVideo = null;
+      }
 
-      // If the bg step corresponds to a video, play video, else show image
       const bgKey = this.bgSteps[this.bgStepIndex];
 
-      if (this.textIsVideo(bgKey)) {
-        const vid = this.add.video(
-          this.sys.game.config.width / 2,
-          this.sys.game.config.height / 2,
-          bgKey
-        ).setDepth(0).setDisplaySize(this.sys.game.config.width, this.sys.game.config.height);
+      if (this.cache.video.exists(bgKey)) {
+        this.bgVideo = this.add.video(0, 0, bgKey)
+          .setOrigin(0, 0)
+          .setDepth(0);
 
-        vid.play(true);
-        this.background = vid;
+        this.bgVideo.setDisplaySize(this.sys.game.config.width, this.sys.game.config.height);
+        this.bgVideo.play(true);
       } else {
         this.background = this.add.image(0, 0, bgKey)
           .setOrigin(0, 0)
@@ -309,12 +299,6 @@ export class Chapter1 extends Phaser.Scene {
       }
     }
 
-    this.dialogueUI.showLine(nextLine.speaker, nextLine.text, this.currentLine);
-  }
-
-  textIsVideo(key) {
-    // List of keys for video bg
-    const videoKeys = ['CellBorn', 'Blood', 'body', 'bloodvess', 'noobywalkyellow', 'RBCIntro', 'RBCwalkpink'];
-    return videoKeys.includes(key);
+    this.dialogueUI.showLine(nextLine.speaker, nextLine.text, `Chapter1_line${this.currentLine}`);
   }
 }
