@@ -258,31 +258,43 @@ export class Chapter2game extends Phaser.Scene {
     this.moveEnemies();
     this.checkEnemyCollisions();
   }
-
   endGame(success) {
     this.physics.pause();
 
     const overlay = this.add.rectangle(512, 384, 1024, 768, 0x000000, 0.8).setDepth(1000);
     const message = success ? 'Well done!' : 'Game Over!';
-    const nextText = success ? '▶ Continue to Chapter 3' : '⟳ Try Again';
+    const retryText = '⟳ Try Again';
+    const nextText = '▶ Proceed to Chapter 3';
 
-    this.add.text(512, 300, message, {
+    this.add.text(512, 280, message, {
       fontSize: '38px',
       color: '#ffffff',
       align: 'center'
     }).setOrigin(0.5).setDepth(1001);
 
-    const btn = this.add.text(512, 420, nextText, {
+    const retryBtn = this.add.text(512, 380, retryText, {
       fontSize: '30px',
       backgroundColor: '#ffffff',
       color: '#000',
       padding: { left: 20, right: 20, top: 10, bottom: 10 },
     }).setOrigin(0.5).setDepth(1001).setInteractive({ useHandCursor: true });
 
-    btn.on('pointerdown', () => {
-      this.scene.start(success ? 'Chapter3' : 'Chapter2game');
+    const nextBtn = this.add.text(512, 460, nextText, {
+      fontSize: '28px',
+      backgroundColor: '#eeeeee',
+      color: '#000',
+      padding: { left: 20, right: 20, top: 10, bottom: 10 },
+    }).setOrigin(0.5).setDepth(1001).setInteractive({ useHandCursor: true });
+
+    retryBtn.on('pointerdown', () => {
+      window.location.reload(); 
+    });
+
+    nextBtn.on('pointerdown', () => {
+      this.scene.start('Chapter3');
     });
   }
+
 
   showHowToPlayPopup(onClose) {
     const overlay = this.add.rectangle(512, 360, 1024, 800, 0x000000, 0.66)
