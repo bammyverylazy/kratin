@@ -208,6 +208,11 @@ export class Chapter1 extends Phaser.Scene {
       this.currentLine++;
       this.showCurrentLine();
     } else {
+      this.events.once('shutdown', () => {
+      if (this.bgm && this.bgm.isPlaying) {
+        this.bgm.stop();
+      }
+    });
       this.scene.start('Chapter1game');
     }
   }
