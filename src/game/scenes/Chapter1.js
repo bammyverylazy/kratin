@@ -288,7 +288,7 @@ export class Chapter1 extends Phaser.Scene {
     } else {
       this.dialogueUI.startDialogue([nextLine]);
       if (nextLine.audioKey) {
-        this.voiceNarrator.play(nextLine.audioKey, { volume: 10 }); // adjust volume here
+        this.voiceNarrator.play(nextLine.audioKey, { volume: 5 }); // adjust volume here
       }
       this.dialogueUI.onLineComplete = () => {
         // Automatically advance dialogue when line finishes
