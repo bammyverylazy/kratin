@@ -71,7 +71,7 @@ export class Dashboard extends Scene {
     const legendY = graphY - 15;
     this.add.rectangle(legendBaseX, legendY, 20, 20, 0x3366ff).setOrigin(0, 0);
     this.add.text(legendBaseX + 28, legendY + 1, 'Score', { fontSize: '18px', color: '#000' });
-    this.add.text(legendBaseX + 120, legendY + 1, '(Hints shown above bars)', { fontSize: '16px', color: '#666' });
+    //this.add.text(legendBaseX + 120, legendY + 1, '(Hints shown above bars)', { fontSize: '16px', color: '#666' });
 
     fetch(`${backendURL}/api/user/${userId}/gameplay-history`)
       .then(res => res.json())
@@ -98,9 +98,9 @@ const maxY = Math.max(...sessions.map(s => Math.max(s.score, s.hintsUsed || 0)),
 const scaleY = graphHeight / maxY;
 
 // Y-axis
-this.add.line(0, 0, graphX, graphY, graphX, graphY + graphHeight, 0x000000).setLineWidth(2);
+this.add.line(0, 0, graphX, graphY, graphX, graphY - graphHeight, 0x000000).setLineWidth(2);
 // X-axis
-this.add.line(0, 0, graphX, graphY + graphHeight, graphX + graphWidth, graphY + graphHeight, 0x000000).setLineWidth(2);
+this.add.line(0, 0, graphX, graphY + graphHeight, graphX - graphWidth, graphY + graphHeight, 0x000000).setLineWidth(2);
 
 sessions.forEach((session, index) => {
   const groupX = graphX + 10 + index * (2 * barWidth + barGap);
@@ -108,10 +108,10 @@ sessions.forEach((session, index) => {
   const hintHeight = (session.hintsUsed || 0) * scaleY;
 
   // Score bar (Blue)
-  this.add.rectangle(groupX, graphY + graphHeight, barWidth, -scoreHeight, 0x3366ff).setOrigin(0, 1);
+  this.add.rectangle(groupX, graphY + graphHeight, barWidth, scoreHeight, 0x3366ff).setOrigin(0, 1);
 
   // Hint bar (Pink)
-  this.add.rectangle(groupX + barWidth, graphY + graphHeight, barWidth, -hintHeight, 0xfa821a).setOrigin(0, 1);
+  this.add.rectangle(groupX + barWidth, graphY + graphHeight, barWidth, hintHeight, 0xfa821a).setOrigin(0, 1);
 
   // Labels below
   this.add.text(groupX + barWidth, graphY + graphHeight + 5, `#${index + 1}`, {
@@ -124,7 +124,7 @@ sessions.forEach((session, index) => {
 this.add.rectangle(legendBaseX, legendY, 20, 20, 0x3366ff).setOrigin(0, 0);
 this.add.text(legendBaseX + 28, legendY + 1, 'Score', { fontSize: '18px', color: '#000' });
 
-this.add.rectangle(legendBaseX + 100, legendY, 20, 20, 0xff6699).setOrigin(0, 0);
+this.add.rectangle(legendBaseX + 100, legendY, 20, 20, 0xfa821a).setOrigin(0, 0);
 this.add.text(legendBaseX + 128, legendY + 1, 'Hints Used', { fontSize: '18px', color: '#000' });
 
 
