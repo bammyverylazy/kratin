@@ -46,34 +46,37 @@ export class Dashboard extends Scene {
   }
 
   renderDashboard(w, h, currentChapterIndex, userId) {
-    const graphX = 80;
+    const graphX = 100;
     const graphY = 140;
     const graphWidth = w - 2 * graphX;
-    const maxHeight = 220;
+    const maxHeight = 200;
     const barWidth = 30;
-    const barGap = 25;
+    const barGap = 30;
 
-    const graphBg = this.add.rectangle(graphX - 20, graphY - 60, graphWidth + 40, maxHeight + 180, 0xffffff)
-      .setOrigin(0, 0)
-      .setStrokeStyle(2, 0xaaaaaa);
-    if (graphBg.setCornerRadius) graphBg.setCornerRadius(20);
-
-    // Title
-    this.add.text(w / 2, graphY - 45, 'Recent Game Performance', {
-      fontSize: '36px',
+    this.add.text(w / 2, graphY - 60, 'Recent Game Performance', {
+      fontSize: '35px',
       fontStyle: 'bold',
       color: '#5a3e1b',
     }).setOrigin(0.5);
 
-    // Legend
-    this.add.rectangle(graphX, graphY - 10, 20, 20, 0x3366ff).setOrigin(0);
-    this.add.text(graphX + 28, graphY - 6, 'Score (Y Axis)', {
+    const graphBg = this.add.rectangle(graphX - 30, graphY - 10, graphWidth + 60, maxHeight + 150, 0xffffff)
+      .setOrigin(0, 0)
+      .setStrokeStyle(2, 0xaaaaaa);
+    if (graphBg.setCornerRadius) graphBg.setCornerRadius(20);
+
+    const legendY = graphY + maxHeight + 10;
+    this.add.rectangle(graphX, legendY, 20, 20, 0x3366ff).setOrigin(0, 0);
+    this.add.text(graphX + 25, legendY + 2, 'Score', {
       fontSize: '18px',
-      color: '#000'
+      color: '#000',
+      fontStyle: 'bold',
     }).setOrigin(0, 0);
-    this.add.text(graphX + 250, graphY - 6, 'Hint count (Above Bar)', {
+
+    this.add.rectangle(graphX + 120, legendY, 20, 20, 0xff9933).setOrigin(0, 0);
+    this.add.text(graphX + 145, legendY + 2, 'Hints Used', {
       fontSize: '18px',
-      color: '#000'
+      color: '#000',
+      fontStyle: 'bold',
     }).setOrigin(0, 0);
 
     fetch(`${backendURL}/api/user/${userId}/gameplay-history`)
@@ -87,65 +90,50 @@ export class Dashboard extends Scene {
           return;
         }
 
-        // Sort sessions by timestamp (oldest to newest)
         sessions.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
 
         const totalScore = sessions.reduce((sum, s) => sum + s.score, 0);
         const avgScore = (totalScore / sessions.length).toFixed(2);
         const missedKeywords = Array.from(new Set(sessions.flatMap(s => s.missedKeywords || [])));
 
-        // Show average score
-        this.add.text(graphX, graphY + maxHeight + 10, `Average Score: ${avgScore}`, {
-          fontSize: '24px',
-          color: '#000',
-          fontStyle: 'bold',
-        });
-
-        // Missed keywords label
-        this.add.text(graphX + 350, graphY + maxHeight + 10, `Missed Keywords:`, {
-          fontSize: '24px',
-          color: '#000',
-          fontStyle: 'bold',
-        });
-
-        // Missed keyword list (multiline)
-        this.add.text(graphX + 350, graphY + maxHeight + 50, missedKeywords.length > 0 ? missedKeywords.join(', ') : 'None', {
-          fontSize: '20px',
-          color: '#333',
-          wordWrap: { width: w - graphX - 370 }
-        });
-
-        // Y-axis scaling
         const maxScore = Math.max(...sessions.map(s => s.score));
         const scaleScore = maxScore > 0 ? maxHeight / maxScore : 0;
+
+        this.add.line(0, 0, graphX - 10, graphY, graphX - 10, graphY + maxHeight, 0x000000).setLineWidth(2);
+        this.add.line(0, 0, graphX - 10, graphY + maxHeight, graphX + sessions.length * (barWidth + barGap), graphY + maxHeight, 0x000000).setLineWidth(2);
 
         sessions.forEach((session, index) => {
           const x = graphX + index * (barWidth + barGap);
           const scoreHeight = session.score * scaleScore;
 
-          // Score bar
           this.add.rectangle(x, graphY + maxHeight, barWidth, -scoreHeight, 0x3366ff).setOrigin(0, 1);
-
-          // Hint label above bar
-          this.add.text(x + barWidth / 2, graphY + maxHeight - scoreHeight - 10, `${session.hintsUsed}`, {
-            fontSize: '14px',
+          this.add.text(x + barWidth / 2, graphY + maxHeight - scoreHeight - 10, session.hintsUsed, {
+            fontSize: '16px',
             color: '#000',
+            fontStyle: 'bold',
           }).setOrigin(0.5, 1);
+        });
 
-          // Date label below bar
-          let dateStr = '';
-          try {
-            dateStr = new Date(session.timestamp).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
-          } catch (e) { dateStr = 'Invalid'; }
+        const bottomY = graphY + maxHeight + 60;
+        this.add.text(graphX, bottomY, `Average Score: ${avgScore}`, {
+          fontSize: '24px',
+          color: '#000',
+          fontStyle: 'bold',
+        });
 
-          this.add.text(x + barWidth / 2, graphY + maxHeight + 5, dateStr, {
-            fontSize: '12px',
-            color: '#000',
-          }).setOrigin(0.5, 0);
+        this.add.text(graphX + 300, bottomY, 'Missed Keywords:', {
+          fontSize: '24px',
+          color: '#000',
+          fontStyle: 'bold',
+        });
+
+        this.add.text(graphX + 300, bottomY + 30, missedKeywords.join(', ') || 'None', {
+          fontSize: '20px',
+          color: '#333',
+          wordWrap: { width: w - graphX - 300 - 40 },
         });
       });
 
-    // === Game Maps ===
     const mapsY = h - 230;
     this.add.text(w / 2, mapsY - 40, 'Game Maps', {
       fontSize: '28px',
@@ -174,6 +162,7 @@ export class Dashboard extends Scene {
       const thumb = this.add.image(x, mapsY, ch.key)
         .setDisplaySize(thumbWidth, thumbHeight)
         .setOrigin(0, 0);
+
       if (!isUnlocked) thumb.setAlpha(0.3);
 
       this.add.text(x + thumbWidth / 2, mapsY + thumbHeight + 10, ch.label, {
