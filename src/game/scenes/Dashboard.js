@@ -159,10 +159,10 @@ export class Dashboard extends Scene {
     }).setOrigin(0.5);
 
     const chapters = [
-      { key: 'Chapter1scene1', label: 'Chapter 1', scene: 'Chapter1game' },
-      { key: 'Chapter2scene1', label: 'Chapter 2', scene: 'Chapter2game' },
-      { key: 'Chapter3scene1', label: 'Chapter 3', scene: 'Chapter3game' },
-      { key: 'Chapter4scene1', label: 'Chapter 4', scene: 'Chapter4game' },
+      { key: 'Chapter1scene1', label: 'Chapter1', scene: 'Chapter1game' },
+      { key: 'Chapter2scene1', label: 'Chapter2', scene: 'Chapter2game' },
+      { key: 'Chapter3scene1', label: 'Chapter3', scene: 'Chapter3game' },
+      { key: 'Chapter4scene1', label: 'Chapter4', scene: 'Chapter4game' },
     ];
 
     const thumbWidth = 150;
@@ -190,7 +190,7 @@ export class Dashboard extends Scene {
         // Make thumbnail clickable
         thumb.setInteractive({ cursor: 'pointer' });
         thumb.on('pointerdown', () => {
-          this.scene.start(ch.scene);
+          this.scene.start(ch.label);
         });
 
         // Add "Play" button
