@@ -119,9 +119,13 @@ export class Chapter1game extends Phaser.Scene {
         if (this.soundEnabled) this.correctSound.play();
 
         this.showImagePopup('correct', () => {
-          box.textObj.destroy();
-          box.destroy();
-          this.showNextProperty();
+          box.setVisible(false);
+          box.textObj.setVisible(false);
+          this.time.delayedCall(50, () => {
+            box.textObj.destroy();
+            box.destroy();
+            this.showNextProperty();
+          });
         });
 
       } else {
@@ -165,33 +169,32 @@ export class Chapter1game extends Phaser.Scene {
   }
 
   showNextProperty() {
-  if (this.currentIndex >= this.properties.length) {
-    const overlay = this.add.rectangle(512, 384, 1024, 768, 0x000000, 0.85)
-      .setOrigin(0.5)
-      .setDepth(1000)
-      .setInteractive();
+    if (this.currentIndex >= this.properties.length) {
+      const overlay = this.add.rectangle(512, 384, 1024, 768, 0x000000, 0.85)
+        .setOrigin(0.5)
+        .setDepth(1000)
+        .setInteractive();
 
-    this.add.text(512, 300, 'All Done!ヽ(*。>Д<)o゜', {
-      fontSize: '38px',
-      color: '#ffffff',
-      align: 'center'
-    }).setOrigin(0.5).setDepth(1001);
+      this.add.text(512, 300, 'All Done!ヽ(*。>Д<)o゜', {
+        fontSize: '38px',
+        color: '#ffffff',
+        align: 'center'
+      }).setOrigin(0.5).setDepth(1001);
 
-    const continueBtn = this.add.text(512, 420, '▶ Continue to Chapter 2', {
-      fontSize: '30px',
-      backgroundColor: '#ffffff',
-      color: '#000',
-      padding: { left: 20, right: 20, top: 10, bottom: 10 },
-      borderRadius: 10
-    }).setOrigin(0.5).setDepth(1001).setInteractive({ useHandCursor: true });
+      const continueBtn = this.add.text(512, 420, '▶ Continue to Chapter 2', {
+        fontSize: '30px',
+        backgroundColor: '#ffffff',
+        color: '#000',
+        padding: { left: 20, right: 20, top: 10, bottom: 10 },
+        borderRadius: 10
+      }).setOrigin(0.5).setDepth(1001).setInteractive({ useHandCursor: true });
 
-    continueBtn.on('pointerdown', () => {
-      this.scene.start('Chapter2');
-    });
+      continueBtn.on('pointerdown', () => {
+        this.scene.start('Chapter2');
+      });
 
-    return;
-  }
-
+      return;
+    }
 
     const prop = this.properties[this.currentIndex++];
     const x = this.sys.game.config.width / 2;
@@ -251,9 +254,9 @@ export class Chapter1game extends Phaser.Scene {
       this.cameras.main.centerY,
       key
     ).setOrigin(0.5)
-     .setDepth(999)
-     .setScale(0.8)
-     .setAlpha(0);
+      .setDepth(999)
+      .setScale(0.8)
+      .setAlpha(0);
 
     this.tweens.add({
       targets: popup,

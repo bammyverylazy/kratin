@@ -1,4 +1,3 @@
-// scenes/Chapter2.js
 import { EventBus } from '../EventBus';
 import { Scene } from 'phaser';
 import { addStoryModeUI } from './UIscene';
@@ -28,6 +27,13 @@ export class Chapter2 extends Scene {
       'body'
     ];
     this.bgStepIndex = 0;
+
+    // Sound references
+    this.pressureBgm = null;
+    this.mainBgm = null;
+    this.voiceNarration = null;
+
+    this.soundEnabled = true;
   }
 
   preload() {
@@ -42,6 +48,12 @@ export class Chapter2 extends Scene {
     this.load.image('P7', '/assets/54.jpg');
     this.load.video('body','/assets/body.mp4');
 
+    this.load.audio('pressureBgm', '/assets/audio/pressurebackgroundmusic.mp3');
+    this.load.audio('mainBgm', '/assets/audio/backgroundmusic.mp3');
+    // Load voice narration files as needed, e.g.:
+    // this.load.audio('voice1', '/assets/audio/voice1.mp3');
+    // For simplicity, here we assume voice narration is inline or no voice for now.
+
     // UI assets
     this.load.image('magnifying', '/assets/magnifying.png');
     this.load.image('setting', '/assets/setting.png');
@@ -54,16 +66,24 @@ export class Chapter2 extends Scene {
   }
 
   create() {
+    const user = JSON.parse(localStorage.getItem('currentUser'));
+    const userId = user?._id;
+    const currentChapter = 'Chapter2';
 
+    saveGameProgress(userId, currentChapter);
 
-      const user = JSON.parse(localStorage.getItem('currentUser'));
-      const userId = user?._id;
-      const currentChapter = 'Chapter2';
+    const storedSound = localStorage.getItem('soundEnabled');
+    this.soundEnabled = storedSound === null ? true : (storedSound === 'true');
+    this.sound.mute = !this.soundEnabled;
 
-      console.log('userId:', userId, 'currentChapter:', currentChapter);
-      saveGameProgress(userId, currentChapter);
-;
-  
+    this.pressureBgm = this.sound.add('pressureBgm', { loop: true, volume: 0.4 });
+    this.mainBgm = this.sound.add('mainBgm', { loop: true, volume: 0.4 });
+
+    if (this.soundEnabled) {
+      this.pressureBgm.play();
+      console.log('Pressure background music playing');
+    }
+
     this.cameras.main.setBackgroundColor('#000000');
 
     this.coverImage = this.add.video(0, 0, 'Chapter2scene1')
@@ -98,6 +118,7 @@ export class Chapter2 extends Scene {
       onBook: (scene, box) => scene.add.text(box.x, box.y, 'Custom Book', { fontSize: '32px', color: '#222' }).setOrigin(0.5).setDepth(201),
     });
 
+    // Your existing script lines here...
     this.script = [
       { speaker: "Senior Red Blood Cell (narrating):", text: "After a long journey through the dark, winding vein called the Inferior Vena Cava, you finally approach the mighty heart — the body’s powerful pump." },
       { speaker: "Senior Red Blood Cell (narrating):", text: "And your new friend just arrived from the Superior Vena Cava, bringing blood back from the upper body." },
@@ -131,6 +152,10 @@ export class Chapter2 extends Scene {
         this.startButton.emit('pointerdown');
       }
     });
+
+    // Stop sounds when scene shuts down
+    this.events.on('shutdown', () => this.stopAllSounds());
+    this.events.on('destroy', () => this.stopAllSounds());
   }
 
   startStorySequence() {
@@ -187,12 +212,24 @@ export class Chapter2 extends Scene {
 
   showCurrentLine() {
     if (this.currentLine >= this.script.length) {
-      
-       this.scene.start('Chapter2game'); // Optional: auto-start next game scene
+      this.stopVoiceNarration();
+      // optionally fade out bg music or transition
+      this.scene.start('Chapter2game');
       return;
     }
 
     const nextLine = this.script[this.currentLine];
+
+    // Switch BGM at sceneStep 2
+    if (nextLine.sceneStep === 2) {
+      if (this.pressureBgm && this.pressureBgm.isPlaying) this.pressureBgm.stop();
+      if (this.soundEnabled && this.mainBgm && !this.mainBgm.isPlaying) this.mainBgm.play();
+    }
+
+    // Voice narration logic here:
+    // Example: play a voice audio clip if available, else do nothing.
+    // For demo, assuming no voice clip, so stop any existing voice narration.
+    this.stopVoiceNarration();
 
     this.dialogueUI.onLineComplete = () => {
       this.currentLine++;
@@ -234,5 +271,27 @@ export class Chapter2 extends Scene {
 
     this.backButton.setVisible(this.currentLine > 0);
     this.dialogueUI.startDialogue([nextLine]);
+  }
+
+  stopVoiceNarration() {
+    if (this.voiceNarration && this.voiceNarration.isPlaying) {
+      this.voiceNarration.stop();
+      this.voiceNarration.destroy();
+      this.voiceNarration = null;
+    }
+  }
+
+  stopAllSounds() {
+    if (this.pressureBgm) {
+      if (this.pressureBgm.isPlaying) this.pressureBgm.stop();
+      this.pressureBgm.destroy();
+      this.pressureBgm = null;
+    }
+    if (this.mainBgm) {
+      if (this.mainBgm.isPlaying) this.mainBgm.stop();
+      this.mainBgm.destroy();
+      this.mainBgm = null;
+    }
+    this.stopVoiceNarration();
   }
 }
