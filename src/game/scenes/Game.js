@@ -25,7 +25,7 @@ export class Game extends Scene {
   }
 
   create() {
-    this.cameras.main.setBackgroundColor('#FFD700');
+    this.cameras.main.setBackgroundColor('#699737');
 
     this.scoreText = this.add.text(512, 160, 'Score: 0', {
       fontSize: '32px',
@@ -56,7 +56,7 @@ export class Game extends Scene {
     });
 
     const graphics = this.add.graphics();
-    graphics.fillStyle(0xFF8317);
+    graphics.fillStyle(0x84A671);
     graphics.lineStyle(19, 0xFFFFFF);
     const cardWidth = 867;
     const cardHeight = 520;
@@ -310,3 +310,4 @@ export class Game extends Scene {
     return `${m}:${s}`;
   }
 }
+
