@@ -31,7 +31,7 @@ export class Mode extends Scene {
             const user = JSON.parse(localStorage.getItem('currentUser')) || JSON.parse(localStorage.getItem('user'));
             const playerName = user?.name || "Anonymous";
 
-        this.cameras.main.setBackgroundColor('#fa821a');
+        this.cameras.main.setBackgroundColor('#84A671');
         const headerY = this.cameras.main.height * 0.22;
         const headerText = this.add.text(this.cameras.main.width / 2, headerY, 'MODE', {
             fontSize: '68px',
@@ -270,3 +270,4 @@ continueBtn.on('pointerdown', async () => {
         });
     }
 }
+
