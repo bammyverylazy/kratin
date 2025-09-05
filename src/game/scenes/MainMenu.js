@@ -19,7 +19,7 @@ export class MainMenu extends Scene {
     }
 
     create() { 
-        this.cameras.main.setBackgroundColor('#91e3ff');
+        this.cameras.main.setBackgroundColor('#6C9B31');//
         this.logo = this.add.image(this.cameras.main.centerX, 300, 'logo').setDepth(100).setScale(0.4);
 
         // Load current user
@@ -241,3 +241,4 @@ if (currentUser && currentUser.name) {
         }
     }
 }
+
