@@ -23,7 +23,7 @@ const config = {
     width: 1024,
     height: 768,
     parent: 'game-container',
-    backgroundColor: '#91e3ff',
+    backgroundColor: '#84A671',
     scene: [
         Boot,        // Only Boot is started automatically
         Preloader,   // Boot will start Preloader
