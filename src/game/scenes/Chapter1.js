@@ -26,7 +26,7 @@ export class Chapter1 extends Phaser.Scene {
     this.musicStarted = false;
 
     this.script = [
-      { speaker: "Narrator:", text: 'Welcome to your journey inside the body, This is "CELLVIVOR".' },
+      { speaker: "Narrator:", text: 'Welcome to your journey inside the body, This is "KRATIN-Save The World".' },
       { speaker: "Narrator:", text: " a vast network of cells works relentlessly to keep us alive.", sceneStep: 2 },
       { speaker: "Narrator", text: "And here, deep inside, is the marrow.", sceneStep: 3 },
       { speaker: "Narrator:", text: "The marrow is bustling with activity.", sceneStep: 4 },

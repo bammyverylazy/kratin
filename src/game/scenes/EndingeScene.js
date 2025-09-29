@@ -46,7 +46,7 @@ export class EndingScene extends Scene {
     });
 
     this.script = [
-      { speaker: "Narrator:", text: 'Congratulations, Cellvivor. \nYou’ve journeyed through the bloodstream, tackled challenges in every chamber, and helped the body survive and thrive' },
+      { speaker: "Narrator:", text: 'Congratulations, Kratin. \nYou’ve journeyed through the bloodstream, tackled challenges in every chamber, and helped the body survive and thrive' },
       { speaker: "Senior Red Blood Cell:", text: "Red Blood Cells delivering oxygen.", sceneStep: 2 },
       { speaker: "White Blood Cell:", text: "White Blood Cells fighting infections.", sceneStep: 3 },
       { speaker: "Platelet:", text: "Platelets clotting wounds.", sceneStep: 4 },
