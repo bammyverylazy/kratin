@@ -64,20 +64,12 @@ export class Chapter3game extends Phaser.Scene {
 
     this.events.on('shutdown', () => this.stopAllSounds());
     this.events.on('destroy', () => this.stopAllSounds());
-
-    if (this.cache.video.exists('chapter4scene1')) {
       this.add.video(0, 0, 'chapter4scene1')
         .setOrigin(0, 0)
         .setDisplaySize(1024, 768)
         .play(true)
         .setLoop(true)
         .setDepth(-1);
-    } else {
-      // fallback if video missing: use static chapter4 image if present
-      if (this.textures.exists('chapter4')) {
-        this.add.image(0, 0, 'chapter4').setOrigin(0, 0).setDisplaySize(1024, 768).setDepth(-1);
-      }
-    }
     addStoryModeUI(this, {
     });
 
@@ -177,20 +169,20 @@ export class Chapter3game extends Phaser.Scene {
   spawnItem() {
     // Select random item and spawn as a single image sprite (physics-enabled)
     const itemData = Phaser.Utils.Array.GetRandom([
-      { label: 'plasticbottles', target: 'yellow' },
-      { label: 'facemask', target: 'red' },
-      { label: 'treeleaves', target: 'green' },
-      { label: 'leftovers', target: 'green' },
-      { label: 'electronicdevices', target: 'red' },
-      { label: 'unrecycleable trashes', target: 'blue' },
-      { label: 'brokenglass', target: 'red' },
+      { label: 'plasticbottles', target: 'Recycling Waste'  },
+      { label: 'facemask', target: 'Hazardous Waste' },
+      { label: 'treeleaves', target: 'Organic Waste' },
+      { label: 'leftovers', target: 'Organic Waste' },
+      { label: 'electronicdevices', target: 'Hazardous Waste'  },
+      { label: 'unrecycleable trashes', target: 'General Waste'  },
+      { label: 'brokenglass', target: 'Hazardous Waste'  },
     ]);
 
     const x = Phaser.Math.Between(100, 924);
     // spawn physics image; set reasonable display size for items
     const sprite = this.physics.add.image(x, 0, itemData.label)
       .setDepth(5)
-      .setDisplaySize(64, 64); // adjust size as needed
+      .setDisplaySize(130, 130); // adjust size as needed
 
     sprite.setVelocityY(100);
     sprite.setData('target', itemData.target);

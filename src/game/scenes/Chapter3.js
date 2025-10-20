@@ -97,7 +97,7 @@ export class Chapter3 extends Scene {
 
 
     ];
-
+    this.bggImage = this.add.image(512, 384, 'chapter3scene1').setDepth(0);
     this.startButton.on('pointerdown', () => {
       this.startButton.destroy();
       this.coverImage.destroy();
