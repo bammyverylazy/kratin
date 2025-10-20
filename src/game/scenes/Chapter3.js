@@ -13,7 +13,7 @@ export class Chapter3 extends Scene {
     this.propertyText = null;
     this.hasShaken = false;
     this.bgm = null;
-    this.voiceAudio = null; // for voice narration audio object
+    //this.voiceAudio = null; // for voice narration audio object
   }
 
   preload() {
@@ -100,6 +100,10 @@ export class Chapter3 extends Scene {
     this.startButton.on('pointerdown', () => {
       this.startButton.destroy();
       this.coverImage.destroy();
+      this.add.image(0, 0, 'chapter3scene1')
+      .setOrigin(0, 0)
+      .setDisplaySize(this.sys.game.config.width, this.sys.game.config.height)
+      .setDepth(0);
       this.startStorySequence();
     });
 
@@ -125,7 +129,7 @@ export class Chapter3 extends Scene {
 
     // TODO: Implement loading & playing of voice narration audio based on `key`
     // For now, just log the request
-    console.log(`Voice narration requested for key: ${key}`);
+    //console.log(`Voice narration requested for key: ${key}`);
 
     // Example placeholder:
     // this.voiceAudio = this.sound.add(key);

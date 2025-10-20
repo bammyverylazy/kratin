@@ -16,8 +16,7 @@ export class Chapter2 extends Scene {
     this.script = [];
     this.currentLine = 0;
     this.bgSteps = [
-      'Chapter2scene1', 'map', 'P1', 'P2', 'P3',
-      'P4', 'P5', 'P6', 'P7', 'body'
+      'chapter2scene1', 'chapter2scene2', 'chapter2scene3'
     ];
     this.bgStepIndex = 0;
     this.pressureBgm = null;

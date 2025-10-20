@@ -55,8 +55,12 @@ export class Chapter3game extends Phaser.Scene {
     this.events.on('shutdown', () => this.stopAllSounds());
     this.events.on('destroy', () => this.stopAllSounds());
 
-    this.add.video(0, 0, 'chapter4scene1').setOrigin(0, 0).play(true).setLoop(true);
-
+    this.add.video(0, 0, 'chapter4scene1')
+    .setOrigin(0, 0)
+    .setDisplaySize(1024, 768)
+    .play(true)
+    .setLoop(true)
+    .setDepth(-1);
     addStoryModeUI(this, {
     });
 
@@ -74,7 +78,7 @@ export class Chapter3game extends Phaser.Scene {
       const x = 180 + i * 220;
       const y = 650;
       const image = this.add.image(x, y - 69, info.key).setDisplaySize(100, 100).setDepth(1).setScale(0.5);
-      const label = this.add.text(x, y + 60, info.label, { fontSize: '24px', color: '#fff' }).setOrigin(0.5);
+      const label = this.add.text(x, y + 65, info.label, { fontSize: '24px', color: '#fff' }).setOrigin(0.5);
       this.targetBoxes.add(image);
       image.label = info.label;
     });
