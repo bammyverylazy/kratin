@@ -80,9 +80,9 @@ export class Chapter2game extends Phaser.Scene {
     // Leakage questions — one per room, shuffled order
     const baseQuestions = [
       { room: 'Living Room', text: 'The TV is left ON overnight.' , target: 'living'},
-      { room: 'Bedroom', text: 'The window is open while the heater is ON.' , target: 'bedroom'},
+      { room: 'Bedroom', text: 'The lamplight was ON overnight' , target: 'bedroom'},
       { room: 'Kitchen', text: 'The fridge door is left open.' , target: 'kitchen'},
-      { room: 'Bathroom', text: 'The tap keeps running after brushing teeth.' , target: 'bathroom'}
+      { room: 'Bathroom', text: 'The tap keeps running in the bathtub.' , target: 'bathroom'}
     ];
     this.questions = Phaser.Utils.Array.Shuffle(baseQuestions);
     this.totalLeakages = this.questions.length;
