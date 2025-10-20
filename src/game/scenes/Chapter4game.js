@@ -8,9 +8,11 @@ export class Chapter4game extends Phaser.Scene {
 
     // game state
     this.score = 0;
-    this.ecoScore = 0; // 0..100 eco meter
+    this.ecoScore = 0; // 0..100 eco meter (calculated from goodClicks)
     this.badCatches = 0;
     this.maxBadCatches = 3;
+    this.goodClicks = 0;
+    this.goodNeeded = 4; // number of correct clicks to win
 
     // visuals / groups
     this.player = null;
@@ -65,12 +67,20 @@ export class Chapter4game extends Phaser.Scene {
       .setDepth(5)
       .setScale(0.7);
 
-    // Player (basket / Kratin) - controllable left/right
+    // Player (basket / Kratin) - draggable left/right for convenience
     this.player = this.physics.add.image(this.cameras.main.centerX, this.cameras.main.height - 60, 'player')
       .setCollideWorldBounds(true)
       .setImmovable(true)
       .setDepth(10)
-      .setScale(0.6);
+      .setScale(0.6)
+      .setInteractive();
+
+    // make player draggable (pointer/touch)
+    this.input.setDraggable(this.player);
+    this.input.on('drag', (pointer, gameObject, dragX) => {
+      // only move horizontally
+      gameObject.x = Phaser.Math.Clamp(dragX, gameObject.displayWidth / 2, this.cameras.main.width - gameObject.displayWidth / 2);
+    });
 
     // Item group (falling transport/activity icons)
     this.items = this.physics.add.group();
@@ -88,21 +98,20 @@ export class Chapter4game extends Phaser.Scene {
 
     this.add.text(meterX, meterY - 18, 'Eco Meter', { fontSize: '14px', color: '#fff' }).setDepth(20);
 
-    // hearts for bad catches
+    // hearts for bad clicks
     for (let i = 0; i < this.maxBadCatches; i++) {
       const h = this.add.image(80 + i * 36, 120, 'star').setDisplaySize(28, 28).setDepth(20);
       this.heartIcons.push(h);
     }
 
-    // input: keyboard and touch
+    // input: pointer-only controls primarily; keep keyboard as optional lateral moves
     this.cursors = this.input.keyboard.createCursorKeys();
     this.input.on('pointermove', (pointer) => {
-      // allow dragging player with pointer for mobile
-      this.player.x = Phaser.Math.Clamp(pointer.x, this.player.displayWidth / 2, this.cameras.main.width - this.player.displayWidth / 2);
+      // optional: move player with pointer when dragging (handled by drag anyway)
+      if (pointer.isDown && !pointer.wasTouch) {
+        // noop — dragging is handled by drag event
+      }
     });
-
-    // physics overlap: catching
-    this.physics.add.overlap(this.player, this.items, (player, item) => this.evaluateItem(player, item), null, this);
 
     // spawn items regularly
     this.spawnEvent = this.time.addEvent({
@@ -127,54 +136,64 @@ export class Chapter4game extends Phaser.Scene {
   spawnItem() {
     if (this.ended) return;
 
-    // item types with carbon classification
-    const pool = [
-      { key: 'walking', carbon: 'low' },
-      { key: 'bicycle', carbon: 'low' },
-      { key: 'publictransportation', carbon: 'low' },
-      { key: 'electriccar', carbon: 'low' },
-      { key: 'car', carbon: 'high' },
-      { key: 'airplane', carbon: 'high' }
-    ];
+    // image choices — image key chosen randomly
+    const keys = ['walking', 'bicycle', 'publictransportation', 'electriccar', 'car', 'airplane'];
+    const imgKey = Phaser.Utils.Array.GetRandom(keys);
 
-    const itemData = Phaser.Utils.Array.GetRandom(pool);
+    // carbon classification is now randomized independently (requirement)
+    const carbon = Phaser.Utils.Array.GetRandom(['low', 'high']);
+
     const x = Phaser.Math.Between(60, this.cameras.main.width - 60);
-    const sprite = this.items.create(x, -50, itemData.key).setDepth(5).setScale(0.6);
+    const sprite = this.items.create(x, -50, imgKey).setDepth(5).setScale(0.6);
 
-    // physics properties
-    sprite.setVelocityY(Phaser.Math.Between(80, 140));
-    sprite.setData('carbon', itemData.carbon);
+    // physics properties - gentle fall
+    sprite.setVelocityY(Phaser.Math.Between(60, 120));
+    sprite.setData('carbon', carbon);
+    sprite.setData('imgKey', imgKey);
     sprite.setInteractive();
-    sprite.body.setAllowGravity(false); // use velocity to fall; gravity disabled for stable speed
+    sprite.body.setAllowGravity(false); // stable fall via velocity
+
+    // mark not clicked
+    sprite.setData('clicked', false);
+
+    // clicking the item now evaluates (user clicks the action)
+    sprite.on('pointerdown', (pointer) => {
+      // avoid processing same sprite twice
+      if (sprite.getData('clicked')) return;
+      sprite.setData('clicked', true);
+      this.evaluateItemClick(sprite);
+    });
 
     // auto-destroy when out of bounds
     sprite.checkWorldBounds = true;
     sprite.outOfBoundsKill = true;
   }
 
-  evaluateItem(player, item) {
+  // user clicks item to choose it
+  evaluateItemClick(item) {
     if (this.ended) return;
     if (!item.active) return;
 
     const carbon = item.getData('carbon');
 
-    // remove item immediately to avoid double-catch
-    item.disableBody(true, true);
-    item.destroy();
+    // remove item visually
+    try { item.disableBody(true, true); item.destroy(); } catch (e) {}
 
     if (carbon === 'low') {
-      // good catch
+      // correct action clicked
       this.score += 10;
-      this.ecoScore = Phaser.Math.Clamp(this.ecoScore + 10, 0, 100);
+      this.goodClicks = Math.min(this.goodNeeded, this.goodClicks + 1);
+      // ecoScore computed from goodClicks
+      this.ecoScore = Math.round((this.goodClicks / this.goodNeeded) * 100);
 
-      // brighten world briefly and show happy Earthy
+      if (this.sound && this.catchGood) this.catchGood.play();
       this.cameras.main.flash(200, 200, 240, 200);
       this.earthy.setTexture('earthshy');
     } else {
-      // bad catch
+      // wrong action clicked
       this.score = Math.max(0, this.score - 5);
       this.badCatches++;
-      // darken world briefly and show sad Earthy
+      if (this.sound && this.catchBad) this.catchBad.play();
       this.tweens.add({
         targets: this.flashRect,
         alpha: 0.18,
@@ -183,8 +202,8 @@ export class Chapter4game extends Phaser.Scene {
         onStart: () => { this.earthy.setTexture('earthcry'); }
       });
 
-      // update heart icons (fade out)
-      const idx = Math.max(0, this.maxBadCatches - this.badCatches);
+      // update heart icons (fade out) — show progression of mistakes
+      const idx = Math.max(0, this.badCatches - 1);
       if (this.heartIcons[idx]) {
         this.tweens.add({ targets: this.heartIcons[idx], alpha: 0.2, duration: 300 });
       }
@@ -194,31 +213,33 @@ export class Chapter4game extends Phaser.Scene {
     this.scoreText.setText('Score: ' + this.score);
     this.updateEcoMeter();
 
-    // check win/lose
-    if (this.ecoScore >= 100) {
+    // check win/lose using goodClicks and badCatches
+    if (this.goodClicks >= this.goodNeeded) {
       this.endGame(true);
-    } else if (this.badCatches >= this.maxBadCatches) {
-      this.endGame(false);
-    } else {
-      // small delay to restore earthy happy face if not lost
-      this.time.delayedCall(800, () => {
-        if (!this.ended) this.earthy.setTexture('earthshy');
-      });
+      return;
     }
+    if (this.badCatches >= this.maxBadCatches) {
+      this.endGame(false);
+      return;
+    }
+
+    // small delay to restore earthy happy face if not lost
+    this.time.delayedCall(700, () => {
+      if (!this.ended) this.earthy.setTexture('earthshy');
+    });
   }
 
   updateEcoMeter() {
     const meterW = this.ecoMeterBg.width - 4;
     const pct = Phaser.Math.Clamp(this.ecoScore / 100, 0, 1);
     this.ecoMeterFill.width = Math.round(meterW * pct);
-    // reposition fill to align left inside bg
     this.ecoMeterFill.x = this.ecoMeterBg.x + 2;
   }
 
   update(time, delta) {
     if (this.ended) return;
 
-    // player movement - keyboard
+    // player movement - keyboard left/right (optional)
     const speed = 400;
     if (this.cursors.left.isDown) {
       this.player.setVelocityX(-speed);
@@ -228,12 +249,14 @@ export class Chapter4game extends Phaser.Scene {
       this.player.setVelocityX(0);
     }
 
-    // remove items that passed bottom
+    // remove items that passed bottom (missed)
     this.items.children.each((it) => {
+      if (!it.active) return;
       if (it.y > this.cameras.main.height + 64) {
-        // if it's low-carbon and missed, penalize slightly (optional)
-        if (it.active && it.getData && it.getData('carbon') === 'low') {
-          this.ecoScore = Phaser.Math.Clamp(this.ecoScore - 5, 0, 100);
+        // missed item penalty: if it was low-carbon and missed, reduce progress slightly
+        if (it.getData && it.getData('carbon') === 'low') {
+          this.goodClicks = Math.max(0, this.goodClicks - 1);
+          this.ecoScore = Math.round((this.goodClicks / this.goodNeeded) * 100);
           this.updateEcoMeter();
         }
         try { it.destroy(); } catch (e) {}
@@ -247,16 +270,16 @@ export class Chapter4game extends Phaser.Scene {
     // stop spawning
     if (this.spawnEvent) this.spawnEvent.remove(false);
 
-    // stop all items
+    // clear remaining items
     this.items.clear(true, true);
 
-    // clear input velocities
-    this.player.setVelocity(0, 0);
+    // stop player
+    try { this.player.setVelocity(0, 0); } catch (e) {}
 
     // overlay
     const overlay = this.add.rectangle(this.cameras.main.centerX, this.cameras.main.centerY, this.cameras.main.width, this.cameras.main.height, 0x000000, 0.6).setDepth(1000);
 
-    const title = didWin ? 'You made Earthy happy! ' : 'Try again and make greener choices!';
+    const title = didWin ? 'You made Earthy happy! 🌞' : 'Try again and make greener choices!';
     this.add.text(this.cameras.main.centerX, 200, title, { fontSize: '36px', color: '#ffffff' }).setOrigin(0.5).setDepth(1001);
 
     // show Earthy image according to result
