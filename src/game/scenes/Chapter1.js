@@ -4,7 +4,10 @@ import { Scene } from 'phaser';
 import { addStoryModeUI } from './UIscene';
 import DialogueUI from './DialogueUI';
 import { saveGameProgress } from '../utils/saveProgress.js';
-import VoiceNarratorManager from '../utils/VoiceNarratorManager.js';
+// Voice narration manager temporarily disabled:
+// import VoiceNarratorManager from '../utils/VoiceNarratorManager.js';
+// NOTE: Narrative audio features commented out to avoid runtime errors until
+// per-line audio assets and VoiceNarratorManager are verified.
 
 export class Chapter1 extends Phaser.Scene {
   constructor() {
@@ -16,7 +19,7 @@ export class Chapter1 extends Phaser.Scene {
     this.bgVideo = null;
     this.startButton = null;
     this.dialogueUI = null;
-    this.voiceNarrator = null;
+   // this.voiceNarrator = null;
 
     this.popupContainer = null;
     this.popupBook = null;
@@ -48,10 +51,10 @@ export class Chapter1 extends Phaser.Scene {
   preload() {
     this.load.audio('openingsong', '/assets/audio/openingsong.mp3');
     this.load.audio('backgroundmusic', '/assets/audio/backgroundmusic.mp3');
-    for (let i = 0; i < this.script.length; i++) {
-      const audioKey = `Chapter1_line${i}`;
-      this.load.audio(audioKey, `/assets/audio/chapter1/${audioKey}.mp3`);
-    }
+    // for (let i = 0; i < this.script.length; i++) {
+    //   const audioKey = `Chapter1_line${i}`;
+    //   this.load.audio(audioKey, `/assets/audio/chapter1/${audioKey}.mp3`);
+    // }
 
     this.load.image('chapter1scene0', '/assets/chapter1scene0.png');
     this.load.image('chapter1', '/assets/chapter1.png');
@@ -149,7 +152,9 @@ export class Chapter1 extends Phaser.Scene {
       .setDisplaySize(this.sys.game.config.width, this.sys.game.config.height);
 
     if (!this.dialogueUI) this.dialogueUI = new DialogueUI(this, this.script);
-    if (!this.voiceNarrator) this.voiceNarrator = new VoiceNarratorManager(this);
+    // if (!this.voiceNarrator) this.voiceNarrator = new VoiceNarratorManager(this);
+    // Voice narration disabled for now. Re-enable when audio files & manager are available:
+    // if (!this.voiceNarrator) this.voiceNarrator = new VoiceNarratorManager(this);
 
     // Create buttons only once
     if (!this.nextButton) {
@@ -210,7 +215,7 @@ export class Chapter1 extends Phaser.Scene {
     }
 
     const nextLine = this.script[this.currentLine];
-    nextLine.audioKey = `Chapter1_line${this.currentLine}`;
+   // nextLine.audioKey = `Chapter1_line${this.currentLine}`;
 
     // Handle background or video changes
     if (
@@ -256,11 +261,13 @@ export class Chapter1 extends Phaser.Scene {
     };
 
     this.dialogueUI.startDialogue([this.script[this.currentLine]]);
-    if (this.script[this.currentLine].audioKey) {
-      this.voiceNarrator.play(this.script[this.currentLine].audioKey, { volume: 1 });
-    }
+   // if (this.script[this.currentLine].audioKey) {
+   //   this.voiceNarrator.play(this.script[this.currentLine].audioKey, { volume: 1 });
+   // }
     this.dialogueUI.onLineComplete = () => {
-      closePopup();
+      // TODO: closePopup() is referenced here but not defined in this file.
+      // keep flow but flag for review to avoid runtime exceptions:
+      // closePopup();
       this.advanceDialogue();
     };
   }

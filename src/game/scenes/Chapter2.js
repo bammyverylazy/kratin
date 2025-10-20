@@ -28,7 +28,6 @@ export class Chapter2 extends Scene {
   preload() {
     this.load.image('chapter2scene1', '/assets/chapter2scene1.png');
     this.load.image('chapter2scene2', '/assets/chapter2scene2.png');
-    this.load.image('chapter2scene2', '/assets/chapter2scene2.png');
     this.load.image('chapter2', '/assets/chapter2.png');
 
     
@@ -63,16 +62,23 @@ export class Chapter2 extends Scene {
     this.cameras.main.setBackgroundColor('#000000');
 
     this.coverImage = this.add.image(0, 0, 'chapter2').setOrigin(0, 0).setDepth(0);
-    this.coverImage.setMute(true);
-    this.coverImage.play(true);
-    this.coverImage.on('play', () => {
-      const vidWidth = this.coverImage.video.videoWidth;
-      const vidHeight = this.coverImage.video.videoHeight;
-      const canvasWidth = this.sys.game.config.width;
-      const canvasHeight = this.sys.game.config.height;
-      const scale = Math.min(canvasWidth / vidWidth, canvasHeight / vidHeight);
-      this.coverImage.setDisplaySize(vidWidth * scale, vidHeight * scale);
-    });
+    // Safety: if a video with key 'chapter2' was actually preloaded, use it; otherwise use the image.
+    if (this.cache.video.exists('chapter2')) {
+      this.coverImage = this.add.video(0, 0, 'chapter2').setOrigin(0, 0).setDepth(0);
+      this.coverImage.setMute(true);
+      this.coverImage.play(true);
+      this.coverImage.on('play', () => {
+        const vidWidth = this.coverImage.video.videoWidth;
+        const vidHeight = this.coverImage.video.videoHeight;
+        const canvasWidth = this.sys.game.config.width;
+        const canvasHeight = this.sys.game.config.height;
+        const scale = Math.min(canvasWidth / vidWidth, canvasHeight / vidHeight);
+        this.coverImage.setDisplaySize(vidWidth * scale, vidHeight * scale);
+      });
+    } else {
+      // It's an image; images don't support .play()/.setMute() — set display size and continue.
+      this.coverImage.setDisplaySize(this.sys.game.config.width, this.sys.game.config.height);
+    }
 
     this.startButton = this.add.text(
       this.cameras.main.centerX,
@@ -162,7 +168,6 @@ export class Chapter2 extends Scene {
 
   showCurrentLine() {
     if (this.currentLine >= this.script.length) {
-      this.stopVoiceNarration();
       this.scene.start('Chapter2game');
       return;
     }

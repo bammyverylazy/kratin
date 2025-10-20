@@ -7,10 +7,10 @@ export class Dashboard extends Scene {
   }
 
   preload() {
-    this.load.image('Chapter1scene1', '/assets/Chapter1scene1.png');
-    this.load.image('Chapter2scene1', '/assets/Chapter2scene1Intro.png');
-    this.load.image('Chapter3scene1', '/assets/Chapter3scene1.png');
-    this.load.image('Chapter4scene1', '/assets/Chapter4scene1Intro.png');
+    this.load.image('Chapter1scene1', '/assets/chapter1.png');
+    this.load.image('Chapter2scene1', '/assets/chapter2.png');
+    this.load.image('Chapter3scene1', '/assets/chapter3.png');
+    this.load.image('Chapter4scene1', '/assets/chapter4.png');
     this.load.image('lock', '/assets/lock-icon.png');
   }
 
