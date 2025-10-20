@@ -18,7 +18,9 @@ export class Chapter3 extends Scene {
 
   preload() {
     this.load.image('chapter3', '/assets/chapter3.png');
-    this.load.image('chapter3scene1', '/assets/chapter3scene1.png');
+    // chapter3scene1 was failing as image loader — likely a video file. Use video loader.
+    // TODO: verify actual file extension in /assets (chapter3scene1.mp4 or .png)
+    this.load.video('chapter3scene1', '/assets/chapter3scene1.mp4');
    
     this.load.image('red', '/assets/red.png');
     this.load.image('blue', '/assets/blue.png');
@@ -43,19 +45,19 @@ export class Chapter3 extends Scene {
     const user = JSON.parse(localStorage.getItem('currentUser'));
     const userId = user?._id;
     const currentChapter = 'Chapter3';
-
+ 
     //saveGameProgress(userId, currentChapter);
-
+ 
     this.cameras.main.setBackgroundColor('#000000');
-
+ 
     this.bgm = this.sound.add('sadBgm', { loop: true, volume: 0.5 });
     this.bgm.play();
-
+ 
     this.coverImage = this.add.image(0, 0, 'chapter3')
       .setOrigin(0, 0)
       .setDepth(0)
       .setDisplaySize(this.sys.game.config.width, this.sys.game.config.height);
-
+ 
     this.startButton = this.add.text(
       this.cameras.main.centerX,
       this.cameras.main.centerY + 300,
@@ -99,11 +101,21 @@ export class Chapter3 extends Scene {
     this.startButton.on('pointerdown', () => {
       this.startButton.destroy();
       this.coverImage.destroy();
-      this.add.image(0, 0, 'chapter3scene1')
-      .setOrigin(0, 0)
-      .setDisplaySize(this.sys.game.config.width, this.sys.game.config.height)
-      .setDepth(0);
-      this.startStorySequence();
+      // Use video if chapter3scene1 is a video; otherwise fall back to image.
+      if (this.cache.video.exists('chapter3scene1')) {
+        this.add.video(0, 0, 'chapter3scene1')
+          .setOrigin(0, 0)
+          .setDisplaySize(this.sys.game.config.width, this.sys.game.config.height)
+          .play(true)
+          .setLoop(true)
+          .setDepth(0);
+      } else {
+        this.add.image(0, 0, 'chapter3scene1')
+          .setOrigin(0, 0)
+          .setDisplaySize(this.sys.game.config.width, this.sys.game.config.height)
+          .setDepth(0);
+      }
+       this.startStorySequence();
     });
 
     this.input.keyboard.on('keydown', (event) => {

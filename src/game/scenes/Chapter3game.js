@@ -55,12 +55,19 @@ export class Chapter3game extends Phaser.Scene {
     this.events.on('shutdown', () => this.stopAllSounds());
     this.events.on('destroy', () => this.stopAllSounds());
 
-    this.add.video(0, 0, 'chapter4scene1')
-    .setOrigin(0, 0)
-    .setDisplaySize(1024, 768)
-    .play(true)
-    .setLoop(true)
-    .setDepth(-1);
+    if (this.cache.video.exists('chapter4scene1')) {
+      this.add.video(0, 0, 'chapter4scene1')
+        .setOrigin(0, 0)
+        .setDisplaySize(1024, 768)
+        .play(true)
+        .setLoop(true)
+        .setDepth(-1);
+    } else {
+      // fallback if video missing: use static chapter4 image if present
+      if (this.textures.exists('chapter4')) {
+        this.add.image(0, 0, 'chapter4').setOrigin(0, 0).setDisplaySize(1024, 768).setDepth(-1);
+      }
+    }
     addStoryModeUI(this, {
     });
 
