@@ -10,6 +10,9 @@ export class Chapter4 extends Scene {
     this.currentLine = 0;
     this.thoughtBubbles = [];
     this.activityImage = null;
+    // track which scene step/video is currently shown
+    this.currentSceneStep = null;
+    this.bgVideo = null;
   }
 
   preload() {
@@ -17,11 +20,8 @@ export class Chapter4 extends Scene {
     this.load.video('chapter4scene2', '/assets/chapter4scene2.mp4');
     this.load.image('chapter4', '/assets/chapter4.png');
 
-    this.load.image('relaxing', '/assets/relaxing.png');
-    this.load.image('resting', '/assets/resting.png');
-    this.load.image('walking', '/assets/walking.png');
-    this.load.image('Jogging', '/assets/jogging.png');
-    this.load.image('running', '/assets/running.png');
+     this.load.video('earthymoving', '/assets/earthymoving.mp4');
+
     this.load.image('magnifying', '/assets/magnifying.png');
     this.load.image('setting', '/assets/setting.png');
     this.load.image('book', '/assets/book.png');
@@ -38,7 +38,7 @@ export class Chapter4 extends Scene {
     const currentChapter = 'Chapter4';
     //saveGameProgress(userId, currentChapter);
 
-    this.cameras.main.setBackgroundColor('#000000');
+    this.cameras.main.setBackgroundColor('#a7d8e8');
   
     // Use the same key as in preload: 'chapter4scene1' (lowercase).
     this.coverImage = this.add.video(0, 0, 'chapter4scene1').setOrigin(0, 0).setDepth(0);
@@ -76,15 +76,12 @@ export class Chapter4 extends Scene {
     this.dialogueUI = new DialogueUI(this);
 
     this.script = [
-      { text: "Boom... boom... boom... Can you feel that?", speed: 0.8 },
-      { text:  "The pulse is the rhythmic throbbing you can feel in your arteries, caused by the beating of the heart.", video: 'Bloodflow' },
-      { text: " It’s like the body's natural drumbeat, marking each heartbeat as blood is pumped through your arteries.", video: 'Blood' },
-      { text: "When you're relaxing 🧘 → ~50–60 bpm", speed: 0.2, bubble: "💨 Deep breathing... low pulse", image: "relaxing" },
-      { text: "When you're resting 🛌 → ~60–80 bpm", speed: 0.5, bubble: "🛌 Resting... conserving energy", image: "resting" },
-      { text: "When you're walking 🚶 → ~80–100 bpm", speed: 1.0, bubble: "🚶 Gentle movement... light pump", image: "walking" },
-      { text: "Jogging 🏃‍♂️ → ~100–140 bpm", speed: 2.5, bubble: "🏃 Jogging... moderate effort", image: "running" },
-      { text: "Running 🏃💨 → ~140–180 bpm", speed: 3, bubble: "💥 Intense exercise!", image: "running" },
-      { text: "Now it’s your mission to match your heartbeat to the activity shown." }
+         { speaker: "Narrator:", text: "Kratin and Earthy travel to the city where people move in many ways — cars, bikes, buses, and on foot." },
+        { speaker: "Earthy:", text: "Hmm… I feel warm when there are too many cars. The smoke makes the air heavy." ,sceneStep:1},
+        { speaker: "Kratin:", text: "Let’s choose cleaner ways to travel — walking, biking, or using renewable energy!" ,sceneStep:2},
+        { speaker: "Narrator:", text: "Each good choice helps the world glow brighter and keeps Earthy cool and happy." ,sceneStep:2},
+        { speaker: "Kratin:", text: "Let’s find the best way to move — the one that makes Earthy smile!", sceneStep:2},
+
     ];
     // TODO: 'Bloodflow' and 'Blood' are referenced by the script but are NOT preloaded above.
     // Either preload these video keys in preload() or remove/replace them.
@@ -130,8 +127,11 @@ export class Chapter4 extends Scene {
 
     const line = this.script[this.currentLine];
 
-    if (this.bgVideo) {
-      this.bgVideo.destroy();
+    // Switch background video/image according to sceneStep (if provided)
+    const newStep = line.sceneStep ?? null;
+    if (newStep !== this.currentSceneStep) {
+      const newKey = newStep ? `chapter4scene${newStep}` : null;
+      this._switchBackgroundTo(newKey);
     }
 
     // 🎤 Future voice narration (placeholder)
@@ -168,6 +168,84 @@ export class Chapter4 extends Scene {
 
     this.backButton.setVisible(this.currentLine > 0);
     this.dialogueUI.startDialogue([{ speaker: 'Narrator', text: line.text }]);
+  }
+
+  // Helper: smoothly switch background to provided video key (or fallback image).
+  _switchBackgroundTo(key) {
+    // If current key is same, do nothing
+    if (key && this.bgVideo && this.bgVideo.getData('key') === key) {
+      this.currentSceneStep = key.replace('chapter4scene','') || this.currentSceneStep;
+      return;
+    }
+    
+    // Create new background (video preferred). New object starts invisible (alpha=0)
+    let newBg = null;
+    if (key && this.cache.video.exists(key)) {
+      newBg = this.add.video(0, 0, key).setOrigin(0, 0).setDepth(0).setAlpha(0);
+      newBg.setMute(true);
+      // play and loop
+      try { newBg.play(true); } catch (e) { /* ignore play errors */ }
+      if (typeof newBg.setLoop === 'function') newBg.setLoop(true);
+      // scale once playback begins (videoWidth available after 'play')
+      newBg.on('play', () => {
+        const vw = newBg.video.videoWidth || newBg.width || this.sys.game.config.width;
+        const vh = newBg.video.videoHeight || newBg.height || this.sys.game.config.height;
+        const scale = Math.min(this.sys.game.config.width / vw, this.sys.game.config.height / vh);
+        newBg.setDisplaySize(vw * scale, vh * scale);
+      });
+      newBg.setData('key', key);
+    } else if (this.textures.exists('chapter4')) {
+      // fallback to static image if video missing
+      newBg = this.add.image(0, 0, 'chapter4').setOrigin(0, 0).setDepth(0).setAlpha(0);
+      newBg.setDisplaySize(this.sys.game.config.width, this.sys.game.config.height);
+      newBg.setData('key', 'chapter4');
+    } else {
+      // Nothing to show — clear existing background
+      if (this.bgVideo) {
+        this.tweens.add({
+          targets: this.bgVideo,
+          alpha: 0,
+          duration: 400,
+          onComplete: () => {
+            try { this.bgVideo.destroy(); } catch (e) {}
+            this.bgVideo = null;
+          }
+        });
+        this.currentSceneStep = null;
+      }
+      return;
+    }
+
+    // Fade in new background while fading out old one
+    const duration = 600;
+    // Fade out existing
+    if (this.bgVideo) {
+      this.tweens.add({
+        targets: this.bgVideo,
+        alpha: 0,
+        duration,
+        onComplete: () => {
+          try { this.bgVideo.destroy(); } catch (e) {}
+        }
+      });
+    }
+
+    // Fade in new
+    this.tweens.add({
+      targets: newBg,
+      alpha: 1,
+      duration,
+      ease: 'Sine.easeInOut'
+    });
+
+    this.bgVideo = newBg;
+    // update currentSceneStep numeric value where possible
+    if (key && key.startsWith('chapter4scene')) {
+      const stepNum = parseInt(key.replace('chapter4scene',''), 10);
+      this.currentSceneStep = Number.isFinite(stepNum) ? stepNum : null;
+    } else {
+      this.currentSceneStep = null;
+    }
   }
 
   //  Voice narration system (future use)

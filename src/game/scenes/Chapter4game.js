@@ -5,234 +5,285 @@ import { saveGameProgress } from '../utils/saveProgress.js';
 export class Chapter4game extends Phaser.Scene {
   constructor() {
     super('Chapter4game');
-    this.rounds = [];
-    this.currentRound = 0;
-    this.score = 0;
-    this.hearts = 3;
-    this.heartIcons = [];
-    this.requiredTaps = 0;
-    this.currentTaps = 0;
-    this.character = null;
-    this.heartbeatVideo = null;
-    this.progressText = null;
-    this.scoreText = null;
-    this.targetBpmText = null;
 
-    this.correctPopup = null;
-    this.correctOverlay = null;
+    // game state
+    this.score = 0;
+    this.ecoScore = 0; // 0..100 eco meter
+    this.badCatches = 0;
+    this.maxBadCatches = 3;
+
+    // visuals / groups
+    this.player = null;
+    this.earthy = null;
+    this.items = null;
+    this.spawnEvent = null;
+
+    // UI
+    this.scoreText = null;
+    this.ecoMeterBg = null;
+    this.ecoMeterFill = null;
+    this.heartIcons = [];
   }
 
   preload() {
+    // keep previous assets already used elsewhere
     this.load.image('star', '/assets/star.png');
-    this.load.image('relaxing', '/assets/relaxing.png');
-    this.load.image('resting', '/assets/resting.png');
+    this.load.image('publictransportation', '/assets/publictransportation.png');
+    this.load.image('car', '/assets/car.png');
     this.load.image('walking', '/assets/walking.png');
-    this.load.image('jogging', '/assets/jogging.png');
-    this.load.image('running', '/assets/running.png');
-    this.load.video('heartbeat', '/assets/heartbeat.mp4');
+    this.load.image('bicycle', '/assets/bicycle.png');
+    this.load.image('airplane', '/assets/airplane.png');
+    this.load.image('electriccar', '/assets/electriccar.png');
+
+    this.load.image('player', '/assets/noobynooby.png');
+    this.load.image('earthcry', '/assets/earthcry.png');
+    this.load.image('earthshy', '/assets/earthshy.png');
+
     this.load.image('magnifying', '/assets/magnifying.png');
     this.load.image('setting', '/assets/setting.png');
     this.load.image('book', '/assets/book.png');
     this.load.image('correct', '/assets/correct.png');
-    this.load.image('End', '/assets/End.png'); 
+    this.load.image('End', '/assets/End.png');
     this.load.image('notebook', '/assets/notebook.png');
+    // sounds (optional)
+    this.load.audio('catchGood', '/assets/audio/correctsound.mp3');
+    this.load.audio('catchBad', '/assets/audio/wrongsound.mp3');
   }
 
   create() {
+    const user = JSON.parse(localStorage.getItem('currentUser'));
+    this.userId = user?._id;
+    //saveGameProgress(this.userId, 'Chapter4game');
 
-      const user = JSON.parse(localStorage.getItem('currentUser'));
-      const userId = user?._id;
-      const currentChapter = 'Chapter4game';
-
-      console.log('userId:', userId, 'currentChapter:', currentChapter);
-      //saveGameProgress(userId, currentChapter);
-
-    this.cameras.main.setBackgroundColor('#000');
-
-    this.heartbeatVideo = this.add.video(240, 400, 'heartbeat').setScale(1).setDepth(1).play(true);
-    this.heartbeatVideo.setLoop(true);
+    this.cameras.main.setBackgroundColor('#a7d8e8');
 
     addStoryModeUI(this);
-    this.createUI();
 
-    this.generateRounds();
-    this.startRound();
+    // Earthy sprite at bottom center
+    this.earthy = this.add.image(this.cameras.main.centerX, this.cameras.main.height - 120, 'earthshy')
+      .setOrigin(0.5, 0.5)
+      .setDepth(5)
+      .setScale(0.7);
 
-    this.input.keyboard.on('keydown-SPACE', () => this.handleTap());
-    this.input.on('click', () => this.handleTap());
-    this.input.on('pointerdown', () => this.handleTap());
+    // Player (basket / Kratin) - controllable left/right
+    this.player = this.physics.add.image(this.cameras.main.centerX, this.cameras.main.height - 60, 'player')
+      .setCollideWorldBounds(true)
+      .setImmovable(true)
+      .setDepth(10)
+      .setScale(0.6);
 
-    // Black overlay behind popup
-    this.correctOverlay = this.add.rectangle(
-      this.cameras.main.centerX,
-      this.cameras.main.centerY,
-      this.cameras.main.width,
-      this.cameras.main.height,
-      0x000000,
-      0.6
-    ).setDepth(199).setVisible(false);
+    // Item group (falling transport/activity icons)
+    this.items = this.physics.add.group();
 
-    // Correct popup container — using the 'correct' image asset only
-    this.correctPopup = this.add.container(this.cameras.main.centerX, this.cameras.main.centerY)
-      .setDepth(200)
-      .setVisible(false);
+    // UI: score and eco meter
+    this.scoreText = this.add.text(80, 80, 'Score: 0', { fontSize: '22px', color: '#fff' }).setDepth(20);
 
-    const correctImage = this.add.image(0, 0, 'correct').setOrigin(0.5);
-    this.correctPopup.add(correctImage);
-  }
+    // eco meter background and fill
+    const meterX = this.cameras.main.width - 260;
+    const meterY = 60;
+    const meterW = 200;
+    const meterH = 24;
+    this.ecoMeterBg = this.add.rectangle(meterX, meterY, meterW, meterH, 0x444444).setOrigin(0, 0.5).setDepth(20);
+    this.ecoMeterFill = this.add.rectangle(meterX + 2, meterY, 0, meterH - 4, 0x33cc66).setOrigin(0, 0.5).setDepth(21);
 
-  createUI() {
-    this.progressText = this.add.text(80, 100, 'Progress: 0/2', {
-      fontSize: '24px',
-      color: '#fff',
-    }).setScrollFactor(0).setDepth(100);
+    this.add.text(meterX, meterY - 18, 'Eco Meter', { fontSize: '14px', color: '#fff' }).setDepth(20);
 
-    this.scoreText = this.add.text(80, 130, 'Score: 0', {
-      fontSize: '24px',
-      color: '#fff',
-    }).setScrollFactor(0).setDepth(100);
-
-    this.targetBpmText = this.add.text(750, 180, 'Target BPM: --', {
-      fontSize: '28px',
-      color: '#ffff00',
-      fontStyle: 'bold',
-    }).setOrigin(0.5);
-
-    for (let i = 0; i < 3; i++) {
-      const heart = this.add.image(100 + i * 40, 70, 'star')
-        .setScrollFactor(0)
-        .setDisplaySize(28, 28)
-        .setDepth(100);
-      this.heartIcons.push(heart);
+    // hearts for bad catches
+    for (let i = 0; i < this.maxBadCatches; i++) {
+      const h = this.add.image(80 + i * 36, 120, 'star').setDisplaySize(28, 28).setDepth(20);
+      this.heartIcons.push(h);
     }
+
+    // input: keyboard and touch
+    this.cursors = this.input.keyboard.createCursorKeys();
+    this.input.on('pointermove', (pointer) => {
+      // allow dragging player with pointer for mobile
+      this.player.x = Phaser.Math.Clamp(pointer.x, this.player.displayWidth / 2, this.cameras.main.width - this.player.displayWidth / 2);
+    });
+
+    // physics overlap: catching
+    this.physics.add.overlap(this.player, this.items, (player, item) => this.evaluateItem(player, item), null, this);
+
+    // spawn items regularly
+    this.spawnEvent = this.time.addEvent({
+      delay: 900,
+      loop: true,
+      callback: this.spawnItem,
+      callbackScope: this
+    });
+
+    // sounds
+    this.catchGood = this.sound.add('catchGood', { volume: 0.6 });
+    this.catchBad = this.sound.add('catchBad', { volume: 0.6 });
+
+    // small white overlay used to brighten/darken world
+    this.flashRect = this.add.rectangle(0, 0, this.cameras.main.width, this.cameras.main.height, 0xffffff, 0)
+      .setOrigin(0, 0).setDepth(999);
+
+    // win/lose flags
+    this.ended = false;
   }
 
-  generateRounds() {
-    // Example rounds; targetInterval = ms between taps
-    const rounds = [
-      { label: 'Relaxing (Trial)', targetInterval: 1000, image: 'relaxing' }, // bpm 60 approx
-      { label: 'Resting', targetInterval: 1090, image: 'resting' },          // bpm ~55
-      { label: 'Walking', targetInterval: 860, image: 'walking' },           // bpm ~70
-      { label: 'Jogging', targetInterval: 500, image: 'jogging' },           // bpm ~120
-      { label: 'Running', targetInterval: 400, image: 'running' },           // bpm ~150
+  spawnItem() {
+    if (this.ended) return;
+
+    // item types with carbon classification
+    const pool = [
+      { key: 'walking', carbon: 'low' },
+      { key: 'bicycle', carbon: 'low' },
+      { key: 'publictransportation', carbon: 'low' },
+      { key: 'electriccar', carbon: 'low' },
+      { key: 'car', carbon: 'high' },
+      { key: 'airplane', carbon: 'high' }
     ];
-    Phaser.Utils.Array.Shuffle(rounds);
-    this.rounds = [
-      rounds[0], // trial
-      rounds[1]  // only 2 rounds for demo
-    ];
+
+    const itemData = Phaser.Utils.Array.GetRandom(pool);
+    const x = Phaser.Math.Between(60, this.cameras.main.width - 60);
+    const sprite = this.items.create(x, -50, itemData.key).setDepth(5).setScale(0.6);
+
+    // physics properties
+    sprite.setVelocityY(Phaser.Math.Between(80, 140));
+    sprite.setData('carbon', itemData.carbon);
+    sprite.setInteractive();
+    sprite.body.setAllowGravity(false); // use velocity to fall; gravity disabled for stable speed
+
+    // auto-destroy when out of bounds
+    sprite.checkWorldBounds = true;
+    sprite.outOfBoundsKill = true;
   }
 
-  startRound() {
-    if (this.currentRound >= 2) return this.endGame();
+  evaluateItem(player, item) {
+    if (this.ended) return;
+    if (!item.active) return;
 
-    const round = this.rounds[this.currentRound];
-    const bpm = Math.round(60000 / round.targetInterval);
+    const carbon = item.getData('carbon');
 
-    this.requiredTaps = Math.round(bpm / 10);
-    this.currentTaps = 0;
+    // remove item immediately to avoid double-catch
+    item.disableBody(true, true);
+    item.destroy();
 
-    this.progressText.setText(`Round ${this.currentRound + 1} of 2`);
-    this.targetBpmText.setText(`Target BPM: ${bpm} \n (Tap ${this.requiredTaps} times)`);
-
-    if (this.character) this.character.destroy();
-    this.character = this.add.image(750, 400, round.image).setScale(0.6);
-  }
-
-  handleTap() {
-    this.currentTaps++;
-
-    if (this.currentTaps === this.requiredTaps) {
-      // Player tapped correct amount → correct!
+    if (carbon === 'low') {
+      // good catch
       this.score += 10;
-      this.scoreText.setText('Score: ' + this.score);
-      this.addHeart();
-      this.showCorrectPopup();
-    } else if (this.currentTaps > this.requiredTaps) {
-      // Too many taps → incorrect
-      this.loseHeart();
-      this.cameras.main.shake(200, 0.01);
-      this.currentRound++;
-      this.startRound();
-    }
-  }
+      this.ecoScore = Phaser.Math.Clamp(this.ecoScore + 10, 0, 100);
 
-  loseHeart() {
-    if (this.hearts > 0) {
-      this.hearts--;
-      const heart = this.heartIcons[this.hearts];
-      this.tweens.add({ targets: heart, alpha: 0, duration: 300 });
-    }
-  }
-
-  addHeart() {
-    if (this.hearts < 3) {
-      const heart = this.heartIcons[this.hearts];
-      heart.setAlpha(1);
+      // brighten world briefly and show happy Earthy
+      this.cameras.main.flash(200, 200, 240, 200);
+      this.earthy.setTexture('earthshy');
+    } else {
+      // bad catch
+      this.score = Math.max(0, this.score - 5);
+      this.badCatches++;
+      // darken world briefly and show sad Earthy
       this.tweens.add({
-        targets: heart,
-        scale: 0.06,
+        targets: this.flashRect,
+        alpha: 0.18,
+        duration: 120,
         yoyo: true,
-        duration: 300,
-        onComplete: () => heart.setScale(0.04)
+        onStart: () => { this.earthy.setTexture('earthcry'); }
       });
-      this.hearts++;
+
+      // update heart icons (fade out)
+      const idx = Math.max(0, this.maxBadCatches - this.badCatches);
+      if (this.heartIcons[idx]) {
+        this.tweens.add({ targets: this.heartIcons[idx], alpha: 0.2, duration: 300 });
+      }
+    }
+
+    // update UI
+    this.scoreText.setText('Score: ' + this.score);
+    this.updateEcoMeter();
+
+    // check win/lose
+    if (this.ecoScore >= 100) {
+      this.endGame(true);
+    } else if (this.badCatches >= this.maxBadCatches) {
+      this.endGame(false);
+    } else {
+      // small delay to restore earthy happy face if not lost
+      this.time.delayedCall(800, () => {
+        if (!this.ended) this.earthy.setTexture('earthshy');
+      });
     }
   }
 
-  showCorrectPopup() {
-    this.correctOverlay.setVisible(true);
-    this.correctPopup.setVisible(true);
-    this.input.enabled = false;
+  updateEcoMeter() {
+    const meterW = this.ecoMeterBg.width - 4;
+    const pct = Phaser.Math.Clamp(this.ecoScore / 100, 0, 1);
+    this.ecoMeterFill.width = Math.round(meterW * pct);
+    // reposition fill to align left inside bg
+    this.ecoMeterFill.x = this.ecoMeterBg.x + 2;
+  }
 
-    this.time.delayedCall(1500, () => {
-      this.correctPopup.setVisible(false);
-      this.correctOverlay.setVisible(false);
-      this.input.enabled = true;
+  update(time, delta) {
+    if (this.ended) return;
 
-      this.currentRound++;
-      this.startRound();
+    // player movement - keyboard
+    const speed = 400;
+    if (this.cursors.left.isDown) {
+      this.player.setVelocityX(-speed);
+    } else if (this.cursors.right.isDown) {
+      this.player.setVelocityX(speed);
+    } else {
+      this.player.setVelocityX(0);
+    }
+
+    // remove items that passed bottom
+    this.items.children.each((it) => {
+      if (it.y > this.cameras.main.height + 64) {
+        // if it's low-carbon and missed, penalize slightly (optional)
+        if (it.active && it.getData && it.getData('carbon') === 'low') {
+          this.ecoScore = Phaser.Math.Clamp(this.ecoScore - 5, 0, 100);
+          this.updateEcoMeter();
+        }
+        try { it.destroy(); } catch (e) {}
+      }
+    }, this);
+  }
+
+  endGame(didWin = false) {
+    this.ended = true;
+
+    // stop spawning
+    if (this.spawnEvent) this.spawnEvent.remove(false);
+
+    // stop all items
+    this.items.clear(true, true);
+
+    // clear input velocities
+    this.player.setVelocity(0, 0);
+
+    // overlay
+    const overlay = this.add.rectangle(this.cameras.main.centerX, this.cameras.main.centerY, this.cameras.main.width, this.cameras.main.height, 0x000000, 0.6).setDepth(1000);
+
+    const title = didWin ? 'You made Earthy happy! ' : 'Try again and make greener choices!';
+    this.add.text(this.cameras.main.centerX, 200, title, { fontSize: '36px', color: '#ffffff' }).setOrigin(0.5).setDepth(1001);
+
+    // show Earthy image according to result
+    const resImg = didWin ? 'earthshy' : 'earthcry';
+    this.add.image(this.cameras.main.centerX, 360, resImg).setOrigin(0.5).setScale(0.9).setDepth(1001);
+
+    const retry = this.add.text(this.cameras.main.centerX, 520, 'Try Again', {
+      fontSize: '26px', backgroundColor: '#ffffff', color: '#000', padding: { left: 20, right: 20, top: 10, bottom: 10 }
+    }).setOrigin(0.5).setDepth(1001).setInteractive({ useHandCursor: true });
+
+    const next = this.add.text(this.cameras.main.centerX, 580, 'Proceed', {
+      fontSize: '24px', backgroundColor: '#eeeeee', color: '#000', padding: { left: 18, right: 18, top: 8, bottom: 8 }
+    }).setOrigin(0.5).setDepth(1001).setInteractive({ useHandCursor: true });
+
+    retry.on('pointerdown', () => {
+      this.scene.restart();
+    });
+
+    next.on('pointerdown', () => {
+      // save progress optionally
+      // saveGameProgress(this.userId, 'Chapter4game_result', { score: this.score, ecoScore: this.ecoScore, success: didWin });
+      this.scene.start('Mode');
     });
   }
 
-endGame() {
-  // Show end image
-  this.image = this.add.image(this.cameras.main.centerX, this.cameras.main.centerY, 'End')
-    .setOrigin(0.5)
-    .setScale(0.7)
-    .setDepth(200);
-
-  // Add semi-transparent overlay (no interaction!)
-  this.overlay = this.add.rectangle(
-    this.cameras.main.centerX,
-    this.cameras.main.centerY,
-    this.cameras.main.width,
-    this.cameras.main.height,
-    0x000000,
-    0.6
-  ).setDepth(199); // No .setInteractive()
-
-  // Add continue button
-  this.continueButton = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY + 200, 'Continue', {
-    fontSize: '32px',
-    backgroundColor: '#4BC6F0',
-    color: '#fff',
-    padding: { x: 20, y: 10 },
-    fontStyle: 'bold',
-    align: 'center',
-    fixedWidth: 200
-  })
-  .setOrigin(0.5)
-  .setDepth(201)
-  .setInteractive({ useHandCursor: true });
-
-  // Button click handler
-  this.continueButton.on('pointerdown', () => {
-    this.scene.start('Mode', { score: this.score });
-  });
-
-  // Do NOT disable input here so button works
-  // this.input.enabled = false;
-}
-
+  stopAllSounds() {
+    if (this.catchGood) { try { this.catchGood.stop(); this.catchGood.destroy(); } catch(e) {} }
+    if (this.catchBad) { try { this.catchBad.stop(); this.catchBad.destroy(); } catch(e) {} }
+  }
 }
