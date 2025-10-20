@@ -27,6 +27,7 @@ export class Chapter2 extends Scene {
   preload() {
     this.load.image('chapter2scene1', '/assets/chapter2scene1.png');
     this.load.image('chapter2scene2', '/assets/chapter2scene2.png');
+    this.load.image('chapter2scene3', '/assets/chapter2scene3.png');
     this.load.image('chapter2', '/assets/chapter2.png');
 
     

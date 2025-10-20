@@ -18,7 +18,6 @@ export class Chapter3 extends Scene {
 
   preload() {
     this.load.image('chapter3', '/assets/chapter3.png');
-    this.load.image('chapter2scene1', '/assets/chapter2scene1.png');
     this.load.image('chapter3scene1', '/assets/chapter3scene1.png');
    
     this.load.image('red', '/assets/red.png');
@@ -72,27 +71,27 @@ export class Chapter3 extends Scene {
             });
 
     this.script = [
-      { speaker: "Narrator:", text: "Kratin and Earthy arrive in a busy town full of scattered trash." , sceneStep: 1},
-      { speaker: "Earthy:", text: "Oh no… the streets are messy, and it hurts to see the waste!"  ,sceneStep: 2},
-      { speaker: "Kratin:", text: "Don’t worry! If we sort the trash correctly, everything will look clean again!" ,sceneStep: 3 },
+      { speaker: "Narrator:", text: "Kratin and Earthy arrive in a busy town full of scattered trash." },
+      { speaker: "Earthy:", text: "Oh no… the streets are messy, and it hurts to see the waste!"  },
+      { speaker: "Kratin:", text: "Don’t worry! If we sort the trash correctly, everything will look clean again!"  },
       { speaker: "Narrator:", text: "Suddenly, four colorful bins appear — Blue, Green, Red, and Yellow — each ready to teach Kratin and Earthy how to sort trash properly." },
       { speaker: "Blue (General Waste):", 
         text: "Always be careful and keep these items separate!",
         character: "blue", 
-        property:"Hi there! I’m Blue, the bin for general waste. I take care of things that can’t be recycled or composted — like dirty tissues, old sponges, and snack wrappers. If it doesn’t fit anywhere else, it goes to me!" },
+        property:"Hi there! I’m Blue, the bin for general waste. I take care of things that can’t be recycled or composted" },
       { speaker: "Green (Organic Waste):", 
-        text: "Compost helps plants grow strong, Feed me leftovers, and I’ll feed the Earth!",
+        text: " — like dirty tissues, old sponges, and snack wrappers. If it doesn’t fit anywhere else, it goes to me!",
         character: "green", 
-        property:"Hello, friends! I’m Green, and I love food scraps and garden waste — like banana peels, apple cores, and leaves. I help turn them into compost that makes plants grow strong and healthy!" },
+        property:"Hello, friends! I’m Green, and I love food scraps and garden waste." },
       { speaker: "Red (Hazardous Waste):", 
-        text: " Mixing hazardous waste could harm people and nature!",
+        text: "  — like banana peels, apple cores, and leaves. I help turn them into compost that makes plants grow strong and healthy!",
         character: "red", 
-        property:"Greetings, heroes! I’m Red, the safety bin. I handle dangerous or toxic items like batteries, old medicines, paint, and broken glass. Keep these away from other bins to protect people and nature!"},
+        property:"Greetings, heroes! I’m Red, the safety bin. I handle dangerous or toxic items like batteries, old medicines, paint, and broken glass."},
       { speaker: "Yellow (Recycling Waste):", 
         text: " Every item you recycle gives the Earth a big smile!",
         character: "yellow", 
-        property:"Hey everyone! I’m Yellow, the recycling bin. I take clean paper, plastic bottles, cans, and cardboard so they can be reused instead of wasted. Recycling helps save energy and keeps our planet happy!" },
-      { speaker: "Narrator", text: "Now that you’ve met them all, let's begin your mission!" }
+        property:"Hey everyone! I’m Yellow, the recycling bin. " },
+      { speaker: "Narrator", text: "I take clean paper, plastic bottles, cans, and cardboard so they can be reused instead of wasted. Recycling helps save energy and keeps our planet happy!" }
 
 
     ];
