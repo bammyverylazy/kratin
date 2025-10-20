@@ -26,6 +26,16 @@ export class Chapter3game extends Phaser.Scene {
     this.load.image('green', '/assets/green.png');
     this.load.image('notebook', '/assets/notebook.png');
 
+    this.load.image('plasticbottles', '/assets/plasticbottles.png');
+    this.load.image('leftovers', '/assets/leftovers.png');
+    this.load.image('treeleaves', '/assets/treeleaves.png');
+    this.load.image('facemask', '/assets/facemask.png');
+    this.load.image('unrecycleabletrashes', '/assets/unrecycleabletrashes.png');
+    this.load.image('electronicdevices', '/assets/electronicdevices.png');
+    this.load.image('brokenglass', '/assets/brokenglass.png');
+
+    // New item sprites (used by spawnItem) — ensure these files exist in /assets
+    
     this.load.audio('bgm', '/assets/audio/gamemusic.mp3');
     this.load.audio('correctSound', '/assets/audio/correctsound.mp3');
     this.load.audio('wrongSound', '/assets/audio/wrongsound.mp3');
@@ -165,27 +175,28 @@ export class Chapter3game extends Phaser.Scene {
   }
 
   spawnItem() {
+    // Select random item and spawn as a single image sprite (physics-enabled)
     const itemData = Phaser.Utils.Array.GetRandom([
-      { label: 'bloodclot', target: 'Platelets' },
-      { label: 'hormone', target: 'Plasma' },
-      { label: 'food', target: 'Plasma' },
-      { label: 'waste', target: 'Plasma' },
-      { label: 'bacteria', target: 'WBC' },
-      { label: 'poison', target: 'WBC' },
-      { label: 'oxygen', target: 'RBC' },
+      { label: 'plasticbottles', target: 'yellow' },
+      { label: 'facemask', target: 'red' },
+      { label: 'treeleaves', target: 'green' },
+      { label: 'leftovers', target: 'green' },
+      { label: 'electronicdevices', target: 'red' },
+      { label: 'unrecycleable trashes', target: 'blue' },
+      { label: 'brokenglass', target: 'red' },
     ]);
 
     const x = Phaser.Math.Between(100, 924);
-    const box = this.add.rectangle(0, 0, 100, 40, 0xffffff).setStrokeStyle(2, 0x000000);
-    const label = this.add.text(0, 0, itemData.label, { fontSize: '18px', color: '#000' }).setOrigin(0.5);
-    const container = this.add.container(x, 0, [box, label]);
+    // spawn physics image; set reasonable display size for items
+    const sprite = this.physics.add.image(x, 0, itemData.label)
+      .setDepth(5)
+      .setDisplaySize(64, 64); // adjust size as needed
 
-    this.physics.world.enable(container);
-    container.body.setVelocityY(100);
-    container.setData('target', itemData.target);
-    container.setInteractive(new Phaser.Geom.Rectangle(-50, -20, 100, 40), Phaser.Geom.Rectangle.Contains);
-    this.input.setDraggable(container);
-    this.currentItem = container;
+    sprite.setVelocityY(100);
+    sprite.setData('target', itemData.target);
+    sprite.setInteractive();
+    this.input.setDraggable(sprite);
+    this.currentItem = sprite;
   }
 
   update() {

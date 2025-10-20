@@ -61,7 +61,7 @@ export class Chapter1 extends Phaser.Scene {
     this.load.image('chapter1scene0', '/assets/chapter1scene0.png');
     this.load.video('chapter1scene1', '/assets/chapter1scene1.mp4');
     this.load.video('chapter1scene2', '/assets/chapter1scene2.mp4');
-    this.load.image('chapter1scene3', '/assets/chapter1scene3.image');
+    this.load.video('chapter1scene3', '/assets/chapter1scene3.mp4');
     this.load.video('chapter1scene4', '/assets/chapter1scene4.mp4');
     this.load.video('chapter1scene5', '/assets/chapter1scene5.mp4');
     this.load.video('chapter1scene6', '/assets/chapter1scene6.mp4');
