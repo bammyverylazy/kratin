@@ -17,13 +17,14 @@ export class Chapter3 extends Scene {
   }
 
   preload() {
-    this.load.image('Chapter3scene1', '/assets/Chapter3scene1.png');
-    this.load.video('bloodflow', '/assets/bloodflow.mp4');
-
-    this.load.image('rbc', '/assets/rbc.png');
-    this.load.image('wbc', '/assets/wbc.png');
-    this.load.image('platelet', '/assets/platelet.png');
-    this.load.image('plasma', '/assets/plasma.png');
+    this.load.image('chapter3', '/assets/chapter3.png');
+    this.load.image('chapter2scene1', '/assets/chapter2scene1.png');
+    this.load.image('chapter3scene1', '/assets/chapter3scene1.png');
+   
+    this.load.image('red', '/assets/red.png');
+    this.load.image('blue', '/assets/blue.png');
+    this.load.image('yellow', '/assets/yellow.png');
+    this.load.image('green', '/assets/green.png');
     this.load.image('notebook', '/assets/notebook.png');
 
     this.load.image('magnifying', '/assets/magnifying.png');
@@ -51,7 +52,7 @@ export class Chapter3 extends Scene {
     this.bgm = this.sound.add('sadBgm', { loop: true, volume: 0.5 });
     this.bgm.play();
 
-    this.coverImage = this.add.image(0, 0, 'Chapter3scene1')
+    this.coverImage = this.add.image(0, 0, 'chapter3')
       .setOrigin(0, 0)
       .setDepth(0)
       .setDisplaySize(this.sys.game.config.width, this.sys.game.config.height);
@@ -71,32 +72,29 @@ export class Chapter3 extends Scene {
             });
 
     this.script = [
-      { speaker: "Narrator", text: "Let’s meet the blood components.", sceneStep: 1 },
-      {
-        speaker: "Red Blood Cells (Erythrocytes)",
-        text: "They carry oxygen from the lungs to all the cells.",
-        character: "rbc",
-        property: "Carry oxygen from the lungs to all body cells.\nContain hemoglobin, the protein that binds oxygen."
-      },
-      {
-        speaker: "White Blood Cells (Leukocytes)",
-        text: "They fight infection and remove invaders.",
-        character: "wbc",
-        property: "Protect the body by fighting infections.\nPlay a key role in the immune system."
-      },
-      {
-        speaker: "Platelets (Thrombocytes)",
-        text: "They help blood clot when you're injured.",
-        character: "platelet",
-        property: "Help blood clot, preventing excessive bleeding.\nGather at wounds to seal vessels."
-      },
-      {
-        speaker: "Plasma",
-        text: "The yellow fluid that carries nutrients and cells.",
-        character: "plasma",
-        property: "Transports nutrients, hormones, and blood cells.\nHelps maintain blood pressure and volume."
-      },
+      { speaker: "Narrator:", text: "Kratin and Earthy arrive in a busy town full of scattered trash." , sceneStep: 1},
+      { speaker: "Earthy:", text: "Oh no… the streets are messy, and it hurts to see the waste!"  ,sceneStep: 2},
+      { speaker: "Kratin:", text: "Don’t worry! If we sort the trash correctly, everything will look clean again!" ,sceneStep: 3 },
+      { speaker: "Narrator:", text: "Suddenly, four colorful bins appear — Blue, Green, Red, and Yellow — each ready to teach Kratin and Earthy how to sort trash properly." },
+      { speaker: "Blue (General Waste):", 
+        text: "Always be careful and keep these items separate!",
+        character: "blue", 
+        property:"Hi there! I’m Blue, the bin for general waste. I take care of things that can’t be recycled or composted — like dirty tissues, old sponges, and snack wrappers. If it doesn’t fit anywhere else, it goes to me!" },
+      { speaker: "Green (Organic Waste):", 
+        text: "Compost helps plants grow strong, Feed me leftovers, and I’ll feed the Earth!",
+        character: "green", 
+        property:"Hello, friends! I’m Green, and I love food scraps and garden waste — like banana peels, apple cores, and leaves. I help turn them into compost that makes plants grow strong and healthy!" },
+      { speaker: "Red (Hazardous Waste):", 
+        text: " Mixing hazardous waste could harm people and nature!",
+        character: "red", 
+        property:"Greetings, heroes! I’m Red, the safety bin. I handle dangerous or toxic items like batteries, old medicines, paint, and broken glass. Keep these away from other bins to protect people and nature!"},
+      { speaker: "Yellow (Recycling Waste):", 
+        text: " Every item you recycle gives the Earth a big smile!",
+        character: "yellow", 
+        property:"Hey everyone! I’m Yellow, the recycling bin. I take clean paper, plastic bottles, cans, and cardboard so they can be reused instead of wasted. Recycling helps save energy and keeps our planet happy!" },
       { speaker: "Narrator", text: "Now that you’ve met them all, let's begin your mission!" }
+
+
     ];
 
     this.startButton.on('pointerdown', () => {
@@ -135,13 +133,8 @@ export class Chapter3 extends Scene {
   }
 
   startStorySequence() {
-    const bgKey = 'bloodflow';
-    if (this.cache.video.exists(bgKey)) {
-      this.bgVideo = this.add.video(0, 0, bgKey).setOrigin(0, 0).setDepth(0);
-      this.bgVideo.play(true).setLoop(true);
-    }
-
-    const keys = ['rbc', 'wbc', 'platelet', 'plasma'];
+    
+    const keys = ['red', 'blue', 'green', 'yellow'];
     const spacing = 200;
     const startX = (this.sys.game.config.width / 2) - spacing * (keys.length - 1) / 2;
     const y = 480;
@@ -230,10 +223,10 @@ export class Chapter3 extends Scene {
     if (line.property) {
       let emoji = '';
       switch (line.character) {
-        case 'rbc': emoji = '🧬 '; break;
-        case 'wbc': emoji = '🛡️ '; break;
-        case 'platelet': emoji = '🩹 '; break;
-        case 'plasma': emoji = '💧 '; break;
+        case 'red': emoji = '🎀 '; break;
+        case 'blue': emoji = '🩵 '; break;
+        case 'yellow': emoji = '⭐ '; break;
+        case 'green': emoji = '🥬 '; break;
       }
 
       const decoratedProperty = line.property

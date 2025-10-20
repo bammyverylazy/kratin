@@ -11,10 +11,7 @@ export class EndingScene extends Scene {
     this.script = [];
     this.currentLine = 0;
     this.bgSteps = [
-        'rbc',
-        'wbc',
-        'platelet',
-        'plasma',
+        'endingscene',
         'End'
     ];
     this.bgStepIndex = 0;
@@ -31,10 +28,7 @@ export class EndingScene extends Scene {
     this.load.image('8.png', '/assets/8.png');
     this.load.image('9.png', '/assets/9.png');
     this.load.image('End', '/assets/End.png');
-    this.load.image('rbc', '/assets/rbc.png');
-    this.load.image('wbc', '/assets/wbc.png');
-    this.load.image('platelet', '/assets/platelet.png');
-    this.load.image('plasma', '/assets/plasma.png');
+    this.load.image('endingscene', '/assets/endingscene.png');
   }
 
   create() {
@@ -45,13 +39,14 @@ export class EndingScene extends Scene {
       onBook: (scene, box) => scene.add.text(box.x, box.y, 'Custom Book', { fontSize: '32px', color: '#222' }).setOrigin(0.5).setDepth(201 ),
     });
 
-    this.script = [
-      { speaker: "Narrator:", text: 'Congratulations, Kratin. \nYou’ve journeyed through the bloodstream, tackled challenges in every chamber, and helped the body survive and thrive' },
-      { speaker: "Senior Red Blood Cell:", text: "Red Blood Cells delivering oxygen.", sceneStep: 2 },
-      { speaker: "White Blood Cell:", text: "White Blood Cells fighting infections.", sceneStep: 3 },
-      { speaker: "Platelet:", text: "Platelets clotting wounds.", sceneStep: 4 },
-      { speaker: "Plasma:", text: "Plasma transporting nutrients and waste." ,sceneStep: 5 },
-      { speaker: "Narrator:", text: "And now, you’re ready to take on the next adventure in the body’s journey." ,sceneStep: 6}
+    this.script = [ 
+  { speaker: "Narrator:", text: "With every mission complete, the world shines brighter than ever." },
+  { speaker: "Earthy:", text: "I can breathe again! The forests, rivers, and skies are full of life!" },
+  { speaker: "Kratin:", text: "You did it, my friend! Your choices made a big difference for our home." },
+  { speaker: "Narrator:", text: "Kratin and Earthy float above the glowing Earth, surrounded by trees and starlight." },
+  { speaker: "Earthy:", text: "Thank you for helping me smile again. Remember — even small actions can change the world." },
+  { speaker: "Kratin:", text: "Let’s keep caring for our planet, every day. Together, we can keep the Earth shining bright!",sceneStep:2 },
+
     ];
 
     // Keyboard shortcut to start story sequence
@@ -213,7 +208,7 @@ export class EndingScene extends Scene {
     }).setOrigin(0.5);
 
     // Game title
-    this.add.text(centerX, 250, '🌟 CELLVIVOR 🌟', {
+    this.add.text(centerX, 250, 'KRATIN : Save The World', {
       fontFamily: 'Georgia',
       fontSize: '32px',
       fontStyle: 'bold',

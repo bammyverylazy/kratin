@@ -15,9 +15,8 @@ export class Chapter1game extends Phaser.Scene {
   }
 
   preload() {
-    this.load.image('BloodVessel', '/assets/BloodVessel_Capi.png');
-    this.load.image('Vein', '/assets/Vein.png');
-    this.load.image('Artery', '/assets/Artery.png');
+    this.load.image('earthcry', '/assets/earthcry.png');
+    this.load.image('earthshy', '/assets/earthshy.png');
     this.load.image('setting', '/assets/setting.png');
     this.load.image('book', '/assets/book.png');
     this.load.image('correct', '/assets/correct.png');
@@ -60,9 +59,8 @@ export class Chapter1game extends Phaser.Scene {
     });
 
     const zoneData = [
-      { key: 'Artery', label: 'Arteries', type: 'arteries' },
-      { key: 'Vein', label: 'Veins', type: 'veins' },
-      { key: 'BloodVessel', label: 'Capillaries', type: 'capillaries' }
+      { key: 'earthcry', label: 'bad action', type: 'earthcry' },
+      { key: 'earthshy', label: 'good action', type: 'earthshy' },
     ];
 
     const screenWidth = this.sys.game.config.width;
@@ -139,7 +137,7 @@ export class Chapter1game extends Phaser.Scene {
       }
     });
 
-    this.add.text(screenWidth / 2, 170, 'Match the property to the\ncorrect blood vessel type!', {
+    this.add.text(screenWidth / 2, 170, 'Match the behavior on the right category', {
       fontSize: '30px',
       color: '#222',
       fontStyle: 'bold'

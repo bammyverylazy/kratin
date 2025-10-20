@@ -48,7 +48,7 @@ export class Mode extends Scene {
         
         // --- Story Mode Popup ---
         const storyboardBtn = this.add.image(this.cameras.main.width * 0.265, buttonY, 'storymode')
-        .setOrigin(0.5).setScale(0.145).setInteractive({ useHandCursor: true }).setDepth(50);
+        .setOrigin(0.5).setScale(0.14).setInteractive({ useHandCursor: true }).setDepth(50);
 
 
     storyboardBtn.on('pointerdown', () => {
@@ -127,7 +127,7 @@ continueBtn.on('pointerdown', async () => {
 
         // --- Multiplayer Popup ---
         const gameModeBtn = this.add.image(this.cameras.main.width * 0.715, buttonY, 'multimode')
-            .setOrigin(0.5).setScale(0.145).setInteractive({ useHandCursor: true }).setDepth(50);
+            .setOrigin(0.5).setScale(0.14).setInteractive({ useHandCursor: true }).setDepth(50);
 
         gameModeBtn.on('pointerdown', () => {
             if (this.popupContainer) return;

@@ -26,16 +26,12 @@ export class Chapter2 extends Scene {
   }
 
   preload() {
-    this.load.video('Chapter2scene1', '/assets/Chapter2fr.mp4');
-    this.load.image('map', '/assets/map.jpg');
-    this.load.image('P1', '/assets/C2P1.jpg');
-    this.load.image('P2', '/assets/48.jpg');
-    this.load.image('P3', '/assets/49.jpg');
-    this.load.image('P4', '/assets/50.jpg');
-    this.load.image('P5', '/assets/52.jpg');
-    this.load.image('P6', '/assets/53.jpg');
-    this.load.image('P7', '/assets/54.jpg');
-    this.load.video('body', '/assets/body.mp4');
+    this.load.image('chapter2scene1', '/assets/chapter2scene1.png');
+    this.load.image('chapter2scene2', '/assets/chapter2scene2.png');
+    this.load.image('chapter2scene2', '/assets/chapter2scene2.png');
+    this.load.image('chapter2', '/assets/chapter2.png');
+
+    
     this.load.audio('pressureBgm', '/assets/audio/pressurebackgroundmusic.mp3');
 
     this.load.image('magnifying', '/assets/magnifying.png');
@@ -66,7 +62,7 @@ export class Chapter2 extends Scene {
 
     this.cameras.main.setBackgroundColor('#000000');
 
-    this.coverImage = this.add.video(0, 0, 'Chapter2scene1').setOrigin(0, 0).setDepth(0);
+    this.coverImage = this.add.image(0, 0, 'chapter2').setOrigin(0, 0).setDepth(0);
     this.coverImage.setMute(true);
     this.coverImage.play(true);
     this.coverImage.on('play', () => {
@@ -93,22 +89,14 @@ export class Chapter2 extends Scene {
     addStoryModeUI(this, {
          });
 
-    this.script = [
-      { speaker: "Senior Red Blood Cell (narrating):", text: "After a long journey through the dark, winding vein called the Inferior Vena Cava..." },
-      { speaker: "Senior Red Blood Cell (narrating):", text: "Your new friend just arrived from the Superior Vena Cava..." },
-      { speaker: "New Red Blood Cell:", text: "Hey there! Looks like we’re teammates now!" },
-      { speaker: "Narrator:", text: "Noobyzom has reached the heart..." },
-      { speaker: "Narrator:", text: "Now that you’ve reached the heart..." },
-      { speaker: "Narrator:", text: "Your real mission begins here...", sceneStep: 2 },
-      { speaker: "Narrator:", text: "The Right Atrium is the first chamber...", sceneStep: 3 },
-      { speaker: "Narrator:", text: "It collects deoxygenated blood...", sceneStep: 3 },
-      { speaker: "Narrator:", text: "The Right Ventricle contracts to pump...", sceneStep: 4 },
-      { speaker: "Narrator:", text: "This artery carries blood to the lungs...", sceneStep: 4 },
-      { speaker: "Narrator:", text: "Oxygen-poor blood flows through the lungs...", sceneStep: 5 },
-      { speaker: "Narrator:", text: "Oxygen binds with hemoglobin...", sceneStep: 5 },
-      { speaker: "Narrator:", text: "The Left Atrium receives oxygen-rich blood...", sceneStep: 6 },
-      { speaker: "Narrator:", text: "Then blood flows into the Left Ventricle...", sceneStep: 6 },
-      { speaker: "Narrator:", text: "The Left Ventricle pumps oxygenated blood...", sceneStep: 7 },
+    this.script = [      
+    { speaker: "Narrator:", text: "Kratin and Earthy arrive at a small village full of lights and dripping taps." },
+    { speaker: "Earthy:", text: "Oh no... so much energy is being wasted!",sceneStep:2 },
+    { speaker: "Kratin:", text: "Don’t worry, Earthy! We’ll find and fix every leak!",sceneStep:2 },
+    { speaker: "Narrator:", text: "Lights on, fans spinning, and water running — all wasting energy.",sceneStep:2 },
+    { speaker: "Kratin:", text: "If we save energy, the Earth can rest and smile again!",sceneStep:3 },
+    { speaker: "Narrator:", text: "Let’s help Kratin find the leaks and make Earthy shine bright once more!",sceneStep:3 },
+
     ];
 
     this.startButton.on('pointerdown', () => {

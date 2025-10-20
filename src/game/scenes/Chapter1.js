@@ -26,33 +26,21 @@ export class Chapter1 extends Phaser.Scene {
     this.musicStarted = false;
 
     this.script = [
-      { speaker: "Narrator:", text: 'Welcome to your journey inside the body, This is "KRATIN-Save The World".' },
-      { speaker: "Narrator:", text: " a vast network of cells works relentlessly to keep us alive.", sceneStep: 2 },
-      { speaker: "Narrator", text: "And here, deep inside, is the marrow.", sceneStep: 3 },
-      { speaker: "Narrator:", text: "The marrow is bustling with activity.", sceneStep: 4 },
-      { speaker: "Noobyzom:", text: "☆*: .。. o(≧◇≦)o .。.:*☆", sceneStep: 5 },
-      { speaker: "Narrator:", text: "You are Noobyzom", sceneStep: 6 },
-      { speaker: "Narrator:", text: "A newborn red blood cell, just created in the bone marrow, the body’s blood cell factory.", sceneStep: 7 },
-      { speaker: "Narrator:", text: " Born from hematopoietic stem cells, you have developed into a biconcave, flexible, nucleus-free hero", sceneStep: 8 },
-      { speaker: "Narrator:", text: "  perfectly designed to carry one of life’s most precious elements: oxygen.", sceneStep: 8 },
-      { speaker: "Narrator:", text: "Your journey starts here. From the bone marrow, \nyou will enter the bloodstream through the vessels.", sceneStep: 10 },
-      { speaker: "Narrator:", text: "Your mission: Deliver oxygen to every cell in the body and maintain life.", sceneStep: 9 },
-      { speaker: "Narrator:", text: "This is not just a task — it's the purpose of your existence.", sceneStep: 11 },
-      { speaker: "Senior Red Blood Cell:", text: " Ah, fresh from the marrow, huh? I’m your senior — a well-traveled, oxygen-delivering expert.", sceneStep: 12 },
-      { speaker: "Senior Red Blood Cell:", text: " And lucky you — I’ve got a heart map just for you.", sceneStep: 12 },
-      { speaker: "Noobyzom:", text: "“A map? Wait… where exactly is the heart?", sceneStep: 11 },
-      { speaker: "Senior Red Blood Cell:", text: "Haha, rookie move! Don't worry, you’ll learn quickly.\nThe heart is our command center — the engine that pumps us through the body.", sceneStep: 13 },
-      { speaker: "Senior Red Blood Cell:", text: " Now listen up, I’ll walk you through the main routes: \nthe atria, ventricles, arteries, veins… It’s like a highway system in here!", sceneStep: 14 },
-      { speaker: "☆Arteries☆", text: "Arteries have thick, elastic walls that allow them to handle the high pressure of blood being pumped directly from the heart. They do not contain valves, and blood pulses strongly through them with each heartbeat. ", sceneStep: 15 },
-      { speaker: "☆Veins☆", text: "Veins have thinner walls than arteries and carry blood under lower pressure. They contain valves to prevent the backward flow of blood, and blood movement is aided by surrounding muscles and these valves. ", sceneStep: 16 },
-      { speaker: "☆Capillaries☆", text: "Capillaries are the smallest blood vessels, with walls only one cell thick. They are the sites where the exchange of gases, nutrients, and waste occurs between the blood and body cells. ", sceneStep: 14 }
-    ];
+      { speaker: "Narrator:", text: "Once upon a time, our beautiful planet was full of green forests, clean rivers, and fresh air." },
+      { speaker: "Narrator:", text: "But as time passed, humans began to forget how to take care of nature. The world became polluted and sad.",sceneStep:2 },
+      { speaker: "Earthy:", text: "Oh no... The smoke makes it hard for me to breathe! The rivers are full of trash...",sceneStep:2 },
+      { speaker: "Narrator:", text: "But don’t worry! Deep inside the forest, a tiny sparkle of hope begins to shine.",sceneStep:2 },
+      { speaker: "Narrator:", text: "From the roots of a magical tree, a little green spirit is born — Kratin!" ,sceneStep:3},
+      { speaker: "Kratin:", text: "Hi there! I’m Kratin, the guardian of the Earth! I love helping nature stay happy and healthy!",sceneStep:3 },
+      { speaker: "Narrator:", text: "Kratin looks around and sees how the world needs help. But Kratin can’t do it alone...",sceneStep:4 },
+      { speaker: "Kratin:", text: "Hey, friend! Would you like to join me? Together, we can make the world bright again!" ,sceneStep:4},
+      { speaker: "Earthy:", text: "Yay! Let’s find out which actions are good or bad for me — so I can smile again!",sceneStep:5 },
+      { speaker: "Narrator:", text: "Your journey begins now. Help Kratin sort good and bad behaviors for the Earth!" ,sceneStep:6},
+      { speaker: "Kratin:", text: "Let’s start our first challenge! Ready? Let’s go! ☆*: .｡. o(≧▽≦)o .｡.:*☆" ,sceneStep:6},   ];
 
     this.currentLine = 0;
     this.bgSteps = [
-      'Chapter1scene2', 'bone', 'bone1', 'bone2', 'Bonemarrow', 'noobysleep', 'noobywake',
-      'CellBorn', 'Blood', 'body', 'bloodvess', 'noobywalkyellow', 'RBCIntro',
-      'RBCwalkpink', 'BloodVessel', 'BloodVesselA', 'BloodVesselB'
+      'chapter1scene1','chapter1scene2','chapter1scene3','chapter1scene4','chapter1scene5','chapter1scene6'
     ];
     this.bgStepIndex = 0;
   }
@@ -65,25 +53,17 @@ export class Chapter1 extends Phaser.Scene {
       this.load.audio(audioKey, `/assets/audio/chapter1/${audioKey}.mp3`);
     }
 
-    this.load.image('Chapter1scene1', '/assets/Chapter1scene1.png');
-    this.load.image('Chapter1scene2', '/assets/Chapter1scene2.png');
-    this.load.image('bone', '/assets/Bone.png');
-    this.load.image('bone1', '/assets/Bone1.png');
-    this.load.image('bone2', '/assets/Bone2.png');
-    this.load.image('Bonemarrow', '/assets/Bonemarrow.png');
-    this.load.image('noobysleep', '/assets/noobysleep.png');
-    this.load.image('noobywake', '/assets/noobywake.png');
-    this.load.image('BloodVessel', '/assets/BloodVessel.png');
-    this.load.image('BloodVesselA', '/assets/BloodVesselA.png');
-    this.load.image('BloodVesselB', '/assets/BloodVesselB.png');
-
-    this.load.video('CellBorn', '/assets/CellBorn.mp4');
-    this.load.video('Blood', '/assets/Blood.mp4');
-    this.load.video('body', '/assets/body.mp4');
-    this.load.video('bloodvess', '/assets/bloodvess.mp4');
-    this.load.video('noobywalkyellow', '/assets/noobywalkyellow.mp4');
-    this.load.video('RBCIntro', '/assets/RBCIntro.mp4');
-    this.load.video('RBCwalkpink', '/assets/RBCwalkpink.mp4');
+    this.load.image('chapter1scene0', '/assets/chapter1scene0.png');
+    this.load.image('chapter1', '/assets/chapter1.png');
+    
+    this.load.video('chapter1scene1', '/assets/chapter1scene1.mp4');
+    this.load.video('chapter1scene2', '/assets/chapter1scene2.mp4');
+    this.load.video('chapter1scene3', '/assets/chapter1scene3.mp4');
+    this.load.video('chapter1scene4', '/assets/chapter1scene4.mp4');
+    this.load.video('chapter1scene5', '/assets/chapter1scene5.mp4');
+    this.load.video('chapter1scene6', '/assets/chapter1scene6.mp4');
+    
+    
 
     this.load.image('magnifying', '/assets/magnifying.png');
     this.load.image('setting', '/assets/setting.png');
@@ -111,7 +91,7 @@ export class Chapter1 extends Phaser.Scene {
 
     this.cameras.main.setBackgroundColor('#000000');
 
-    this.coverImage = this.add.image(0, 0, 'Chapter1scene1')
+    this.coverImage = this.add.image(0, 0, 'chapter1')
       .setOrigin(0, 0)
       .setDepth(0)
       .setDisplaySize(this.sys.game.config.width, this.sys.game.config.height);
@@ -148,7 +128,7 @@ export class Chapter1 extends Phaser.Scene {
   this.musicStarted = true;
 
   const opening = this.sound.add('openingsong', { volume: 1 });
-  this.bgm = this.sound.add('backgroundmusic', { volume: 0.3, loop: true }); // ✅ Assign to this.bgm
+  this.bgm = this.sound.add('backgroundmusic', { volume: 0.3, loop: true }); 
 
   opening.play();
   this.time.delayedCall(opening.duration * 1000, () => {
@@ -273,78 +253,7 @@ export class Chapter1 extends Phaser.Scene {
           .setDepth(0)
           .setDisplaySize(this.sys.game.config.width, this.sys.game.config.height);
       }
-    }
-
-    // Show/hide back button
-    this.backButton.setVisible(this.currentLine > 0);
-
-    // Popup handling for special dialogues
-    if (
-      nextLine.speaker === "Senior Red Blood Cell" &&
-      nextLine.text.includes("heart map")
-    ) {
-      this.showPopup("You received a heart map!\nUse it to navigate the body.", 'book');
-    } else if (
-      nextLine.speaker === "Senior Red Blood Cell" &&
-      nextLine.text.includes("main routes")
-    ) {
-      this.showPopup("Learn the main routes: atria, ventricles, arteries, veins.");
-    } else {
-      this.dialogueUI.startDialogue([nextLine]);
-      if (nextLine.audioKey) {
-        this.voiceNarrator.play(nextLine.audioKey, { volume: 10 }); // adjust volume here
-      }
-      this.dialogueUI.onLineComplete = () => {
-        // Automatically advance dialogue when line finishes
-        this.advanceDialogue();
-      };
-    }
-  }
-
-  showPopup(text, iconKey = null) {
-    if (this.popupContainer) return; // prevent multiple popups
-
-    this.popupContainer = this.add.rectangle(512, 360, 1024, 800, 0x000000, 0.5)
-      .setOrigin(0.5).setDepth(299).setInteractive();
-
-    const popupBox = this.add.rectangle(512, 320, 500, 200, 0xc7c7c7, 1)
-      .setOrigin(0.5).setDepth(300).setInteractive();
-
-    if (iconKey) {
-      this.popupBook = this.add.image(332, 320, iconKey)
-        .setOrigin(0.5)
-        .setDisplaySize(80, 80)
-        .setDepth(301);
-    }
-
-    this.popupText = this.add.text(547, 320, text, {
-      fontSize: '28px',
-      color: '#222',
-      wordWrap: { width: 340 }
-    }).setOrigin(0.5).setDepth(301);
-
-    const closePopup = () => {
-      if (this.popupContainer) this.popupContainer.destroy();
-      if (popupBox) popupBox.destroy();
-      if (this.popupBook) this.popupBook.destroy();
-      if (this.popupText) this.popupText.destroy();
-      this.popupContainer = null;
-      this.popupBook = null;
-      this.popupText = null;
     };
-
-    this.popupContainer.on('pointerdown', (pointer) => {
-      const px = pointer.x, py = pointer.y;
-      if (
-        px < popupBox.x - popupBox.width / 2 ||
-        px > popupBox.x + popupBox.width / 2 ||
-        py < popupBox.y - popupBox.height / 2 ||
-        py > popupBox.y + popupBox.height / 2
-      ) {
-        closePopup();
-        this.advanceDialogue();
-      }
-    });
 
     this.dialogueUI.startDialogue([this.script[this.currentLine]]);
     if (this.script[this.currentLine].audioKey) {

@@ -15,15 +15,15 @@ export class Chapter3game extends Phaser.Scene {
   }
 
   preload() {
-    this.load.video('bloodflow', '/assets/bloodflow.mp4');
+    this.load.video('chapter4scene1', '/assets/chapter4scene1.mp4');
     this.load.image('star', '/assets/star.png');
     this.load.image('magnifying', '/assets/magnifying.png');
     this.load.image('setting', '/assets/setting.png');
     this.load.image('book', '/assets/book.png');
-    this.load.image('rbc', '/assets/rbc.png');
-    this.load.image('wbc', '/assets/wbc.png');
-    this.load.image('platelet', '/assets/platelet.png');
-    this.load.image('plasma', '/assets/plasma.png');
+    this.load.image('red', '/assets/red.png');
+    this.load.image('blue', '/assets/blue.png');
+    this.load.image('yellow', '/assets/yellow.png');
+    this.load.image('green', '/assets/green.png');
     this.load.image('notebook', '/assets/notebook.png');
 
     this.load.audio('bgm', '/assets/audio/gamemusic.mp3');
@@ -55,7 +55,7 @@ export class Chapter3game extends Phaser.Scene {
     this.events.on('shutdown', () => this.stopAllSounds());
     this.events.on('destroy', () => this.stopAllSounds());
 
-    this.add.video(0, 0, 'bloodflow').setOrigin(0, 0).play(true).setLoop(true);
+    this.add.video(0, 0, 'chapter4scene1').setOrigin(0, 0).play(true).setLoop(true);
 
     addStoryModeUI(this, {
     });
@@ -64,10 +64,10 @@ export class Chapter3game extends Phaser.Scene {
 
     this.targetBoxes = this.physics.add.staticGroup();
     const boxInfo = [
-      { key: 'rbc', label: 'RBC' },
-      { key: 'wbc', label: 'WBC' },
-      { key: 'platelet', label: 'Platelets' },
-      { key: 'plasma', label: 'Plasma' },
+      { key: 'red', label: 'Hazardous Waste' },
+      { key: 'blue', label: 'General Waste' },
+      { key: 'yellow', label: 'Recycling Waste' },
+      { key: 'green', label: 'Organic Waste' },
     ];
 
     boxInfo.forEach((info, i) => {

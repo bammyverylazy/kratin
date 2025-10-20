@@ -13,10 +13,9 @@ export class Chapter4 extends Scene {
   }
 
   preload() {
-    this.load.video('Chapter4scene1', '/assets/Chapter4scene1.mp4');
-    this.load.video('heartbeat', '/assets/heartbeat.mp4');
-    this.load.video('Blood', '/assets/Blood.mp4');
-    this.load.video('Bloodflow', '/assets/Bloodflow.mp4');
+    this.load.video('chapter4scene1', '/assets/chapter4scene1.mp4');
+    this.load.video('chapter4scene2', '/assets/chapter4scene2.mp4');
+    this.load.image('chapter4', '/assets/chapter4.png');
 
     this.load.image('relaxing', '/assets/relaxing.png');
     this.load.image('resting', '/assets/resting.png');
@@ -30,8 +29,6 @@ export class Chapter4 extends Scene {
     this.load.image('notebook', '/assets/notebook.png');
 
     // Audio
-    this.load.audio('fastHeart', '/assets/audio/fastheartbeatingsound.mp3');
-    this.load.audio('slowHeart', '/assets/audio/heartbeatingsound.mp3');
     // this.load.audio('narration1', '/assets/audio/line1.mp3'); // For future
   }
 
@@ -42,11 +39,7 @@ export class Chapter4 extends Scene {
     //saveGameProgress(userId, currentChapter);
 
     this.cameras.main.setBackgroundColor('#000000');
-    this.soundEnabled = localStorage.getItem('soundEnabled') !== 'false';
-
-    this.fastHeartSound = this.sound.add('fastHeart', { loop: true, volume: 0.3 });
-    this.slowHeartSound = this.sound.add('slowHeart', { loop: true, volume: 0.3 });
-
+  
     this.coverImage = this.add.video(0, 0, 'Chapter4scene1').setOrigin(0, 0).setDepth(0);
     this.coverImage.setMute(true);
     this.coverImage.play(true);
@@ -122,16 +115,12 @@ export class Chapter4 extends Scene {
     this.dialogueUI.advance();
   }
 
-  stopHeartSounds() {
-    if (this.fastHeartSound?.isPlaying) this.fastHeartSound.stop();
-    if (this.slowHeartSound?.isPlaying) this.slowHeartSound.stop();
-  }
+ 
 
   showCurrentLine() {
     if (this.currentLine >= this.script.length) {
       this.nextButton.destroy();
       this.backButton.destroy();
-      this.stopHeartSounds();
       this.showGameTransition();
       return;
     }
@@ -140,24 +129,6 @@ export class Chapter4 extends Scene {
 
     if (this.bgVideo) {
       this.bgVideo.destroy();
-    }
-
-    // 🎥 Background video
-    if (line.video) {
-      this.bgVideo = this.add.video(0, 0, line.video).setOrigin(0, 0).setDepth(0).setMute(true).play(true);
-    } else {
-      this.bgVideo = this.add.video(30, 100, 'heartbeat').setOrigin(-0.25, 0).setDepth(0).setMute(true).play(true);
-      if (line.speed) this.bgVideo.setPlaybackRate(line.speed);
-    }
-
-    // 🎧 Heartbeat sounds
-    this.stopHeartSounds();
-    if (this.soundEnabled) {
-      if (this.currentLine <= 2 || this.currentLine >= 6) {
-        this.fastHeartSound.play();
-      } else if (this.currentLine >= 3 && this.currentLine <= 5) {
-        this.slowHeartSound.play();
-      }
     }
 
     // 🎤 Future voice narration (placeholder)
@@ -218,7 +189,6 @@ export class Chapter4 extends Scene {
     }).setOrigin(0.5).setDepth(1002).setInteractive({ useHandCursor: true });
 
     startBtn.on('pointerdown', () => {
-      this.stopHeartSounds();
       overlay.destroy();
       popup.destroy();
       startBtn.destroy();
