@@ -80,13 +80,14 @@ export class Chapter1game extends Phaser.Scene {
     });
 
     this.properties = Phaser.Utils.Array.Shuffle([
-      { text: 'Thick, elastic walls', type: 'arteries' },
-      { text: 'Blood pulses strongly with each heartbeat', type: 'arteries' },
-      { text: 'Have valves to prevent blood from flowing backward', type: 'veins' },
-      { text: 'Lower pressure', type: 'veins' },
-      { text: 'The smallest vessels', type: 'capillaries' },
-      { text: 'Sites of exchange between blood and body cell', type: 'capillaries' }
-    ]);
+    { text: "Throwing trash into the river", type: "earthcry" },
+    { text: "Planting a new tree in the park", type: "earthshy" },
+    { text: "Leaving the lights on all night", type: "earthcry" },
+    { text: "Using a reusable water bottle", type: "earthshy" },
+    { text: "Using plastic bags for shopping", type: "earthcry" },
+    { text: "Riding a bicycle instead of a car", type: "earthshy" },
+  ]);
+
 
     this.totalCount = this.properties.length;
     this.correctCount = 0;

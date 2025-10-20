@@ -29,21 +29,21 @@ export class Chapter1 extends Phaser.Scene {
     this.musicStarted = false;
 
     this.script = [
-      { speaker: "Narrator:", text: "Once upon a time, our beautiful planet was full of green forests, clean rivers, and fresh air." },
+      { speaker: "Narrator:", text: "Once upon a time, our beautiful planet was full of green forests, clean rivers, and fresh air." ,sceneStep:1},
       { speaker: "Narrator:", text: "But as time passed, humans began to forget how to take care of nature. The world became polluted and sad.",sceneStep:2 },
-      { speaker: "Earthy:", text: "Oh no... The smoke makes it hard for me to breathe! The rivers are full of trash...",sceneStep:2 },
-      { speaker: "Narrator:", text: "But don’t worry! Deep inside the forest, a tiny sparkle of hope begins to shine.",sceneStep:2 },
-      { speaker: "Narrator:", text: "From the roots of a magical tree, a little green spirit is born — Kratin!" ,sceneStep:3},
-      { speaker: "Kratin:", text: "Hi there! I’m Kratin, the guardian of the Earth! I love helping nature stay happy and healthy!",sceneStep:3 },
-      { speaker: "Narrator:", text: "Kratin looks around and sees how the world needs help. But Kratin can’t do it alone...",sceneStep:4 },
-      { speaker: "Kratin:", text: "Hey, friend! Would you like to join me? Together, we can make the world bright again!" ,sceneStep:4},
-      { speaker: "Earthy:", text: "Yay! Let’s find out which actions are good or bad for me — so I can smile again!",sceneStep:5 },
-      { speaker: "Narrator:", text: "Your journey begins now. Help Kratin sort good and bad behaviors for the Earth!" ,sceneStep:6},
-      { speaker: "Kratin:", text: "Let’s start our first challenge! Ready? Let’s go! ☆*: .｡. o(≧▽≦)o .｡.:*☆" ,sceneStep:6},   ];
+      { speaker: "Earthy:", text: "Oh no... The smoke makes it hard for me to breathe! The rivers are full of trash...",sceneStep:3 },
+      { speaker: "Narrator:", text: "But don’t worry! Deep inside the forest, a tiny sparkle of hope begins to shine.",sceneStep:3 },
+      { speaker: "Narrator:", text: "From the roots of a magical tree, a little green spirit is born — Kratin!" ,sceneStep:4},
+      { speaker: "Kratin:", text: "Hi there! I’m Kratin, the guardian of the Earth! I love helping nature stay happy and healthy!",sceneStep:4},
+      { speaker: "Narrator:", text: "Kratin looks around and sees how the world needs help. But Kratin can’t do it alone...",sceneStep:5 },
+      { speaker: "Kratin:", text: "Hey, friend! Would you like to join me? Together, we can make the world bright again!" ,sceneStep:5},
+      { speaker: "Earthy:", text: "Yay! Let’s find out which actions are good or bad for me — so I can smile again!",sceneStep:6 },
+      { speaker: "Narrator:", text: "Your journey begins now. Help Kratin sort good and bad behaviors for the Earth!" ,sceneStep:7},
+      { speaker: "Kratin:", text: "Let’s start our first challenge! Ready? Let’s go! ☆*: .｡. o(≧▽≦)o .｡.:*☆" ,sceneStep:7},   ];
 
     this.currentLine = 0;
     this.bgSteps = [
-      'chapter1scene1','chapter1scene2','chapter1scene3','chapter1scene4','chapter1scene5','chapter1scene6'
+      'chapter1scene0','chapter1scene1','chapter1scene2','chapter1scene3','chapter1scene4','chapter1scene5','chapter1scene6'
     ];
     this.bgStepIndex = 0;
   }
@@ -58,7 +58,7 @@ export class Chapter1 extends Phaser.Scene {
 
     this.load.image('chapter1scene0', '/assets/chapter1scene0.png');
     this.load.image('chapter1', '/assets/chapter1.png');
-    
+    this.load.image('chapter1scene0', '/assets/chapter1scene0.png');
     this.load.video('chapter1scene1', '/assets/chapter1scene1.mp4');
     this.load.video('chapter1scene2', '/assets/chapter1scene2.mp4');
     this.load.video('chapter1scene3', '/assets/chapter1scene3.mp4');
