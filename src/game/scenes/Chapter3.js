@@ -97,24 +97,12 @@ export class Chapter3 extends Scene {
 
 
     ];
-    this.bggImage = this.add.image(512, 384, 'chapter3scene1').setDepth(0);
+  
     this.startButton.on('pointerdown', () => {
       this.startButton.destroy();
       this.coverImage.destroy();
       // Use video if chapter3scene1 is a video; otherwise fall back to image.
-      if (this.cache.video.exists('chapter3scene1')) {
-        this.add.video(0, 0, 'chapter3scene1')
-          .setOrigin(0, 0)
-          .setDisplaySize(this.sys.game.config.width, this.sys.game.config.height)
-          .play(true)
-          .setLoop(true)
-          .setDepth(0);
-      } else {
-        this.add.image(0, 0, 'chapter3scene1')
-          .setOrigin(0, 0)
-          .setDisplaySize(this.sys.game.config.width, this.sys.game.config.height)
-          .setDepth(0);
-      }
+  this.bggImage = this.add.image(512, 384, 'chapter3scene1').setDepth(0);
        this.startStorySequence();
     });
 

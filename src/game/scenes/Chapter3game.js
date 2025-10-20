@@ -30,7 +30,7 @@ export class Chapter3game extends Phaser.Scene {
     this.load.image('leftovers', '/assets/leftovers.png');
     this.load.image('treeleaves', '/assets/treeleaves.png');
     this.load.image('facemask', '/assets/facemask.png');
-    this.load.image('unrecycleabletrashes', '/assets/unrecycleabletrashes.png');
+    this.load.image('unrecycleable trashes', '/assets/unrecycleable trashes.png');
     this.load.image('electronicdevices', '/assets/electronicdevices.png');
     this.load.image('brokenglass', '/assets/brokenglass.png');
 
