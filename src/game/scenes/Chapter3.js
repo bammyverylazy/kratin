@@ -17,28 +17,42 @@ export class Chapter3 extends Scene {
   }
 
   preload() {
-    this.load.image('chapter3', '/assets/chapter3.png');
-  // Use an image for the chapter background instead of a video
-  // Ensure the file exists at /assets/chapter3scene1.png
-  this.load.image('chapter3scene1', '/assets/chapter3scene1.png');
-   
-    this.load.image('red', '/assets/red.png');
-    this.load.image('blue', '/assets/blue.png');
-    this.load.image('yellow', '/assets/yellow.png');
-    this.load.image('green', '/assets/green.png');
-    this.load.image('notebook', '/assets/notebook.png');
+    // Use the same asset base as the Preloader (public/assets)
+    // so paths are consistent across scenes. This avoids accidental
+    // double-/missing-prefix issues like '/assets/...'
+    this.load.setPath('assets');
 
-    this.load.image('magnifying', '/assets/magnifying.png');
-    this.load.image('setting', '/assets/setting.png');
-    this.load.image('book', '/assets/book.png');
-    this.load.image('5.png', '/assets/5.png');
-    this.load.image('6.png', '/assets/6.png');
-    this.load.image('7.png', '/assets/7.png');
-    this.load.image('8.png', '/assets/8.png');
-    this.load.image('9.png', '/assets/9.png');
-    this.load.image('quest3', '/assets/quest3.png');
+    // Log file-level load events to help diagnose "Failed to process file" problems
+    this.load.on('filecomplete', (key, type) => {
+      if (type === 'image') console.log(`Loaded image: ${key}`);
+    });
+    this.load.on('loaderror', (file) => {
+      // file may be a File or a key depending on Phaser version
+      console.error('Asset load error:', file);
+    });
 
-    this.load.audio('sadBgm', '/assets/audio/sadbackgroundmusic.mp3');
+    this.load.image('chapter3', 'chapter3.png');
+    // Use an image for the chapter background instead of a video
+    // Ensure the file exists at assets/chapter3scene1.png
+    this.load.image('chapter3scene1', 'chapter3scene1.png');
+
+    this.load.image('red', 'red.png');
+    this.load.image('blue', 'blue.png');
+    this.load.image('yellow', 'yellow.png');
+    this.load.image('green', 'green.png');
+    this.load.image('notebook', 'notebook.png');
+
+    this.load.image('magnifying', 'magnifying.png');
+    this.load.image('setting', 'setting.png');
+    this.load.image('book', 'book.png');
+    this.load.image('5.png', '5.png');
+    this.load.image('6.png', '6.png');
+    this.load.image('7.png', '7.png');
+    this.load.image('8.png', '8.png');
+    this.load.image('9.png', '9.png');
+    this.load.image('quest3', 'quest3.png');
+
+    this.load.audio('sadBgm', 'audio/sadbackgroundmusic.mp3');
   }
 
   create() {
@@ -53,7 +67,13 @@ export class Chapter3 extends Scene {
     this.bgm = this.sound.add('sadBgm', { loop: true, volume: 0.5 });
     this.bgm.play();
  
-    this.coverImage = this.add.image(0, 0, 'chapter3')
+    // If the texture didn't load correctly, fall back to a safe background
+    const bgKey = this.textures.exists('chapter3') ? 'chapter3' : 'bg';
+    if (!this.textures.exists('chapter3')) {
+      console.warn('chapter3 texture missing; falling back to "bg"');
+    }
+
+    this.coverImage = this.add.image(0, 0, bgKey)
       .setOrigin(0, 0)
       .setDepth(0)
       .setDisplaySize(this.sys.game.config.width, this.sys.game.config.height);
@@ -101,7 +121,13 @@ export class Chapter3 extends Scene {
     this.startButton.on('pointerdown', () => {
       this.startButton.destroy();
       this.coverImage.destroy();
-      this.bggImage = this.add.image(0, 0, 'chapter3scene1')
+      // Use chapter3scene1 if loaded; otherwise fallback to chapter3 or global bg
+      const scene1Key = this.textures.exists('chapter3scene1') ? 'chapter3scene1' : (this.textures.exists('chapter3') ? 'chapter3' : 'bg');
+      if (!this.textures.exists('chapter3scene1')) {
+        console.warn('chapter3scene1 missing; using', scene1Key);
+      }
+
+      this.bggImage = this.add.image(0, 0, scene1Key)
         .setOrigin(0, 0)
         .setDepth(0)
         .setDisplaySize(this.sys.game.config.width, this.sys.game.config.height);

@@ -97,8 +97,8 @@ export class Chapter2 extends Scene {
 
     this.script = [      
     { speaker: "Narrator:", text: "Kratin and Earthy arrive at a small village full of lights and dripping taps." },
-    { speaker: "Earthy:", text: "Oh no... so much energy is being wasted!" },
-    { speaker: "Kratin:", text: "Don’t worry, Earthy! We’ll find and fix every leak!" },
+    { speaker: "Earthy:", text: "Oh no... so much energy is being wasted!" ,scenestep:1},
+    { speaker: "Kratin:", text: "Don’t worry, Earthy! We’ll find and fix every leak!",scenestep:2 },
     { speaker: "Narrator:", text: "Lights on, fans spinning, and water running — all wasting energy."},
     { speaker: "Kratin:", text: "If we save energy, the Earth can rest and smile again!" },
     { speaker: "Narrator:", text: "Let’s help Kratin find the leaks and make Earthy shine bright once more!"},
