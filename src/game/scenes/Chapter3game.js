@@ -279,8 +279,21 @@ export class Chapter3game extends Phaser.Scene {
       padding: { left: 20, right: 20, top: 10, bottom: 10 },
     }).setOrigin(0.5).setDepth(1002).setInteractive();
 
-    nextBtn.on('pointerdown', () => this.scene.start('Chapter4'));
+    nextBtn.on('pointerdown', () => {
+      if (didWin) {
+        try {
+          const user = JSON.parse(localStorage.getItem('currentUser'));
+          const userId = user?._id;
+          const prev = localStorage.getItem('localLastScene') || 'Chapter1';
+          const prevIdx = parseInt(prev.replace('Chapter', '')) || 1;
+          if (prevIdx < 4) localStorage.setItem('localLastScene', 'Chapter4');
+          if (userId) import('../utils/saveProgress.js').then(mod => mod.saveGameProgress(userId, 'Chapter4'));
+        } catch (e) { console.warn('Could not persist unlock locally', e); }
+      }
+      this.scene.start('Chapter4');
+    });
   }
+
 
   stopAllSounds() {
     [this.bgm, this.correctSound, this.wrongSound, this.walkSound, this.tickSound].forEach(snd => {

@@ -18,9 +18,9 @@ export class Chapter3 extends Scene {
 
   preload() {
     this.load.image('chapter3', '/assets/chapter3.png');
-    // chapter3scene1 was failing as image loader — likely a video file. Use video loader.
-    // TODO: verify actual file extension in /assets (chapter3scene1.mp4 or .png)
-    this.load.video('chapter3scene1', '/assets/chapter3scene1.mp4');
+  // Use an image for the chapter background instead of a video
+  // Ensure the file exists at /assets/chapter3scene1.png
+  this.load.image('chapter3scene1', '/assets/chapter3scene1.png');
    
     this.load.image('red', '/assets/red.png');
     this.load.image('blue', '/assets/blue.png');
@@ -101,8 +101,10 @@ export class Chapter3 extends Scene {
     this.startButton.on('pointerdown', () => {
       this.startButton.destroy();
       this.coverImage.destroy();
-      // Use video if chapter3scene1 is a video; otherwise fall back to image.
-  this.bggImage = this.add.image(512, 384, 'chapter3scene1').setDepth(0);
+      this.bggImage = this.add.image(0, 0, 'chapter3scene1')
+        .setOrigin(0, 0)
+        .setDepth(0)
+        .setDisplaySize(this.sys.game.config.width, this.sys.game.config.height);
        this.startStorySequence();
     });
 
@@ -314,10 +316,6 @@ export class Chapter3 extends Scene {
       this.voiceAudio.destroy();
       this.voiceAudio = null;
     }
-    if (this.bgVideo) {
-      this.bgVideo.stop();
-      this.bgVideo.destroy();
-      this.bgVideo = null;
-    }
+    // No bgVideo when using a static image background
   }
 }

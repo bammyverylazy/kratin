@@ -32,8 +32,12 @@ export class Dashboard extends Scene {
     fetch(`${backendURL}/progress/load/${userId}`)
       .then(res => res.json())
       .then(data => {
-        const currentChapterStr = data.lastScene || 'Chapter1';
-        const currentChapterIndex = parseInt(currentChapterStr.replace('Chapter', ''));
+        const backendChapterStr = data.lastScene || 'Chapter1';
+        const backendIndex = parseInt(backendChapterStr.replace('Chapter', '')) || 1;
+        // Respect any locally stored unlocks (in case backend wasn't updated). Use the higher index.
+        const localChapterStr = localStorage.getItem('localLastScene') || backendChapterStr;
+        const localIndex = parseInt(localChapterStr.replace('Chapter', '')) || backendIndex;
+        const currentChapterIndex = Math.max(backendIndex, localIndex);
         this.renderDashboard(w, h, currentChapterIndex, userId);
       })
       .catch(err => {

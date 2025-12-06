@@ -299,8 +299,13 @@ export class Chapter4game extends Phaser.Scene {
     });
 
     next.on('pointerdown', () => {
-      // save progress optionally
-      // saveGameProgress(this.userId, 'Chapter4game_result', { score: this.score, ecoScore: this.ecoScore, success: didWin });
+      // persist unlock for Chapter4 (best-effort local + backend)
+      try {
+        const prev = localStorage.getItem('localLastScene') || 'Chapter1';
+        const prevIdx = parseInt(prev.replace('Chapter', '')) || 1;
+        if (prevIdx < 4) localStorage.setItem('localLastScene', 'Chapter4');
+        if (this.userId) import('../utils/saveProgress.js').then(mod => mod.saveGameProgress(this.userId, 'Chapter4'));
+      } catch (e) { console.warn('Could not persist unlock locally', e); }
       this.scene.start('Mode');
     });
   }

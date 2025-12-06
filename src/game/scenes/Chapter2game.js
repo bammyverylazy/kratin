@@ -77,7 +77,6 @@ export class Chapter2game extends Phaser.Scene {
 
     addStoryModeUI(this, {});
 
-    // Leakage questions — one per room, shuffled order
     const baseQuestions = [
       { room: 'Living Room', text: 'The TV is left ON overnight.' , target: 'living'},
       { room: 'Bedroom', text: 'The lamplight was ON overnight' , target: 'bedroom'},
@@ -89,7 +88,7 @@ export class Chapter2game extends Phaser.Scene {
 
     // Player sprite (enlarged)
     this.player = this.physics.add.sprite(100, 700, 'player')
-      .setDisplaySize(96, 96) // larger than previous
+      .setDisplaySize(96, 96)
       .setCollideWorldBounds(true);
 
     // Controls: arrow keys + WASD
@@ -379,6 +378,15 @@ export class Chapter2game extends Phaser.Scene {
     nextBtn.on('pointerdown', () => {
       // proceed to next chapter if success, otherwise restart behavior
       if (success) {
+        // Persist unlock for Chapter 3 locally and try to save remotely
+        try {
+          const user = JSON.parse(localStorage.getItem('currentUser'));
+          const userId = user?._id;
+          const prev = localStorage.getItem('localLastScene') || 'Chapter1';
+          const prevIdx = parseInt(prev.replace('Chapter', '')) || 1;
+          if (prevIdx < 3) localStorage.setItem('localLastScene', 'Chapter3');
+          if (userId) import('../utils/saveProgress.js').then(mod => mod.saveGameProgress(userId, 'Chapter3'));
+        } catch (e) { console.warn('Could not persist unlock locally', e); }
         this.scene.start('Chapter3');
       } else {
         this.scene.restart();

@@ -185,6 +185,19 @@ export class Chapter1game extends Phaser.Scene {
       }).setOrigin(0.5).setDepth(1001).setInteractive({ useHandCursor: true });
 
       continueBtn.on('pointerdown', () => {
+        // Mark Chapter 2 as unlocked locally and attempt to save progress to backend
+        try {
+          const user = JSON.parse(localStorage.getItem('currentUser'));
+          const userId = user?._id;
+          // store local unlock
+          const prev = localStorage.getItem('localLastScene') || 'Chapter1';
+          const prevIdx = parseInt(prev.replace('Chapter', '')) || 1;
+          if (prevIdx < 2) localStorage.setItem('localLastScene', 'Chapter2');
+          if (userId) {
+            // best-effort save to backend
+            import('../utils/saveProgress.js').then(mod => mod.saveGameProgress(userId, 'Chapter2'));
+          }
+        } catch (e) { console.warn('Could not persist unlock locally', e); }
         this.scene.start('Chapter2');
       });
 
