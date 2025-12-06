@@ -16,6 +16,7 @@ export class Game extends Scene {
     this.roomCode = data.roomCode || 'simple-local';
     this.myRole = data.role || 'guesser';
     this.startTime = data.startTime || Date.now();
+    this.isSingleDevice = data.isSingleDevice || false;
     this.score = 0;
     this.playedKeywords = [];
   }
@@ -46,14 +47,17 @@ export class Game extends Scene {
           this.updateScoreText();
         });
     }
-    socket.on('roleUpdate', ({ hinter, guesser }) => {
-      if (this.myRole === 'guesser' && hinter.length > 0) {
-        this.hinterId = hinter[0]; // เก็บ ID ของฝั่ง hinter
-      }
-      if (this.myRole === 'hinter' && guesser.length > 0) {
-        this.guesserId = guesser[0]; // เผื่อไว้ใช้ในอนาคต
-      }
-    });
+    
+    if (!this.isSingleDevice) {
+      socket.on('roleUpdate', ({ hinter, guesser }) => {
+        if (this.myRole === 'guesser' && hinter.length > 0) {
+          this.hinterId = hinter[0]; // เก็บ ID ของฝั่ง hinter
+        }
+        if (this.myRole === 'hinter' && guesser.length > 0) {
+          this.guesserId = guesser[0]; // เผื่อไว้ใช้ในอนาคต
+        }
+      });
+    }
 
     const graphics = this.add.graphics();
     graphics.fillStyle(0x84A671);
@@ -139,11 +143,13 @@ export class Game extends Scene {
 
 
 
-    socket.on('keyword', ({ keyword, hint }) => {
-      currentKeyword = keyword;
-      currentHint = hint;
-      showKeyword(currentKeyword);
-    });
+    if (!this.isSingleDevice) {
+      socket.on('keyword', ({ keyword, hint }) => {
+        currentKeyword = keyword;
+        currentHint = hint;
+        showKeyword(currentKeyword);
+      });
+    }
 
     const showKeyword = (word) => {
       keywordText.setText(word);
@@ -155,12 +161,14 @@ export class Game extends Scene {
       alert('💡 Hint: ' + hint);
     };
 
-    socket.on('show-hint', ({ hint }) => {
-      if (!hintUsed) {
-        hintUsed = true;
-        showHintPopup(hint);
-      }
-    });
+    if (!this.isSingleDevice) {
+      socket.on('show-hint', ({ hint }) => {
+        if (!hintUsed) {
+          hintUsed = true;
+          showHintPopup(hint);
+        }
+      });
+    }
 
     const hintIcon = this.add.image(900, 200, 'hint')
       .setOrigin(0.5)
@@ -267,10 +275,12 @@ export class Game extends Scene {
 };
 
 
-    socket.on('score-update', ({ score }) => {
-      this.score = score;
-      this.updateScoreText();
-    });
+    if (!this.isSingleDevice) {
+      socket.on('score-update', ({ score }) => {
+        this.score = score;
+        this.updateScoreText();
+      });
+    }
 
     const skipButton = this.add.text(412, 400, 'Skip', {
       fontSize: '32px',

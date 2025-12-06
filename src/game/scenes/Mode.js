@@ -150,6 +150,7 @@ continueBtn.on('pointerdown', async () => {
 
             const createRoomBtn = this.add.text(512, btnY, "   Create Room   ", btnStyle).setOrigin(0.5).setDepth(302).setInteractive();
             const joinRoomBtn = this.add.text(512, btnY + btnSpacing, "    Join Room    ", btnStyle).setOrigin(0.5).setDepth(302).setInteractive();
+            const singleDeviceBtn = this.add.text(512, btnY + btnSpacing * 2, " Play 1 Device  ", btnStyle).setOrigin(0.5).setDepth(302).setInteractive();
            
             let roleMsg, guesserBtn, hinterBtn, startBtn;
 
@@ -231,7 +232,18 @@ continueBtn.on('pointerdown', async () => {
                 socket.emit('joinRoom', roomCode);
                 infoMsg.setText(`${playerName} — Role: None — Room: ${roomCode}`);
                 showRoleSelection();
-            });;
+            });
+
+            singleDeviceBtn.on('pointerdown', () => {
+                // Start game as guesser in single-device mode (no multiplayer)
+                this.popupContainer?.destroy();
+                this.scene.start('Game', {
+                    roomCode: null,
+                    role: 'guesser',
+                    isSingleDevice: true,
+                    startTime: Date.now()
+                });
+            });
 
             socket.on('roleUpdate', ({ guesser, hinter }) => {
                 this.roles = { guesser, hinter };
